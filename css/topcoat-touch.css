@@ -1,5 +1,54 @@
-/** Page Control **/
+/** iScroll **/
 
+.scrollable {
+    overflow: hidden;
+}
+
+/** List View **/
+
+.topcoat-icon--back {
+	background: rgba(0, 0, 0, 0) url(../img/prev_blue.svg);
+	background-size: cover;
+}
+
+.topcoat-navigation-bar__item > .topcoat-icon-button--quiet {
+    margin-top: 10px;
+}
+
+.topcoat-list {
+    list-style: none;
+	overflow: hidden;
+}
+
+.topcoat-list__item {
+    position: relative;
+}
+
+.topcoat-list__item p {
+	color: #000;
+    margin: 0;
+}
+
+.topcoat-list__item .count {
+	color: #58C0FF;
+	position: absolute;
+	right: 50px;
+	top: 6px;
+	font-weight: bold;
+}
+
+.topcoat-list__item .chevron {
+    background: rgba(0, 0, 0, 0) url(../img/next_blue.svg) no-repeat;
+    background-size: contain;
+	position: absolute;
+	right: 12px;
+	top: 30px;
+	height: 50px;
+	width: 28px;
+}
+
+
+/** Page Control **/
 body > div {
     position: absolute;
     top: 9999px;
@@ -9,10 +58,6 @@ body > div {
     position: absolute;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-}
-
-.scrollable {
     overflow: hidden;
 }
 
@@ -46,33 +91,130 @@ body > div {
     transition-duration: .25s;
 }
 
-/** List Items **/
 
-.list {
-    overflow: hidden;
+/** Dropdown **/
+
+.dropdown {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    display: none;
+    padding: 0;
+    list-style: none;
+    line-height: 1.1em;
+    background-color: #fff;
+    background-clip: border-box;
+    opacity: 0;
+    margin: 0;
+    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+    -webkit-transition: all ease-out .1s;
+    -moz-transition: all ease-out .1s;
+    transition: all ease-out .5s;
+    -webkit-transform: scale(0.8, 0.8) translateY(-20px);
+    -moz-transform: scale(0.8, 0.8) translateY(-20px);
+    transform: scale(0.8, 0.8) translateY(-20px);
 }
 
-.list li {
+.dropdown li {
+    margin: 0;
+    width: 100%;
+    border-bottom: 2px solid #ccc;
+    line-height: 2em;   
+}
+
+.dropdown li a {
+    float: left;
+    display: block;
+    padding: 17px 15px 16px;
+    white-space: nowrap;
+    width: 200px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: white;
+    font-weight: normal;
+}
+
+.dropdown li:first-child {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.dropdown li:last-child {
+    border-bottom: none;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+.dropdown li:hover, .dropdown li:active {
+    background-color: rgba(51, 181, 229, 0.6);
+}
+
+.dropdown.active {
+    opacity: 1;
+    z-index: 99;
+    display: block;
+    transition: all ease-in .5s;
+    -webkit-transform: scale(1, 1) translateY(0);
+    -moz-transform: scale(1, 1) translateY(0);
+    transform: scale(1, 1) translateY(0);
+}
+
+
+
+.form-dropdown {
+    position: relative;
+    margin: 0 10px;
+    min-width: 100px;
+}
+
+.form-dropdown .toggle-dropdown {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    padding: 14px 20px 6px 20px;
+    height: 48px;
+    text-align: left;
+    color: #000;
+    border-bottom: 1px solid #3c3c3c;
+    vertical-align: middle;
+    outline: none;
+    /* background: #f7f7f7; */
+}
+
+.form-dropdown .toggle-dropdown:after {
+    position: absolute;
+    content: '';
+    top: 36px;
+    right: 0;
+    margin-left: -4px;
+    width: 0;
+    height: 0;
+    border-right: 12px solid rgba(0, 0, 0, 0);
+    border-top: 12px solid #595959;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+.dropdown {
+    /* float: left; */
+    position: absolute;
+}
+
+.form-dropdown .dropdown {
+    right: 0;
+}
+
+.direction-up {
     position: relative;
 }
 
-.count {
-	color: #58C0FF;
-	position: absolute;
-	right: 50px;
-	top: 6px;
-	font-weight: bold;
-}
-
-.chevron {
-    background: rgba(0, 0, 0, 0) url(../img/next_blue.svg) no-repeat;
-    background-size: contain;
-	position: absolute;
-	right: 12px;
-	height: 50px;
-	width: 28px;
-}
-
+/** end Dropdown **/
 
 /** Spinner **/
 
@@ -105,6 +247,8 @@ body > div {
     -webkit-transform: rotate(360deg);
   }
 }
+
+/** End spinner **/
 
 /** Overlay **/
 
@@ -147,3 +291,4 @@ body > div {
   z-index: 5;
 }
 
+/** end Overlay **/

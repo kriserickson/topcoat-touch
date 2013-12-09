@@ -6,9 +6,14 @@ function TopcoatTouch(container) {
         iScroll = null,
         pages = [];
 
+	// Setup FastClick...
     new FastClick(document.body);
 
-    /** Page sliding */
+    document.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+    }, false);
+
+    /** Page navigation */
     
     container.on('transitionend webkitTransitionEnd', '.page', function(e) {
         if (startedAnimation) {
@@ -28,6 +33,10 @@ function TopcoatTouch(container) {
         }
     });
 
+    
+
+
+    // Public functions
 
     // Whether or not the user can go back... 
     this.hasBack = function() {
@@ -116,6 +125,36 @@ function TopcoatTouch(container) {
     };
 
 
+    /* Dropdown Box */
+    $(document).ready(function() {
+        $(document).on('click', '.toggle-dropdown', function() {
+            var $dropdown = $(this).parent().find('.dropdown');
+            if ($dropdown.hasClass('active')) {
+                $dropdown.removeClass('active');
+            } else {
+                var $toggle = $('.toggle-dropdown');
+                
+                if ($dropdown.hasClass('direction-up')) {                    
+                    $dropdown.css({top: -1 * ($toggle.outerHeight(true) + $dropdown.outerHeight(true)),
+                        width: $toggle.outerWidth()});
+                } else {
+                    $dropdown.css({width: $toggle.width()});    
+                }
+                $dropdown.addClass('active');
+            }
+        });
+        $(document).on('click', '.dropdown-item', function() {
+            var $this = $(this),
+                $dropDown = $this.parent().parent(),
+                newId = $this.data('id');
+            $this.parent().removeClass('active');
+            $dropDown.find('.toggle-dropdown').text($this.text());
+            $dropDown.data('value', newId);
+            $dropDown.trigger('change', newId)
+            $this.parent().parent('trigger', 'change', {id: newId});
+        });
+    });
+
     // Setup all the linked pages
     $(document).on('click', '[data-rel]', function (e) {
         self.goTo($(this).data('rel'));
@@ -127,4 +166,5 @@ function TopcoatTouch(container) {
         self.goBack();
     });
 
+    /* End Dropdown Box */
 }
