@@ -1,6 +1,7 @@
 function TopcoatTouch(container) {
 
-    var currentPage,
+    var $currentPage,
+        currentPage,
         startedAnimation,
         self = this,
         iScroll = null,
@@ -22,21 +23,24 @@ function TopcoatTouch(container) {
                 iScroll.destroy();
             }
 
-            var scrollable = '#' + currentPage.attr('id') + ' .scrollable',
+            var scrollable = '#' + self.currentPage() + ' .scrollable',
                 $scrollable = $(scrollable);
             if ($scrollable.length > 0) {
                 $scrollable.height($scrollable.parent().height() - $scrollable.position().top);
                 iScroll = new IScroll(scrollable);
             }
-            $(document).trigger('pageAnimationEnd');        
+            $currentPage.trigger('pageAnimationEnd');
             startedAnimation = false;
         }
     });
 
-    
-
 
     // Public functions
+
+    // Return the name of the current page
+    this.currentPage = function() {
+        return currentPage;
+    };
 
     // Whether or not the user can go back... 
     this.hasBack = function() {
@@ -54,10 +58,13 @@ function TopcoatTouch(container) {
         var l = pages.length;
 
         if (typeof page === 'string') {
+            currentPage = page;
             if (page.substr(0,1) != '#') {
                 page = '#' + page;
             }
             page = $(page);
+        } else {
+            currentPage = page.attr('id');
         }
 
         if (l === 0) {
@@ -82,14 +89,14 @@ function TopcoatTouch(container) {
 
         startedAnimation = true;
 
-        if (!currentPage || !from) {
-            page.attr("class", "page page-center");
-            currentPage = page;
+        if (!$currentPage || !from) {
+            page.attr('class', 'page page-center');
+            $currentPage = page;
             return;
         }
 
         // Position the page at the starting position of the animation
-        page.attr("class", "page " + from);
+        page.attr('class', 'page ' + from);
 
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
@@ -97,15 +104,22 @@ function TopcoatTouch(container) {
         container[0].offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        page.attr("class", "page transition page-center");
-        currentPage.attr("class", "page transition " + (from === "page-left" ? "page-right" : "page-left"));
+        page.attr('class', 'page transition page-center');
+        $currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
         $(document).trigger('pageAnimationStart');
-        currentPage = page;
+        $currentPage = page;
     };
 
-    // Remove a page from the history...
+    // Remove the previous page from the history (not the current page)...
     this.removePageFromHistory = function() {
-        pages.pop();
+        pages = pages.splice(pages.length - 2, 1);
+    };
+
+    // Refreshes the iScroll in case the page size has changed without leaving and coming back to the page...
+    this.refreshScroll = function() {
+        if (iScroll != null) {
+            iScroll.refresh();
+        }
     };
 
     // Show a loading indciator with an optional message
@@ -124,35 +138,35 @@ function TopcoatTouch(container) {
         $('#loadingDiv,#loadingOverlayDiv').remove();
     };
 
+    // Writing up events...
 
     /* Dropdown Box */
-    $(document).ready(function() {
-        $(document).on('click', '.toggle-dropdown', function() {
-            var $dropdown = $(this).parent().find('.dropdown');
-            if ($dropdown.hasClass('active')) {
-                $dropdown.removeClass('active');
+    $(document).on('click', '.toggle-dropdown', function() {
+        var $dropdown = $(this).parent().find('.dropdown');
+        if ($dropdown.hasClass('active')) {
+            $dropdown.removeClass('active');
+        } else {
+            var $toggle = $('.toggle-dropdown');
+
+            if ($dropdown.hasClass('direction-up')) {
+                $dropdown.css({top: -1 * ($toggle.outerHeight(true) + $dropdown.outerHeight(true)),
+                    width: $toggle.outerWidth()});
             } else {
-                var $toggle = $('.toggle-dropdown');
-                
-                if ($dropdown.hasClass('direction-up')) {                    
-                    $dropdown.css({top: -1 * ($toggle.outerHeight(true) + $dropdown.outerHeight(true)),
-                        width: $toggle.outerWidth()});
-                } else {
-                    $dropdown.css({width: $toggle.width()});    
-                }
-                $dropdown.addClass('active');
+                $dropdown.css({width: $toggle.width()});
             }
-        });
-        $(document).on('click', '.dropdown-item', function() {
-            var $this = $(this),
-                $dropDown = $this.parent().parent(),
-                newId = $this.data('id');
-            $this.parent().removeClass('active');
-            $dropDown.find('.toggle-dropdown').text($this.text());
-            $dropDown.data('value', newId);
-            $dropDown.trigger('change', newId)
-            $this.parent().parent('trigger', 'change', {id: newId});
-        });
+            $dropdown.addClass('active');
+        }
+    });
+
+    $(document).on('click', '.dropdown-item', function() {
+        var $this = $(this),
+            $dropDown = $this.parent().parent(),
+            newId = $this.data('id');
+        $this.parent().removeClass('active');
+        $dropDown.find('.toggle-dropdown').text($this.text());
+        $dropDown.data('value', newId);
+        $dropDown.trigger('change', newId)
+        $this.parent().parent('trigger', 'change', {id: newId});
     });
 
     // Setup all the linked pages
