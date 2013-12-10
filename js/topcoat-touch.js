@@ -112,7 +112,7 @@ function TopcoatTouch(container) {
 
     // Remove the previous page from the history (not the current page)...
     this.removePageFromHistory = function() {
-        pages = pages.splice(pages.length - 2, 1);
+        pages.splice(pages.length - 2, 1);
     };
 
     // Refreshes the iScroll in case the page size has changed without leaving and coming back to the page...
