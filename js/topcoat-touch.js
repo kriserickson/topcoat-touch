@@ -2,10 +2,19 @@ function TopcoatTouch(container) {
 
     var $currentPage,
         currentPage,
+        previousPage,
         startedAnimation,
         self = this,
         iScroll = null,
+        events = {},
         pages = [];
+
+    this.EVENTS = {};
+    this.EVENTS.PAGE_START = 'pageStart';
+    this.EVENTS.PAGE_END = 'pageEnd';
+    this.EVENTS.SCROLL_START = 'scrollStart';
+    this.EVENTS.SCROLL_END = 'scrollEnd';
+    this.isScrolling = false;
 
 	// Setup FastClick...
     new FastClick(document.body);
@@ -28,18 +37,99 @@ function TopcoatTouch(container) {
             if ($scrollable.length > 0) {
                 $scrollable.height($scrollable.parent().height() - $scrollable.position().top);
                 iScroll = new IScroll(scrollable);
+                iScroll.on('scrollStart', function () { 
+                    self.isScrolling = true;
+                    if (events[self.EVENTS.SCROLL_START]) {
+                        for (var i = 0; i < events[self.EVENTS.SCROLL_START].length; i++) {
+                            var pageEvent = events[self.EVENTS.SCROLL_START][i];
+                            if (!pageEvent.page || pageEvent.page == currentPage) {
+                                pageEvent.fn({page: currentPage});
+                            }
+                        }
+                    }                    
+                });
+                iScroll.on('scrollEnd', function () { 
+                    self.isScrolling = false;
+                    if (events[self.EVENTS.SCROLL_END]) {
+                        for (var i = 0; i < events[self.EVENTS.SCROLL_END].length; i++) {
+                            var pageEvent = events[self.EVENTS.SCROLL_END][i];
+                            if (!pageEvent.page || pageEvent.page == currentPage) {
+                                pageEvent.fn({page: currentPage});
+                            }
+                        }
+                    }
+                });
             }
-            $currentPage.trigger('pageAnimationEnd');
+            if (events[self.EVENTS.PAGE_START]) {
+                for (var i = 0; i < events[self.EVENTS.PAGE_START].length; i++) {
+                    var pageEvent = events[self.EVENTS.PAGE_START][i];
+                    if (!pageEvent.page || pageEvent.page == currentPage) {
+                        pageEvent.fn({page: currentPage});
+                    }
+                }
+            }
             startedAnimation = false;
         }
     });
 
 
+    function checkForEvent(event) {
+        var hasEvent = false;
+        for (var eventName in self.EVENTS) {
+            if (self.EVENTS[eventName] == event) {
+                hasEvent = true;
+                break;
+            }
+        }
+
+        if (!hasEvent) {
+            throw 'Invalid event: ' + event;
+        }
+    }
+
     // Public functions
+    this.on = function(event, page, fn) {
+        checkForEvent(event);
+        if (typeof page == 'function') {
+            fn = page;
+            page = undefined;
+        }
+
+        if (!events[event]) {
+            events[event] = [];
+        }
+        events[event].push({page: page, fn:  fn});
+        return self;
+    };
+
+    this.off = function(event, page, fn) {
+        checkForEvent(event);
+        if (typeof page == 'function') {
+            fn = page;
+            page = undefined;
+        }
+        if (events[event]) {
+            if (page || fn) {
+                for (var i = 0; i < events[event].length; i++) {
+                    if (events[event].page == page && (!fn || fn == events[event].fn)) {
+                        events.splice(i,1);
+                        break;
+                    }
+                }
+            } else {
+                events[event] = [];
+            }
+        }
+        return self;
+    };
 
     // Return the name of the current page
     this.currentPage = function() {
         return currentPage;
+    };
+
+    this.previousPage = function() {
+        return previousPage;
     };
 
     // Whether or not the user can go back... 
@@ -56,6 +146,8 @@ function TopcoatTouch(container) {
     this.goTo = function (page, back) {
 
         var l = pages.length;
+
+        previousPage = currentPage;
 
         if (typeof page === 'string') {
             currentPage = page;
@@ -106,7 +198,15 @@ function TopcoatTouch(container) {
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         page.attr('class', 'page transition page-center');
         $currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
-        $(document).trigger('pageAnimationStart');
+        if (events[self.EVENTS.PAGE_END]) {
+            for (var i = 0; i < events[self.EVENTS.PAGE_END].length; i++) {
+                var pageEvent = events[self.EVENTS.PAGE_END][i];
+                if (!pageEvent.page || pageEvent.page == currentPage) {
+                    pageEvent.fn({page: previousPage});
+                }
+            }
+        }
+
         $currentPage = page;
     };
 
