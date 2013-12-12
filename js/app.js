@@ -1,5 +1,5 @@
 /**
- * Created by Kris on 12/8/13.
+ * Demo App for TopcoatTouch
  */
 $(document).ready(function() {
     var topcoatTouch = new TopcoatTouch($('body'));

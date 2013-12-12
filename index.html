@@ -2,9 +2,11 @@
 <html>
 <head>
     <title>Topcoat Touch</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"> 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link href="css/topcoat-mobile-light.css" rel="stylesheet">
-    <link href="css/topcoat-touch.css" rel="stylesheet"> 
+    <link href="css/topcoat-touch.css" rel="stylesheet">
+    <link href="css/app.css" rel="stylesheet">
     <script src="js/jquery-2.0.3.js"></script>
     <script src="js/topcoat-touch.js"></script>
     <script src="js/iscroll.js"></script>
@@ -13,53 +15,119 @@
 </head>
 <body>
 
-    <div id="home">
-        <div class="topcoat-navigation-bar">
-            <div class="topcoat-navigation-bar__item center full">
-                <h1 class="topcoat-navigation-bar__title">Topcoat Touch</h1>
-            </div>
-        </div>
-         <div class="content scrollable">
-            <div class="topcoat-list__container">
-                <ul id="demoList" class="topcoat-list list">
-                    <li class="topcoat-list__item" data-rel="formExample">
-                        <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
-                    </li>
-                    <li class="topcoat-list__item" data-rel="formExample">
-                        <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
-                    </li>
-                    <li class="topcoat-list__item" data-rel="formExample">
-                        <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
-                    </li>
-                    <li class="topcoat-list__item" data-rel="formExample">
-                        <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
-                    </li>
-                    <li class="topcoat-list__item" data-rel="formExample">
-                        <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
-                    </li>
-                </ul>
-            </div>
+<div id="home">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item center full">
+            <h1 class="topcoat-navigation-bar__title">Topcoat Touch</h1>
         </div>
     </div>
-    <div id="formExample">
-        <div class="topcoat-navigation-bar">
-            <div class="topcoat-navigation-bar__item center full">
-                <h1 class="topcoat-navigation-bar__title">Form Example</h1>
-            </div>
+    <div class="content scrollable">
+        <div class="topcoat-list__container">
+            <ul id="demoList" class="topcoat-list list">
+                <li class="topcoat-list__item" data-rel="buttonExample">
+                    <span class="formItem">Buttons</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="formExample">
+                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="formExample">
+                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="formExample">
+                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="formExample">
+                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                </li>
+            </ul>
         </div>
-        <div class="content">
-            <form class="testForm" method="post" action="#">
+    </div>
+</div>
+<div id="buttonExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"/>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Buttons Example</h1>
+        </div>
+    </div>
+    <div class="content">
+        <form class="testForm" method="post" action="#">
 
+            <h3>Button Bar</h3>
 
-                <input type="text" class="topcoat-text-input loginInput" placeholder="Email" id="email"
-                       autocomplete="off"/>
-
-                <div class="buttonBar">
-                    <button class="topcoat-button--cta">Click Me</button>
+            <div class="topcoat-button-bar">
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button">One</button>
                 </div>
-            </form>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button">Two</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button">Three</button>
+                </div>
+            </div>
+
+            <h3>Large Button Bar</h3>
+
+            <div class="topcoat-button-bar">
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button--large">One</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button--large">Two</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button--large">Three</button>
+                </div>
+            </div>
+
+            <h3>Button</h3>
+            <button class="topcoat-button">Button</button>
+            <button class="topcoat-button" disabled>Button</button>
+
+            <h3>Quiet Button</h3>
+            <button class="topcoat-button--quiet">Button</button>
+            <button class="topcoat-button--quiet" disabled>Button</button>
+
+
+            <h3>Large Button</h3>
+            <button class="topcoat-button--large">Button</button>
+            <button class="topcoat-button--large" disabled>Button</button>
+
+            <h3>Large Quiet Button</h3>
+            <button class="topcoat-button--large--quiet">Button</button>
+            <button class="topcoat-button--large--quiet" disabled>Button</button>
+
+            <h3>Call To Action Button</h3>
+            <button class="topcoat-button--large--cta">Button</button>
+            <button class="topcoat-button--large--cta" disabled>Button</button>
+        </form>
+    </div>
+</div>
+<div id="formExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"/>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Form Example</h1>
         </div>
     </div>
+    <div class="content scrollable">
+        <form class="testForm" method="post" action="#">
+
+
+
+        </form>
+    </div>
+</div>
+</div>
 </body>
 </html>
 
