@@ -18,7 +18,8 @@ $(document).ready(function() {
         },1000);
     });
     $('#showDialog').click(function() {
-        topcoatTouch.showDialog('testDialog');
+        topcoatTouch.showDialog('<h3>Example Dialog</h3><div>This is a dialog</div>', {OK: function() { console.log('OK Pressed') }
+            , Cancel: function() { console.log('Cancel Pressed')}});
     });
     $('#testDialog').find('button').click(function() {
         topcoatTouch.hideDialog();

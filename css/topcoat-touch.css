@@ -1,6 +1,7 @@
 /** iScroll **/
 body {
     overflow: hidden;
+	user-select: none;
 }
 
 .scrollable {
@@ -184,8 +185,7 @@ body > div {
     color: #000;
     border-bottom: 1px solid #3c3c3c;
     vertical-align: middle;
-    outline: none;
-    /* background: #f7f7f7; */
+    outline: none;    
 }
 
 .form-dropdown .toggle-dropdown:after {
@@ -221,12 +221,15 @@ body > div {
 /** Spinner **/
 
 .topcoat-spinner {
-  display: inline-block;
   width: 36px;
   height: 36px;
-  margin: 5px;
   background: url("../img/spinner.png") no-repeat;
-  -webkit-animation: spinner 1s infinite linear;
+  -webkit-animation: spinner 1s infinite linear;  
+  top: 45%;
+  left: 45%;
+  top: calc(50% - 18px);
+  position: absolute;
+  left: calc(50% - 18px);  
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2),only screen and (min-resolution: 192dpi) {
@@ -235,6 +238,7 @@ body > div {
     background-size: 36px;
   }
 }
+
 
 @-webkit-keyframes spinner {
   0% {
@@ -255,20 +259,9 @@ body > div {
 /** Overlay **/
 
 .topcoat-overlay {
-  padding: 0;
-  margin: 0;
-  user-select: none;
-  box-sizing: border-box;
-  background-clip: padding-box;
-  overflow: hidden;
+  position: absolute;  
   cursor: default;
-  position: absolute;
-  z-index: 10;
-  border: none;
-}
-
-.topcoat-overlay {
-  position: absolute;
+  z-index: 10;  
   width: 50%;
   height: 25%;
   margin: auto;
@@ -280,6 +273,7 @@ body > div {
   background-color: #e5e9e8;
   border: 1px solid #a5a8a8;
   text-align: center;
+  
 }
 
 .topcoat-overlay-bg {
@@ -294,3 +288,18 @@ body > div {
 }
 
 /** end Overlay **/
+
+/** Dialog Box **/
+.topcoat-dialog-button-bar {
+	position: absolute;
+	bottom: 5px;
+	width: 100%;
+	padding: 0 5px;
+	box-sizing: border-box;
+}
+
+.topcoat-dialog-button-bar button {
+	width: 100%;
+	padding: 2px 0;
+	margin: 2px 0;	
+}
