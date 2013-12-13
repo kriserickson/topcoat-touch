@@ -1,0 +1,8 @@
+.loadingDialogDiv {
+    text-align: center;
+    margin-top: 150px;
+}
+
+.loadingDialogDiv button {
+    width: 45%;
+}

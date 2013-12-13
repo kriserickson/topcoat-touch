@@ -27,17 +27,24 @@
                 <li class="topcoat-list__item" data-rel="buttonExample">
                     <span class="formItem">Buttons</span><span class="chevron"></span><span class="count"></span>
                 </li>
-                <li class="topcoat-list__item" data-rel="formExample">
-                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                <li class="topcoat-list__item" data-rel="checkRadioExample">
+                    <span class="formItem">Check/Radio Example</span><span class="chevron"></span><span
+                        class="count"></span>
                 </li>
                 <li class="topcoat-list__item" data-rel="formExample">
                     <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
                 </li>
-                <li class="topcoat-list__item" data-rel="formExample">
-                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                <li class="topcoat-list__item" data-rel="waitingDialogExample">
+                    <span class="formItem">Waiting/Dialog Example</span><span class="chevron"></span><span
+                        class="count"></span>
                 </li>
-                <li class="topcoat-list__item" data-rel="formExample">
-                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                <li class="topcoat-list__item" data-rel="galleryExample">
+                    <span class="formItem">Gallery Example</span><span class="chevron"></span><span
+                        class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="carouselExample">
+                    <span class="formItem">Carousel Example</span><span class="chevron"></span><span
+                        class="count"></span>
                 </li>
             </ul>
         </div>
@@ -47,7 +54,7 @@
     <div class="topcoat-navigation-bar">
         <div class="topcoat-navigation-bar__item left quarter">
             <a class="topcoat-icon-button--quiet back-button" href="#">
-                <span class="topcoat-icon topcoat-icon--back"/>
+                <span class="topcoat-icon topcoat-icon--back"></span>
             </a>
         </div>
         <div class="topcoat-navigation-bar__item center half">
@@ -108,11 +115,29 @@
         </form>
     </div>
 </div>
+<div id="checkRadioExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Check/Radio Example</h1>
+        </div>
+    </div>
+    <div class="content scrollable">
+        <form class="testForm" method="post" action="#">
+
+
+        </form>
+    </div>
+</div>
 <div id="formExample">
     <div class="topcoat-navigation-bar">
         <div class="topcoat-navigation-bar__item left quarter">
             <a class="topcoat-icon-button--quiet back-button" href="#">
-                <span class="topcoat-icon topcoat-icon--back"/>
+                <span class="topcoat-icon topcoat-icon--back"></span>
             </a>
         </div>
         <div class="topcoat-navigation-bar__item center half">
@@ -123,10 +148,35 @@
         <form class="testForm" method="post" action="#">
 
 
-
         </form>
     </div>
 </div>
+<div id="waitingDialogExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Waiting/Dialog Example</h1>
+        </div>
+    </div>
+    <div class="content">
+        <div class="loadingDialogDiv">
+            <button id="showLoading" class="topcoat-button--large--cta">Show Loaiding</button>
+            <button id="showDialog" class="topcoat-button--large--cta">Show Dialog</button>
+        </div>
+    </div>
+</div>
+<div class="dialog" id="testDialog">
+    <div>
+        <h3>Example Dialog</h3>
+        <span>This is a dialog.</span>
+    </div>
+    
+    <button class="topcoat-button--small">OK</button>
+    <button class="topcoat-button--small">Cancel</button>
 </div>
 </body>
 </html>

@@ -24,7 +24,6 @@ function TopcoatTouch(container) {
     }, false);
 
     /** Page navigation */
-    
     container.on('transitionend webkitTransitionEnd', '.page', function(e) {
         if (startedAnimation) {
 
@@ -225,9 +224,9 @@ function TopcoatTouch(container) {
     // Show a loading indciator with an optional message
     this.showLoading = function (msg) {
         self.hideLoading();
-        var html = $('<div id="loadingOverlayDiv" class="topcoat-overlay-bg"></div>' +
-            '<aside id="loadingDiv" class="topcoat-overlay">' +
-                '<h3 class="topcoat-overlay__title">' + msg + '</h3>' +
+        var html = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
+            '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
+                '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
                 '<span class="topcoat-spinner"></span>' +
             '</aside>');
         $('.page-center').append(html);
@@ -235,7 +234,25 @@ function TopcoatTouch(container) {
 
     // Hides the loading indicator
     this.hideLoading = function () {
-        $('#loadingDiv,#loadingOverlayDiv').remove();
+        $('#topcoat-loading-div,#topcoat-loading-overlay-div').remove();
+    };
+    
+    this.showDialog = function(element) {
+        self.hideDialog();
+        if (typeof element === 'string') {
+            if (element.substr(0,1) != '#') {
+                element = '#' + element;
+            }
+            element = $(element);
+        }
+        var overlay = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');
+        var dialog = $('<div id="topcoat-dialog-div" class="topcoat-overlay"></div>');
+        dialog.append(element);
+        $('.page-center').append(overlay).append(dialog);
+    };
+    
+    this.hideDialog = function() {
+        $('#topcoat-loading-overlay-div,#topcoat-dialog-div').hide();
     };
 
     // Writing up events...
