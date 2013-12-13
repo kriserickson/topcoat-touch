@@ -13,7 +13,7 @@ $(document).ready(function() {
                 clearInterval(interval);
                 topcoatTouch.hideLoading();
             } else {
-                $('#loadingMessage').text(count + ' seconds');
+                $('#topcoat-loading-message').text(count + ' seconds');
             }
         },1000);
     });

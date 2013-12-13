@@ -58,10 +58,10 @@
             </a>
         </div>
         <div class="topcoat-navigation-bar__item center half">
-            <h1 class="topcoat-navigation-bar__title">Buttons Example</h1>
+            <h1 class="topcoat-navigation-bar__title">Buttons</h1>
         </div>
     </div>
-    <div class="content">
+    <div class="content scrollable">
         <form class="testForm" method="post" action="#">
 
             <h3>Button Bar</h3>
@@ -91,6 +91,22 @@
                     <button class="topcoat-button-bar__button--large">Three</button>
                 </div>
             </div>
+      
+      <h3>Tab bar</h3>      
+            <div class="topcoat-tab-bar">
+  <label class="topcoat-tab-bar__item">
+    <input type="radio" name="tab-bar">
+    <button class="topcoat-tab-bar__button">One</button>
+  </label>
+  <label class="topcoat-tab-bar__item">
+    <input type="radio" name="tab-bar">
+    <button class="topcoat-tab-bar__button">Two</button>
+  </label>
+  <label class="topcoat-tab-bar__item">
+    <input type="radio" name="tab-bar">
+    <button class="topcoat-tab-bar__button">Three</button>
+  </label>
+</div>
 
             <h3>Button</h3>
             <button class="topcoat-button">Button</button>
@@ -123,13 +139,106 @@
             </a>
         </div>
         <div class="topcoat-navigation-bar__item center half">
-            <h1 class="topcoat-navigation-bar__title">Check/Radio Example</h1>
+            <h1 class="topcoat-navigation-bar__title">Check/Radio</h1>
         </div>
     </div>
     <div class="content scrollable">
         <form class="testForm" method="post" action="#">
+            <h3>Checkbox</h3>
+            <label class="topcoat-checkbox">
+              <input type="checkbox">
+              <div class="topcoat-checkbox__checkmark"></div>
+              Default
+            </label>
+            <br>
+            <br>
+            <label class="topcoat-checkbox">
+              <input type="checkbox" disabled>
+              <div class="topcoat-checkbox__checkmark"></div>
+              Disabled
+            </label>
+            
+            <h3>Icon Button</h3>
+            <button class="topcoat-icon-button">
+  <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+</button>
+<button class="topcoat-icon-button" disabled>
+  <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+</button>
 
+            <h3>Quiet Icon Button</h3>
+<button class="topcoat-icon-button--quiet">
+  <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+</button>
+<button class="topcoat-icon-button--quiet" disabled>
+  <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+</button>
+            
+            <h3>Large Icon Button</h3>
+            <button class="topcoat-icon-button--large">
+  <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+</button>
+<button class="topcoat-icon-button--large" disabled>
+  <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+</button>
 
+            <h3>Large Quiet Icon Button</h3>
+            <button class="topcoat-icon-button--large--quiet">
+  <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+</button>
+<button class="topcoat-icon-button--large--quiet" disabled>
+  <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+</button>
+            
+            <h3>Radio Button</h3>
+            <!-- NO LABEL -->
+<label class="topcoat-radio-button">
+  <input type="radio" name="topcoat">
+  <div class="topcoat-radio-button__checkmark"></div>
+</label>
+<br>
+<br>
+<!-- LEFT LABEL -->
+<label class="topcoat-radio-button">
+  Left label
+  <input type="radio" name="topcoat">
+  <div class="topcoat-radio-button__checkmark"></div>
+</label>
+<br>
+<br>
+<!-- RIGHT LABEL -->
+<label class="topcoat-radio-button">
+  <input type="radio" name="topcoat">
+  <div class="topcoat-radio-button__checkmark"></div>
+  Right label
+</label>
+<br>
+<br>
+<!-- DISABLED -->
+<label class="topcoat-radio-button">
+  <input type="radio" name="topcoat" Disabled>
+  <div class="topcoat-radio-button__checkmark"></div>
+  Disabled
+</label>
+
+<h3>Switch</h3>
+<label class="topcoat-switch">
+  <input type="checkbox" class="topcoat-switch__input">
+  <div class="topcoat-switch__toggle"></div>
+</label>
+<br>
+<br>
+<label class="topcoat-switch">
+  <input type="checkbox" class="topcoat-switch__input" checked>
+  <div class="topcoat-switch__toggle"></div>
+</label>
+<br>
+<br>
+<label class="topcoat-switch">
+  <input type="checkbox" class="topcoat-switch__input" disabled>
+  <div class="topcoat-switch__toggle"></div>
+</label>
+            
         </form>
     </div>
 </div>
@@ -141,12 +250,48 @@
             </a>
         </div>
         <div class="topcoat-navigation-bar__item center half">
-            <h1 class="topcoat-navigation-bar__title">Form Example</h1>
+            <h1 class="topcoat-navigation-bar__title">Form Elements</h1>
         </div>
     </div>
     <div class="content scrollable">
         <form class="testForm" method="post" action="#">
+        <h3>Notification</h3>
+            <span class="topcoat-notification">1</span>
 
+<h3>Range Slider</h3>
+HTML
+<p><input type="range" class="topcoat-range"> &nbsp; <input type="range" class="topcoat-range" disabled></p>
+
+<h3>Search Input</h3>
+<p><input type="search" value="" placeholder="search" class="topcoat-search-input"></p>
+<p><input type="search" value="" placeholder="search disabled" class="topcoat-search-input" disabled></p>
+
+<h3>Large Search</h3>
+<p><input type="search" value="" placeholder="search" class="topcoat-search-input--large"></p>
+<p><input type="search" value="" placeholder="search disabled" class="topcoat-search-input--large" disabled></p>
+
+
+<h3>Text Input</h3>
+<p><input type="text" class="topcoat-text-input" placeholder="text" value=""></p>
+<p><input type="text" class="topcoat-text-input" placeholder="text" value="" disabled></p>
+<p><input type="text" class="topcoat-text-input" placeholder="text" value="fail" pattern="not-fail"></p>
+
+<h3>Large Text Input</h3>
+
+<p><input type="text" class="topcoat-text-input--large" placeholder="text" value=""></p>
+<p><input type="text" class="topcoat-text-input--large" placeholder="text" value="" disabled></p>
+<p><input type="text" class="topcoat-text-input--large" placeholder="text" value="fail" pattern="not-fail"></p>
+
+
+<h3>Textarea</h3>
+
+<p><textarea class="topcoat-textarea" rows="6" cols="36" placeholder="Textarea"></textarea></p>
+<p><textarea class="topcoat-textarea" rows="6" cols="36" placeholder="Textarea" disabled></textarea></p>
+
+<h3>Large Textarea</h3>
+
+<p><textarea class="topcoat-textarea--large" rows="6" cols="36" placeholder="Textarea"></textarea></p>
+<p><textarea class="topcoat-textarea--large" rows="6" cols="36" placeholder="Textarea" disabled></textarea></p>
 
         </form>
     </div>
@@ -164,8 +309,8 @@
     </div>
     <div class="content">
         <div class="loadingDialogDiv">
-            <button id="showLoading" class="topcoat-button--large--cta">Show Loaiding</button>
-            <button id="showDialog" class="topcoat-button--large--cta">Show Dialog</button>
+            <button id="showLoading" class="topcoat-button--cta">Show Loading</button>
+            <button id="showDialog" class="topcoat-button--cta">Show Dialog</button>
         </div>
     </div>
 </div>

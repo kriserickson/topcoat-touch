@@ -24,7 +24,7 @@ function TopcoatTouch(container) {
     }, false);
 
     /** Page navigation */
-    container.on('transitionend webkitTransitionEnd', '.page', function(e) {
+    container.on('transitionend webkitTransitionEnd', '.page', function() {
         if (startedAnimation) {
 
             if (iScroll != null) {
@@ -75,7 +75,7 @@ function TopcoatTouch(container) {
     function checkForEvent(event) {
         var hasEvent = false;
         for (var eventName in self.EVENTS) {
-            if (self.EVENTS[eventName] == event) {
+            if (self.EVENTS.hasOwnProperty(eventName) && self.EVENTS[eventName] == event) {
                 hasEvent = true;
                 break;
             }
@@ -282,7 +282,7 @@ function TopcoatTouch(container) {
         $this.parent().removeClass('active');
         $dropDown.find('.toggle-dropdown').text($this.text());
         $dropDown.data('value', newId);
-        $dropDown.trigger('change', newId)
+        $dropDown.trigger('change', newId);
         $this.parent().parent('trigger', 'change', {id: newId});
     });
 
