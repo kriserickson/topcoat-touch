@@ -1,4 +1,7 @@
 /** iScroll **/
+.body {
+    overflow: hidden;
+}
 
 .scrollable {
     overflow: hidden;
