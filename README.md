@@ -5,6 +5,13 @@ A very simple mobile framework based on the [Topcoat Framework](http://topcoat.i
 the [jQT](http://jqtjs.com/) framework.  Designed for very simple mobile apps with just a few
 pages.  Uses [jQuery](http://jquery.com), [fastclick](https://github.com/ftlabs/fastclick) and
 [iScroll](https://github.com/cubiq/iscroll) to provide most of the functionality for a mobile
-framework.
+framework.  Uses some of the CSS for page flipping from
+http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbone-js-and-topcoat/
 
-See index.html to see how it is used.
+See example/index.html and example/js/app.js to see how it is used.
+
+Simple Usage:
+
+
+
+
