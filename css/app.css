@@ -15,15 +15,6 @@ textarea {
     width: 100%;
 }
 
-.photoClass {
-    width: 33%;
-    height: 0;
-    padding-bottom: 33%;
-    display: inline-block;
-    background-color: #fff;
-    box-sizing: border-box;
-    border: 4px solid #dfe2e2;
-}
 
 
 /** Carousel css, taken from http://lab.cubiq.org/iscroll5/demos/carousel/ */
@@ -106,4 +97,29 @@ textarea {
 	height: 20px;
 	border-radius: 10px;
 	background: #777;
+}
+
+.menu-item {
+    cursor: pointer;
+
+    /* font-size: 14pt; */
+
+    line-height: 17pt;
+    padding: 5px 10px;
+}
+
+ul.photo-gallery {
+	list-style: none;		
+	padding: 0px;
+	/* margin: 0px; */
+}
+
+.photoClass {
+    width: 32.7%;	
+    height: 0;
+    padding-bottom: 33%;
+    display: inline-block;
+    background-color: #fff;
+    box-sizing: border-box;
+    border: 4px solid #dfe2e2;
 }

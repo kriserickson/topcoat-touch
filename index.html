@@ -53,7 +53,8 @@
 <div id="buttonExample">
     <div class="topcoat-navigation-bar">
         <div class="topcoat-navigation-bar__item left quarter">
-            <a class="topcoat-icon-button--quiet back-button" href="#"> <!-- elements with the class back-button automatically go back on click -->
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <!-- elements with the class back-button automatically go back on click -->
                 <span class="topcoat-icon topcoat-icon--back"></span>
             </a>
         </div>
@@ -126,9 +127,22 @@
             <button class="topcoat-button--large--quiet">Button</button>
             <button class="topcoat-button--large--quiet" disabled>Button</button>
 
-            <h3>Call To Action Button</h3>
+            <h3>Large Call To Action Button</h3>
             <button class="topcoat-button--large--cta">Button</button>
             <button class="topcoat-button--large--cta" disabled>Button</button>
+
+
+            <h3>Small Button</h3>
+            <button class="topcoat-button button-small">Button</button>
+            <button class="topcoat-button button-small" disabled>Button</button>
+
+            <h3>Small Quiet Button</h3>
+            <button class="topcoat-button--quiet button-small">Button</button>
+            <button class="topcoat-button--quiet button-small" disabled>Button</button>
+
+            <h3>Small Call To Action Button</h3>
+            <button class="topcoat-button--cta button-small">Button</button>
+            <button class="topcoat-button--cta button--small" disabled>Button</button>
         </form>
     </div>
 </div>
@@ -349,51 +363,41 @@
             <h1 class="topcoat-navigation-bar__title">Photos</h1>
         </div>
     </div>
-    <div class="content scrollable" >
-        <div id="galleryDiv" >
-            <div><!-- Note: There can be no space between divs or the gallery breaks...  Hence we use comments to remove the space -->
-                <div class="photoClass" style="background:url(http://placekitten.com/150/150) 50% 50% no-repeat"></div><!--
-             --><div class="photoClass" style="background:url(http://placekitten.com/151/150) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/152/150) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/153/155) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/154/150) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/155/155) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/156/150) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/157/168) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/158/150) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/159/170) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/239/183) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/151) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/152) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/173) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/170/154) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/155) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/156) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/157) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/158) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/159) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/200) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/250) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/151/250) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/155/100) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/172/169) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/161) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/162) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/163) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/164) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/165) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/166) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/167) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/150/168) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/250/169) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/151/160) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/152/160) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/253/160) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/154/160) 50% 50% no-repeat"></div><!--
-             --><div  class="photoClass" style="background:url(http://placekitten.com/155/170) 50% 50% no-repeat"></div>
-            </div>
+    <div class="content scrollable">
+        <div id="gallery-div">
+            <ul class="photo-gallery">
+
+            </ul>
         </div>
     </div>
+    <div class="topcoat-bottom-bar">
+        <div class="topcoat-bottom-bar-item" style="width: 70%">
+            <div class="form-dropdown" id="gallery-picker">
+                <a href="#" class="toggle-dropdown">Gallery Type</a>
+                <ul id="gallery-type" class="dropdown direction-up">
+                    <li class="dropdown-item" data-id="kittens">
+                        <div class="menu-item">Kittens</div>
+                    </li>
+                    <li class="dropdown-item" data-id="bears">
+                        <div class="menu-item">Bears</div>
+                    </li>
+                    <li class="dropdown-item" data-id="lorem">
+                        <div class="menu-item">Lorem Pixel</div>
+                    </li>
+                    <li class="dropdown-item" data-id="bacon">
+                        <div class="menu-item">Bacon</div>
+                    </li>
+                    <li class="dropdown-item" data-id="murray">
+                        <div class="menu-item">Bill Murray</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="topcoat-bottom-bar-item quarter">
+            <button class="topcoat-button--cta button-small" id="changeButton">Change</button>
+        </div>
+    </div>
+</div>
 </div>
 <div id="carouselExample">
     <div class="topcoat-navigation-bar">
@@ -432,4 +436,5 @@
 </div>
 </body>
 </html>
+
 

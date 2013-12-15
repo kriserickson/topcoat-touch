@@ -44,12 +44,44 @@ $(document).ready(function() {
                 resize: false
             }
         });
-    }).on(tt.EVENTS.PAGE_START, 'carouselExample', function() {
+    }).on(tt.EVENTS.PAGE_END, 'carouselExample', function() {
         if (carouselScroll != null) {
             carouselScroll.destroy();
             carouselScroll = null;
         }
     });
+    
+    
+    $('.testForm').submit(function(e) {
+        tt.showDialog('<h3>Button Clicked</h3>');       
+        return false;
+    });
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    function createPlaceHolder(type) {
+        var placeHolders = { kittens : 'placekitten.com', bears: 'placebear.com', lorem: 'lorempixel.com',
+            bacon: 'baconmockup.com', murray: 'www.fillmurray.com'};
+        var gallery = '';
+        for (var i = 0; i < 100; i++) {
+            gallery += '<li class="photoClass" style="background:url(http://' + placeHolders[type] + '/' +
+                getRandomInt(200,300) + '/' + getRandomInt(200,300) + ') 50% 50% no-repeat"></li>';
+        }
+        $('.photo-gallery').html(gallery);
+        tt.refreshScroll();
+        tt.scrollTo(0,0);
+    }
+
+
+
+    $('#gallery-picker').change(function(e, id) {
+        createPlaceHolder(id);
+    });
+
+    createPlaceHolder('kittens');
+
 
 
 });

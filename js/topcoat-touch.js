@@ -31,10 +31,10 @@ function TopcoatTouch(container) {
                 iScroll.destroy();
             }
 
-            var scrollable = '#' + self.currentPage() + ' .scrollable',
+            var scrollable = '#' + self.currentPage() + ' .scrollable',                
                 $scrollable = $(scrollable);
             if ($scrollable.length > 0) {
-                $scrollable.height($scrollable.parent().height() - $scrollable.position().top);
+                $scrollable.height($currentPage.height() - $scrollable.position().top);
                 iScroll = new IScroll(scrollable);
                 iScroll.on('scrollStart', function () { 
                     self.isScrolling = true;
@@ -230,6 +230,12 @@ function TopcoatTouch(container) {
         }
     };
 
+    this.scrollTo = function(x, y, duration, easing) {
+       if (iScroll != null) {
+            iScroll.scrollTo(x, y, duration, easing);
+        }
+    };
+
     // Show a loading indciator with an optional message
     this.showLoading = function (msg) {
         self.hideLoading();
@@ -257,7 +263,7 @@ function TopcoatTouch(container) {
         for (var buttonCaption in buttons) {
             if (buttons.hasOwnProperty(buttonCaption)) {
                 var buttonId = 'topcoat-button-' + buttonCount++;
-                buttonText += '<button class="topcoat-button--small" id="' + buttonId + '">' + buttonCaption + '</button>';
+                buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
                 $(document).off('click', '#' + buttonId).on('click', '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
             }
             

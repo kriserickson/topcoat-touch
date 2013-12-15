@@ -95,6 +95,12 @@ body > div {
 }
 
 
+.button-small {
+    line-height: 1.5rem;
+	
+    border-radius: 3px;
+}
+
 /** Dropdown **/
 
 .dropdown {
@@ -302,4 +308,24 @@ body > div {
 	width: 100%;
 	padding: 2px 0;
 	margin: 2px 0;	
+}
+
+/** End Dialog Box **/
+
+/** Bottom Bar **/
+
+.topcoat-bottom-bar {
+	position: absolute;
+	height: 50px;
+	bottom: 0px;
+	width:  100%;
+	background: #e5e9e8;
+	color: #454545;
+	box-shadow: inset 0 -1px #9daca9, 0 1px #d6dcdb;
+}
+
+.topcoat-bottom-bar-item {
+	display: inline-block;
+	height: 50px;
+	/* box-sizing: border-box; */
 }
