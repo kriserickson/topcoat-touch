@@ -86,6 +86,15 @@ function TopcoatTouch(container) {
         }
     }
 
+    function returnButtonFunction(fn) {
+         return function() {
+             if (fn) {
+                 fn();
+             }
+             self.hideDialog();
+         }
+    }
+
     // Public functions
     this.on = function(event, page, fn) {
         checkForEvent(event);
@@ -236,23 +245,36 @@ function TopcoatTouch(container) {
     this.hideLoading = function () {
         $('#topcoat-loading-div,#topcoat-loading-overlay-div').remove();
     };
+
     
-    this.showDialog = function(element) {
+    this.showDialog = function(content, buttons) {
         self.hideDialog();
-        if (typeof element === 'string') {
-            if (element.substr(0,1) != '#') {
-                element = '#' + element;
+        var buttonText = '';
+        var buttonCount = 1;
+
+        buttons = buttons || {OK: null};
+
+        for (var buttonCaption in buttons) {
+            if (buttons.hasOwnProperty(buttonCaption)) {
+                var buttonId = 'topcoat-button-' + buttonCount++;
+                buttonText += '<button class="topcoat-button--small" id="' + buttonId + '">' + buttonCaption + '</button>';
+                $(document).off('click', '#' + buttonId).on('click', '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
             }
-            element = $(element);
+            
+            buttonCount++;
         }
-        var overlay = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');
-        var dialog = $('<div id="topcoat-dialog-div" class="topcoat-overlay"></div>');
-        dialog.append(element);
-        $('.page-center').append(overlay).append(dialog);
+        
+        var dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' + 
+            '<div id="topcoat-dialog-div" class="topcoat-overlay">' + 
+            '<div class="topcoat-dialog-content">' + content + '</div>' +
+            '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
+         '</div>');
+                
+        $('.page-center').append(dialog).append(dialog);
     };
     
     this.hideDialog = function() {
-        $('#topcoat-loading-overlay-div,#topcoat-dialog-div').hide();
+        $('#topcoat-loading-overlay-div,#topcoat-dialog-div').remove();
     };
 
     // Writing up events...
