@@ -1,0 +1,22 @@
+{
+  "name": "topcoat-touch",
+  "version": "0.1.0",
+  "homepage": "https://github.com/kriserickson/topcoat-touch",
+  "authors": [
+    "Kris Erickson <ksoncan34@yahoo.ca>"
+  ],
+  "description": "Topcoat Touch is a lightweight mobile javascript framework built around topcoat.io",
+  "main": "js/topcoat-touch.js",
+  "keywords": [
+    "mobile",
+    "topcoat"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
