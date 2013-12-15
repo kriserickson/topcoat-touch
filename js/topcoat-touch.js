@@ -9,6 +9,8 @@ function TopcoatTouch(container) {
         events = {},
         pages = [];
 
+    container = container || $('body');
+
     this.EVENTS = {};
     this.EVENTS.PAGE_START = 'pageStart';
     this.EVENTS.PAGE_END = 'pageEnd';
@@ -235,6 +237,15 @@ function TopcoatTouch(container) {
             iScroll.scrollTo(x, y, duration, easing);
         }
     };
+
+    this.scrollToElement = function(el, time, offsetX, offsetY, easing) {
+        if (iScroll != null) {
+            if (el instanceof jQuery) {
+                el = el[0];
+            }
+            iScroll.scrollToElement(el, time, offsetX, offsetY, easing);
+        }
+    }
 
     // Show a loading indciator with an optional message
     this.showLoading = function (msg) {

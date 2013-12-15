@@ -8,9 +8,9 @@ pages.  Uses [jQuery](http://jquery.com), [fastclick](https://github.com/ftlabs/
 framework.  Uses some of the CSS for page flipping from
 http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbone-js-and-topcoat/
 
-See example/index.html and example/js/app.js to see how it is used.
+See [index.html](/blob/master/example/index.html) and [app.js](/blob/master/example/js/app.js) to see how it is used.
 
-Simple Usage:
+* [Getting Started](wiki/Getting Started) -- Getting started with topcoat touch.
 
 
 
