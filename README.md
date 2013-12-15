@@ -10,7 +10,7 @@ http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbo
 
 See [index.html](/blob/master/example/index.html) and [app.js](/blob/master/example/js/app.js) to see how it is used.
 
-* [Getting Started](wiki/Getting Started) -- Getting started with topcoat touch.
+* [Getting Started](//github.com/kriserickson/topcoat-touch/wiki/Getting-Started) -- Getting started with topcoat touch.
 
 
 
