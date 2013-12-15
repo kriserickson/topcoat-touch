@@ -10,3 +10,7 @@
 .testForm {
     padding: 10px;
 }
+
+textarea {
+    width: 100%;
+}
