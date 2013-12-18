@@ -96,8 +96,7 @@ body > div {
 
 
 .button-small {
-    line-height: 1.5rem;
-	
+    line-height: 1.5rem;	
     border-radius: 3px;
 }
 
@@ -115,6 +114,7 @@ body > div {
     background-clip: border-box;
     opacity: 0;
     margin: 0;
+	position: absolute;
     -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
     -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
@@ -209,18 +209,7 @@ body > div {
     transform: rotate(180deg);
 }
 
-.dropdown {
-    /* float: left; */
-    position: absolute;
-}
 
-.form-dropdown .dropdown {
-    right: 0;
-}
-
-.direction-up {
-    position: relative;
-}
 
 /** end Dropdown **/
 

@@ -306,8 +306,8 @@ function TopcoatTouch(container) {
             var dropdownHeight = $dropdown.height();
             var toggleHeight = $toggle.outerHeight(true);
             var top = 0;
-            if (toggleTop + toggleHeight + dropdownHeight  > SFGlobals.adjustedScreenHeight) {
-                top = - dropdownHeight;
+            if (toggleTop + toggleHeight + dropdownHeight  > window.innerHeight) {
+                top -= dropdownHeight;
             } else {
                 top = toggleHeight;
             }
@@ -324,7 +324,6 @@ function TopcoatTouch(container) {
         $dropDown.find('.toggle-dropdown').text($this.text());
         $dropDown.data('value', newId);
         $dropDown.trigger('change', newId);
-        $this.parent().parent().trigger('change', {id: newId});
     });
 
     // Setup all the linked pages
