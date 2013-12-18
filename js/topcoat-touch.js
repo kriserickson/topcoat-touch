@@ -25,7 +25,7 @@ function TopcoatTouch(container) {
         e.preventDefault();
     }, false);
 
-    /** Page navigation */
+    /** Page navigation */    
     container.on('transitionend webkitTransitionEnd', '.page', function() {
         if (startedAnimation) {
 
@@ -33,7 +33,7 @@ function TopcoatTouch(container) {
                 iScroll.destroy();
             }
 
-            var scrollable = '#' + self.currentPage() + ' .scrollable',                
+            var scrollable = '#' + self.currentPage() + ' .scrollable',
                 $scrollable = $(scrollable);
             if ($scrollable.length > 0) {
                 $scrollable.height($currentPage.height() - $scrollable.position().top);
@@ -153,35 +153,35 @@ function TopcoatTouch(container) {
     };
 
     // GoTo page, including having history...
-    this.goTo = function (page, back) {
+    this.goTo = function ($page, back) {
 
         var l = pages.length;
 
         previousPage = currentPage;
 
-        if (typeof page === 'string') {
-            currentPage = page;
-            if (page.substr(0,1) != '#') {
-                page = '#' + page;
+        if (typeof $page === 'string') {
+            currentPage = $page;
+            if ($page.substr(0,1) != '#') {
+                $page = '#' + $page;
             }
-            page = $(page);
+            $page = $($page);
         } else {
-            currentPage = page.attr('id');
+            currentPage = $page.attr('id');
         }
 
         if (l === 0) {
-            pages.push(page);
-            this.goDirectly(page);
+            pages.push($page);
+            this.goDirectly($page);
             startedAnimation = true;
-            page.trigger('transitionend');
+            $page.trigger('transitionend');
             return;
         }
-        if (back || page === pages[l - 2]) {
+        if (back || $page === pages[l - 2]) {
             pages.pop();
-            this.goDirectly(page, 'page-left');
+            this.goDirectly($page, 'page-left');
         } else {
-            pages.push(page);
-            this.goDirectly(page, 'page-right');
+            pages.push($page);
+            this.goDirectly($page, 'page-right');
         }
 
     };
@@ -203,7 +203,7 @@ function TopcoatTouch(container) {
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
         //noinspection BadExpressionStatementJS
-        container[0].offsetWidth;
+        container.get(0).offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         page.attr('class', 'page transition page-center');
@@ -245,7 +245,7 @@ function TopcoatTouch(container) {
             }
             iScroll.scrollToElement(el, time, offsetX, offsetY, easing);
         }
-    }
+    };
 
     // Show a loading indciator with an optional message
     this.showLoading = function (msg) {
@@ -299,17 +299,19 @@ function TopcoatTouch(container) {
     /* Dropdown Box */
     $(document).on('click', '.toggle-dropdown', function() {
         var $dropdown = $(this).parent().find('.dropdown');
-        if ($dropdown.hasClass('active')) {
-            $dropdown.removeClass('active');
-        } else {
-            var $toggle = $('.toggle-dropdown');
-
-            if ($dropdown.hasClass('direction-up')) {
-                $dropdown.css({top: -1 * ($toggle.outerHeight(true) + $dropdown.outerHeight(true)),
-                    width: $toggle.outerWidth()});
+        $('.dropdown').removeClass('active');
+        if (!$dropdown.hasClass('active')) {            
+            var $toggle = $(this);
+            var toggleTop = $toggle.offset().top;
+            var dropdownHeight = $dropdown.height();
+            var toggleHeight = $toggle.outerHeight(true);
+            var top = 0;
+            if (toggleTop + toggleHeight + dropdownHeight  > SFGlobals.adjustedScreenHeight) {
+                top = - dropdownHeight;
             } else {
-                $dropdown.css({width: $toggle.width()});
+                top = toggleHeight;
             }
+            $dropdown.css({width: $toggle.outerWidth(), top: top});
             $dropdown.addClass('active');
         }
     });
@@ -322,7 +324,7 @@ function TopcoatTouch(container) {
         $dropDown.find('.toggle-dropdown').text($this.text());
         $dropDown.data('value', newId);
         $dropDown.trigger('change', newId);
-        $this.parent().parent('trigger', 'change', {id: newId});
+        $this.parent().parent().trigger('change', {id: newId});
     });
 
     // Setup all the linked pages
