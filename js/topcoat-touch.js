@@ -1,4 +1,4 @@
-function TopcoatTouch(container) {
+function TopcoatTouch($container) {
 
     var $currentPage,
         currentPage,
@@ -9,7 +9,7 @@ function TopcoatTouch(container) {
         events = {},
         pages = [];
 
-    container = container || $('body');
+    $container = $container || $('body');
 
     this.EVENTS = {};
     this.EVENTS.PAGE_START = 'pageStart';
@@ -26,7 +26,7 @@ function TopcoatTouch(container) {
     }, false);
 
     /** Page navigation */    
-    container.on('transitionend webkitTransitionEnd', '.page', function() {
+    $container.on('transitionend webkitTransitionEnd', '.page', function() {
         if (startedAnimation) {
 
             if (iScroll != null) {
@@ -203,7 +203,7 @@ function TopcoatTouch(container) {
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
         //noinspection BadExpressionStatementJS
-        container.get(0).offsetWidth;
+        $container.get(0).offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         page.attr('class', 'page transition page-center');
@@ -326,10 +326,12 @@ function TopcoatTouch(container) {
         $dropDown.trigger('change', newId);
     });
 
+
     // Setup all the linked pages
     $(document).on('click', '[data-rel]', function (e) {
         self.goTo($(this).data('rel'));
         e.preventDefault();
+        return false;
     });
 
     // setup the all the back buttons
