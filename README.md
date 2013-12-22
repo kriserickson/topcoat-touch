@@ -1,6 +1,8 @@
 Topcoat Touch
 =============
 
+[![Build Status](https://travis-ci.org/kriserickson/topcoat-touch.png?branch=master)](https://travis-ci.org/kriserickson/topcoat-touch)
+
 A very simple mobile framework based on the [Topcoat Framework](http://topcoat.io).  Inspired by
 the [jQT](http://jqtjs.com/) framework.  Designed for very simple mobile apps with just a few
 pages.  Uses [jQuery](http://jquery.com), [fastclick](https://github.com/ftlabs/fastclick) and
