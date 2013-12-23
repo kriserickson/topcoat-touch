@@ -35,8 +35,9 @@ function TopcoatTouch($container) {
 
             var scrollable = '#' + self.currentPage() + ' .scrollable',
                 $scrollable = $(scrollable);
-            if ($scrollable.length > 0) {
-                $scrollable.height($currentPage.height() - $scrollable.position().top);
+            if ($scrollable.length > 0 && typeof IScroll == 'function') {
+                var bottomBarHeight = $currentPage.find('.topcoat-bottom-bar').height() || 0;
+                $scrollable.height($currentPage.height() - $scrollable.position().top - bottomBarHeight);
                 iScroll = new IScroll(scrollable);
                 iScroll.on('scrollStart', function () { 
                     self.isScrolling = true;
@@ -322,8 +323,12 @@ function TopcoatTouch($container) {
             newId = $this.data('id');
         $this.parent().removeClass('active');
         $dropDown.find('.toggle-dropdown').text($this.text());
-        $dropDown.data('value', newId);
-        $dropDown.trigger('change', newId);
+        if (newId) {
+            $dropDown.data('value', newId);
+            $dropDown.trigger('change', newId);
+        } else {
+            $dropDown.trigger('change', this);
+        }
     });
 
 

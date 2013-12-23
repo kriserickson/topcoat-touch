@@ -12,7 +12,7 @@ $(document).ready(function() {
 
 
 
-    //
+    // Show the loading message...
     $('#showLoading').click(function() {
         tt.showLoading('10 seconds');
         var count = 10;
@@ -34,6 +34,10 @@ $(document).ready(function() {
 
 
     tt.on(tt.EVENTS.PAGE_START, 'carouselExample', function() {
+
+        // When the page is loaded, run the following...
+
+        // Setup iScroll..
         carouselScroll = new IScroll('#carouselWrapper', {
             scrollX: true,
             scrollY: false,
@@ -47,13 +51,14 @@ $(document).ready(function() {
             }
         });
     }).on(tt.EVENTS.PAGE_END, 'carouselExample', function() {
+        // When the page is unloaded, run the following...
         if (carouselScroll != null) {
             carouselScroll.destroy();
             carouselScroll = null;
         }
     });
     
-    
+    // Show a message when anyone clicks on button of the test form...
     $('.testForm').submit(function(e) {
         tt.showDialog('<h3>Button Clicked</h3>');       
         return false;
@@ -63,17 +68,18 @@ $(document).ready(function() {
         return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
+    // Create the placeholders in the gallery...
     function createPlaceHolder(type) {
         var placeHolders = { kittens : 'placekitten.com', bears: 'placebear.com', lorem: 'lorempixel.com',
             bacon: 'baconmockup.com', murray: 'www.fillmurray.com'};
         var gallery = '';
-        for (var i = 0; i < 100; i++) {
+        for (var i = 0; i < getRandomInt(50,100); i++) {
             gallery += '<li class="photoClass" style="background:url(http://' + placeHolders[type] + '/' +
                 getRandomInt(200,300) + '/' + getRandomInt(200,300) + ') 50% 50% no-repeat"></li>';
         }
         $('.photo-gallery').html(gallery);
-        tt.refreshScroll();
-        tt.scrollTo(0,0);
+        tt.refreshScroll(); // Refresh the scroller
+        tt.scrollTo(0,0);   // Move back to the top of the page...
     }
 
 

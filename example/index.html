@@ -2,21 +2,30 @@
 <html>
 <head>
     <title>Topcoat Touch</title>
+    <!-- Set the viewport for a mobile device -->
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- link to the topcoat stylesheet, feel free to change this with topcoat-mobile-dark.css to get a dark theme -->
     <link href="../css/topcoat-mobile-light.css" rel="stylesheet">
+    <!-- Additions to the topcoat stylesheet for page swapping and a couple of other widgets
+        see https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions for more information -->
     <link href="../css/topcoat-touch.css" rel="stylesheet">
+    <!-- This apps stylesheet -->
     <link href="css/app.css" rel="stylesheet">
+    <!-- jQuery is currently required -->
     <script src="../js/jquery-2.0.3.js"></script>
-<!--  <script src="../js/topcoat-touch-query.js"></script> -->
+    <!--  The topcoat touch library -->
     <script src="../js/topcoat-touch.js"></script>
+    <!-- iScroll is not required, feel to remove it you aren't scrolling anything, also you could replace it IScroll lite -->
     <script src="../js/iscroll.js"></script>
+    <!-- fastclick also isn't required but dialogs, dropdowns, back-button and data-rel links won't work without some mobile click polyfill -->
     <script src="../js/fastclick.js"></script>
+    <!-- your app's script -->
     <script src="js/app.js"></script>
 </head>
 <body>
 <div id="home">
-    <div class="topcoat-navigation-bar">
+    <div class="topcoat-navigation-bar"> <!-- Navigation bar -->
         <div class="topcoat-navigation-bar__item center full">
             <h1 class="topcoat-navigation-bar__title">Topcoat Touch</h1>
         </div>
@@ -348,7 +357,7 @@
     </div>
     <div class="content">
         <div class="loadingDialogDiv">
-            <button id="showLoading" class="topcoat-button--cta">Show Loading</button>
+            <button id="showLoading" class="topcoat-button--cta">Show Loading</button><!-- See app.js to see how these work -->
             <button id="showDialog" class="topcoat-button--cta">Show Dialog</button>
         </div>
     </div>
@@ -356,7 +365,7 @@
 <div id="galleryExample">
     <div class="topcoat-navigation-bar">
         <div class="topcoat-navigation-bar__item left quarter">
-            <a class="topcoat-icon-button--quiet back-button" href="#" style="display: inline-block;">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
                 <span class="topcoat-icon topcoat-icon--back"></span>
             </a>
         </div>
@@ -371,8 +380,10 @@
             </ul>
         </div>
     </div>
-    <div class="topcoat-bottom-bar">
+    <div class="topcoat-bottom-bar"> <!-- A bottom bar, note this screen is resized automatically
+                                    and bottom-bar is absolute positioned at the bottom of the page -->
         <div class="topcoat-bottom-bar-item" style="width: 70%">
+            <!-- To see how dropdowns are created go to https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions#drop-down -->
             <div class="form-dropdown" id="gallery-picker">
                 <a href="#" class="toggle-dropdown">Gallery Type</a>
                 <ul id="gallery-type" class="dropdown">
@@ -399,11 +410,10 @@
         </div>
     </div>
 </div>
-</div>
 <div id="carouselExample">
     <div class="topcoat-navigation-bar">
         <div class="topcoat-navigation-bar__item left quarter">
-            <a class="topcoat-icon-button--quiet back-button" href="#" style="display: inline-block;">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
                 <span class="topcoat-icon topcoat-icon--back"></span>
             </a>
         </div>
@@ -411,7 +421,7 @@
             <h1 class="topcoat-navigation-bar__title">Photos</h1>
         </div>
     </div>
-    <!-- Carousel Example taken from: http://lab.cubiq.org/iscroll5/demos/carousel/ -->
+    <!-- Carousel Example taken from: http://lab.cubiq.org/iscroll5/demos/carousel/, see app.js for how to do this... -->
     <div id="carouselViewport">
         <div id="carouselWrapper">
             <div class="scroller">
