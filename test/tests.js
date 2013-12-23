@@ -16,14 +16,15 @@ var pageHtml = '<div id="testContainer">' +
                    '</div>' +
                 '</div>';
 
-
+// Quick hack to make the site visible within the test container...
+$('head').append('<style>#testContainer { top: 50px; width: 320px; height: 480px; border: 1px solid #000; } body > div > div { position: absolute; top: 9999px; }</style>');
 
 describe("Initialization Tests", function () {
 
     var tt;
 
     before(function() {
-        $('body').append(pageHtml)
+        $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
     });
 
@@ -68,7 +69,7 @@ describe('Go home tests', function() {
 
     it('currentPage should be home', function() {
         expect(tt.currentPage()).to.equal('home');
-    })
+    });
 
     it('topcoat touch should not have a back page', function() {
         expect(tt.hasBack()).to.be.false;
@@ -202,8 +203,119 @@ describe('Click to page 3 tests', function() {
         expect(tt.previousPage()).to.equal('page2');
     });
 
-    it('should be scrolling', function() {
+    it('should have scroll activated', function() {
         expect($('.wrapper').css('transform').length).to.be.above(1);
     });
+
+});
+
+describe('Loading tests', function() {
+
+    var tt;
+
+    before(function(done) {
+        $('body').append(pageHtml);
+        tt = new TopcoatTouch($('#testContainer'));
+        tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+            tt.showLoading('Loading Test');
+            done();
+        });
+        tt.goTo('home');
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+    });
+
+
+    it('should have an overlay', function() {
+        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+    });
+
+    it('should have a message block of 120px height', function() {
+        expect($('#topcoat-loading-div').height()).to.equal(120);
+    });
+
+    it('should have loading text equaling Loading Test', function() {
+        expect($('#topcoat-loading-message').text()).to.equal('Loading Test');
+    })
+
+});
+
+describe('Simple Dialog tests', function() {
+
+    var tt;
+
+    before(function(done) {
+        $('body').append(pageHtml);
+        tt = new TopcoatTouch($('#testContainer'));
+        tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+            tt.showDialog('Dialog Test');
+            done();
+        });
+        tt.goTo('home');
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+    });
+
+
+    it('should have an overlay', function() {
+        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+    });
+
+    it('should have dialog text equaling Dialog Test', function() {
+        expect($('.topcoat-dialog-content').text()).to.equal('Dialog Test');
+    });
+
+    it('should have a default ok button with an id of topcoat-button-1', function() {
+        expect($('#topcoat-button-1').text()).to.equal('OK');
+    });
+
+    it('Clicking the button should dismiss the dialog box', function() {
+        $('#topcoat-button-1').trigger('click');
+        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
+    });
+
+});
+
+describe('Complex Dialog tests', function() {
+
+    var tt, tmpVal;
+
+    before(function(done) {
+        $('body').append(pageHtml);
+        tt = new TopcoatTouch($('#testContainer'));
+        tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+            tt.showDialog('Complex Dialog Test', {'Click Me': function() { tmpVal = 21; }, 'Dont Click Me': function() {}});
+            done();
+        });
+        tt.goTo('home');
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+    });
+
+
+    it('should have an overlay', function() {
+        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+    });
+
+    it('should have a ClickMe button with an id of topcoat-button-1', function() {
+        expect($('#topcoat-button-1').text()).to.equal('Click Me');
+    });
+
+    it('should have 2 buttons', function() {
+        expect($('#topcoat-dialog-div').find('button').length).to.equal(2);
+    });
+
+    it('clicking ClickMe should change the value of tmpVal to 21 and dismiss the dialog', function() {
+        $('#topcoat-button-1').trigger('click');
+        expect(tmpVal).to.equal(21);
+        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
+    });
+
 
 });
