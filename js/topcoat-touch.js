@@ -17,6 +17,7 @@ function TopcoatTouch($container) {
     this.EVENTS.SCROLL_START = 'scrollStart';
     this.EVENTS.SCROLL_END = 'scrollEnd';
     this.isScrolling = false;
+	this.swipeDistance = 30;
 
 	// Setup FastClick...
     new FastClick(document.body);
@@ -265,10 +266,15 @@ function TopcoatTouch($container) {
     };
 
     
-    this.showDialog = function(content, buttons) {
+    this.showDialog = function(content, title, buttons) {
         self.hideDialog();
+        if (typeof title == 'object') {
+            buttons = title;
+            title = '';
+        }
         var buttonText = '';
         var buttonCount = 1;
+        title = title || 'Info';
 
         buttons = buttons || {OK: null};
 
@@ -282,13 +288,19 @@ function TopcoatTouch($container) {
             buttonCount++;
         }
         
-        var dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' + 
+        var $dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +            
             '<div id="topcoat-dialog-div" class="topcoat-overlay">' + 
+            '<div class="topcoat-dialog-header">' + title + '</div>' +
             '<div class="topcoat-dialog-content">' + content + '</div>' +
             '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
          '</div>');
                 
-        $('.page-center').append(dialog).append(dialog);
+        $('.page-center').append($dialog);
+        var dialogHeight = 40;
+        $dialog.find('div').each(function(index, div) { 
+            dialogHeight += $(div).height(); 
+        });
+        $('#topcoat-dialog-div').height(dialogHeight).css('visibility', 'visible');
     };
     
     this.hideDialog = function() {
@@ -309,6 +321,9 @@ function TopcoatTouch($container) {
             var top = 0;
             if (toggleTop + toggleHeight + dropdownHeight  > window.innerHeight) {
                 top -= dropdownHeight;
+                if ($dropdown.hasClass('contained')) {
+                    top -= toggleHeight;
+                }
             } else {
                 top = toggleHeight;
             }
@@ -345,4 +360,69 @@ function TopcoatTouch($container) {
     });
 
     /* End Dropdown Box */
+
+	/* Start events for next and previous page */
+    // Add next and previous events that can be caught...
+    if (window.history && history.pushState) { // check for history api support
+        
+       // create history states
+        history.pushState(-1, null); // back state
+        history.pushState(0, null); // main state
+        history.pushState(1, null); // forward state
+        history.go(-1); // start in main state
+        window.addEventListener('popstate', function (event) {
+			var state = event.state;
+            if (state) {
+                var newEvent = document.createEvent('Event');
+                newEvent.initEvent(state > 0 ? 'next' : 'previous', true, true);
+                this.dispatchEvent(newEvent);
+                // reset state to what it should be
+                history.go(-state);
+            }
+        }, false);
+
+        
+    }
+
+	/* End events for next and previous page */
+
+
+    /* Add swipe functionality */
+    function createEvent(ev, name) {
+        
+        evt = null;
+        return false
+    }
+
+    var notMoving = true;
+    var startingPoint = {x: 0, y: 0};
+    var endPoint = {x: 0, y: 0};
+    var touch = {
+        touchstart: function (ev) {
+            startingPoint = {x: ev.touches[0].pageX, y: ev.touches[0].pageY}
+        },
+        touchmove: function (ev) {
+            notMoving = false;
+            endPoint = {x: ev.touches[0].pageX, y: ev.touches[0].pageY}
+        },
+        touchend: function (ev) {
+            if (!notMoving) {
+                var x = endPoint.x - startingPoint.x, xr = Math.abs(x), y = endPoint.y - startingPoint.y, yr = Math.abs(y);
+                if (Math.max(xr, yr) > self.swipeDistance) {
+                    var name = (xr > yr ? (x < 0 ? 'swipeLeft' : 'swipeRight') : (y < 0 ? 'swipeUp' : 'swipeDown'));
+                    var evt = document.createEvent("CustomEvent");
+                    evt.initCustomEvent(name, true, true, ev.target);
+                    ev.target.dispatchEvent(evt);
+                }
+            }
+            notMoving = true
+        }
+    };
+    for (var ev in touch) {
+        document.addEventListener(ev, touch[ev], false);
+    }
+	/* End Swipe Functionality */
+
+
+
 }

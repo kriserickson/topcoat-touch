@@ -299,6 +299,18 @@ body > div {
 	margin: 2px 0;	
 }
 
+.topcoat-dialog-content {
+	margin: 5px 5px;
+	text-align: left;
+}
+
+.topcoat-dialog-header {
+	background-color: #666;
+	color: #fff;
+	margin: 2px;
+	padding: 1px;
+}
+
 /** End Dialog Box **/
 
 /** Bottom Bar **/
@@ -315,6 +327,5 @@ body > div {
 
 .topcoat-bottom-bar-item {
 	display: inline-block;
-	height: 50px;
-	/* box-sizing: border-box; */
+	height: 50px;	
 }

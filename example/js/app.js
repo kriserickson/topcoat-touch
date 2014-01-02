@@ -28,7 +28,7 @@ $(document).ready(function() {
 
     // Show the dialog...
     $('#showDialog').click(function() {
-        tt.showDialog('<h3>Example Dialog</h3><div>This is a dialog</div>', {OK: function() { console.log('OK Pressed') }
+        tt.showDialog('This is a dialog', 'Example Dialgo', {OK: function() { console.log('OK Pressed') }
             , Cancel: function() { console.log('Cancel Pressed')}});
     });
 
