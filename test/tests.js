@@ -232,8 +232,8 @@ describe('Loading tests', function() {
         expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
     });
 
-    it('should have a message block of 120px height', function() {
-        expect($('#topcoat-loading-div').height()).to.equal(120);
+    it('should have a message block of 90px height', function() {
+        expect($('#topcoat-loading-div').height()).to.equal(90);
     });
 
     it('should have loading text equaling Loading Test', function() {
