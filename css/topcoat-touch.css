@@ -11,7 +11,7 @@ body {
 /** List View **/
 
 .topcoat-icon--back {
-	background: rgba(0, 0, 0, 0) url(../img/prev_blue.svg);
+	background: rgba(0, 0, 0, 0) url('data:image/svg+xml;utf8,<svg width="42" height="42" xmlns="http://www.w3.org/2000/svg"><g><polygon transform="rotate(180 21,21)" id="svg_2" points="9.5,38.32 27.1,21 9.5,3.7 12.2,1 32.5,21 12.2,41 " fill="%235DC1FF" fill-rule="evenodd"/></g></svg>');
 	background-size: cover;
 }
 
@@ -42,7 +42,7 @@ body {
 }
 
 .topcoat-list__item .chevron {
-    background: rgba(0, 0, 0, 0) url(../img/next_blue.svg) no-repeat;
+    background: rgba(0, 0, 0, 0) url('data:image/svg+xml;utf8,<svg width="42" height="42" xmlns="http://www.w3.org/2000/svg"><polygon fill-rule="evenodd" fill="%235DC1FF" points="11,38.32 28.609,21 11,3.68 13.72,1 34,21.01 13.72,41 "/></svg>') no-repeat;
     background-size: contain;
 	position: absolute;
 	right: 12px;
@@ -50,8 +50,8 @@ body {
 	width: 28px;
 }
 
-
 /** Page Control **/
+
 body > div {
     position: absolute;
     top: 9999px;
@@ -65,7 +65,7 @@ body > div {
 }
 
 .page {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -227,7 +227,10 @@ body > div {
   left: calc(50% - 18px);  
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 2),only screen and (min-resolution: 192dpi) {
+@media only screen and (-webkit-min-device-pixel-ratio: 2),
+       only screen and (        min-device-pixel-ratio: 2),
+       only screen and (                min-resolution: 192dpi),
+       only screen and (                min-resolution: 2dppx) {
   .spinner {
     background: url("../img/spinner2x.png") no-repeat;
     background-size: 36px;
@@ -257,8 +260,8 @@ body > div {
   position: absolute;  
   cursor: default;
   z-index: 10;  
-  width: 50%;
-  height: 25%;
+  width: 70%;
+  height: 30%;
   margin: auto;
   top: 0;
   left: 0;
