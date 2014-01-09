@@ -106,8 +106,8 @@ describe('Go to page2 tests', function() {
         expect($('#home').hasClass('page-center')).not.to.be.true;
     });
 
-    it('home should have the page left class', function() {
-        expect($('#home').hasClass('page-left')).to.be.true;
+    it('home should be visible', function() {
+        expect($('#home').position().top).to.be.above(window.innerHeight);
     });
 
     it('currentPage should be page2', function() {
@@ -232,8 +232,8 @@ describe('Loading tests', function() {
         expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
     });
 
-    it('should have a message block of 90px height', function() {
-        expect($('#topcoat-loading-div').height()).to.equal(90);
+    it('should have a message block of at least 80px height', function() {
+        expect($('#topcoat-loading-div').height()).to.be.above(80);
     });
 
     it('should have loading text equaling Loading Test', function() {

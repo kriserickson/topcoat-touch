@@ -1,13 +1,17 @@
 function TopcoatTouch($container) {
 
-    var $currentPage,
-        currentPage,
-        previousPage,
-        startedAnimation,
-        self = this,
-        iScroll = null,
-        events = {},
-        pages = [];
+    var _$currentPage,
+        _currentPage,
+        _previousPage,
+        _startedAnimation,
+        _dialogShowing,
+        _loadingShowing,
+        _iScroll = null,
+        _events = {},
+        _hammer,
+        _pages = [],
+        _fastClick,
+        self = this;
 
     $container = $container || $('body');
 
@@ -20,7 +24,7 @@ function TopcoatTouch($container) {
 	this.swipeDistance = 30;
 
 	// Setup FastClick...
-    new FastClick(document.body);
+    _fastClick = new FastClick(document.body);
 
     document.addEventListener('touchmove', function (e) {
         e.preventDefault();
@@ -28,53 +32,64 @@ function TopcoatTouch($container) {
 
     /** Page navigation */    
     $container.on('transitionend webkitTransitionEnd', '.page', function() {
-        if (startedAnimation) {
+        if (_startedAnimation) {
 
-            if (iScroll != null) {
-                iScroll.destroy();
+            if (_iScroll != null) {
+                _iScroll.destroy();
             }
 
             var scrollable = '#' + self.currentPage() + ' .scrollable',
                 $scrollable = $(scrollable);
             if ($scrollable.length > 0 && typeof IScroll == 'function') {
-                var bottomBarHeight = $currentPage.find('.topcoat-bottom-bar').height() || 0;
-                $scrollable.height($currentPage.height() - $scrollable.position().top - bottomBarHeight);
-                iScroll = new IScroll(scrollable);
-                iScroll.on('scrollStart', function () { 
+                var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
+                $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
+                _iScroll = new IScroll(scrollable);
+                _iScroll.on('scrollStart', function () {
                     self.isScrolling = true;
-                    if (events[self.EVENTS.SCROLL_START]) {
-                        for (var i = 0; i < events[self.EVENTS.SCROLL_START].length; i++) {
-                            var pageEvent = events[self.EVENTS.SCROLL_START][i];
-                            if (!pageEvent.page || pageEvent.page == currentPage) {
-                                pageEvent.fn({page: currentPage});
+                    if (_events[self.EVENTS.SCROLL_START]) {
+                        for (var i = 0; i < _events[self.EVENTS.SCROLL_START].length; i++) {
+                            var pageEvent = _events[self.EVENTS.SCROLL_START][i];
+                            if (!pageEvent.page || pageEvent.page == _currentPage) {
+                                pageEvent.callback({page: _currentPage});
                             }
                         }
                     }                    
                 });
-                iScroll.on('scrollEnd', function () { 
+                _iScroll.on('scrollEnd', function () {
                     self.isScrolling = false;
-                    if (events[self.EVENTS.SCROLL_END]) {
-                        for (var i = 0; i < events[self.EVENTS.SCROLL_END].length; i++) {
-                            var pageEvent = events[self.EVENTS.SCROLL_END][i];
-                            if (!pageEvent.page || pageEvent.page == currentPage) {
-                                pageEvent.fn({page: currentPage});
+                    if (_events[self.EVENTS.SCROLL_END]) {
+                        for (var i = 0; i < _events[self.EVENTS.SCROLL_END].length; i++) {
+                            var pageEvent = _events[self.EVENTS.SCROLL_END][i];
+                            if (!pageEvent.page || pageEvent.page == _currentPage) {
+                                pageEvent.callback({page: _currentPage});
                             }
                         }
                     }
                 });
             }
-            if (events[self.EVENTS.PAGE_START]) {
-                for (var i = 0; i < events[self.EVENTS.PAGE_START].length; i++) {
-                    var pageEvent = events[self.EVENTS.PAGE_START][i];
-                    if (!pageEvent.page || pageEvent.page == currentPage) {
-                        pageEvent.fn({page: currentPage});
+            if (_events[self.EVENTS.PAGE_START]) {
+                for (var i = 0; i < _events[self.EVENTS.PAGE_START].length; i++) {
+                    var pageEvent = _events[self.EVENTS.PAGE_START][i];
+                    if (!pageEvent.page || pageEvent.page == _currentPage) {
+                        pageEvent.callback({page: _currentPage});
                     }
                 }
             }
-            startedAnimation = false;
+            $container.find('.page.transition').removeClass('transition');
+            $container.find('.page-left').removeClass('page-left').removeClass('page');
+            $container.find('.page-right').removeClass('page-right').removeClass('page');
+            _startedAnimation = false;
+            _fastClick.trackingDisabled = false;
         }
     });
 
+
+    function fixPage(page) {
+        if (page.substr(0,1) == '#') {
+            page = page.substr(1);
+        }
+        return page;
+    }
 
     function checkForEvent(event) {
         var hasEvent = false;
@@ -85,104 +100,118 @@ function TopcoatTouch($container) {
             }
         }
 
-        if (!hasEvent) {
-            throw 'Invalid event: ' + event;
-        }
+        return hasEvent;
     }
 
-    function returnButtonFunction(fn) {
+    function returnButtonFunction(callback) {
          return function() {
-             if (fn) {
-                 fn();
+             if (callback) {
+                 callback();
              }
              self.hideDialog();
          }
     }
 
     // Public functions
-    this.on = function(event, page, fn) {
-        checkForEvent(event);
-        if (typeof page == 'function') {
-            fn = page;
+    this.on = function() {
+        var event = arguments[0];
+        if (checkForEvent(event)) {
+            if (arguments.length > 2) {
+                var page = fixPage(arguments[1]);
+                var callback = arguments[2];
+            } else {
+                callback = arguments[1];
             page = undefined;
         }
 
-        if (!events[event]) {
-            events[event] = [];
+            if (!_events[event]) {
+                _events[event] = [];
+            }
+            _events[event].push({page: page, callback:  callback});
+        } else if (Hammer) {
+            hammerOn(event, arguments[1], arguments[2], arguments[3]);
+        } else {
+            throw 'Invalid event: ' + event;
         }
-        events[event].push({page: page, fn:  fn});
         return self;
     };
 
-    this.off = function(event, page, fn) {
-        checkForEvent(event);
-        if (typeof page == 'function') {
-            fn = page;
+    this.off = function() {
+        var event = arguments[0];
+        if (checkForEvent(event)) {
+            if (arguments.length > 2) {
+                var page = fixPage(arguments[1]);
+                var callback = arguments[2];
+            } else {
+                callback = arguments[1];
             page = undefined;
         }
-        if (events[event]) {
-            if (page || fn) {
-                for (var i = 0; i < events[event].length; i++) {
-                    if (events[event].page == page && (!fn || fn == events[event].fn)) {
-                        events.splice(i,1);
+            if (_events[event]) {
+                if (page || callback) {
+                    for (var i = 0; i < _events[event].length; i++) {
+                        if (_events[event].page == page && (!callback || callback == _events[event].callback)) {
+                            _events.splice(i,1);
                         break;
                     }
                 }
             } else {
-                events[event] = [];
+                    _events[event] = [];
             }
+        }
+        } else {
+            hammerOff(event, arguments[1], arguments[2], arguments[3]);
         }
         return self;
     };
 
     // Return the name of the current page
     this.currentPage = function() {
-        return currentPage;
+        return _currentPage;
     };
 
     this.previousPage = function() {
-        return previousPage;
+        return _previousPage;
     };
 
     // Whether or not the user can go back... 
     this.hasBack = function() {
-        return pages.length > 1;
+        return _pages.length > 1;
     };
 
     // Go back 
     this.goBack = function () {
-        this.goTo(pages[pages.length - 2]);
+        this.goTo(_pages[_pages.length - 2]);
     };
 
     // GoTo page, including having history...
     this.goTo = function ($page, back) {
 
-        var l = pages.length;
+        var l = _pages.length;
 
-        previousPage = currentPage;
+        _previousPage = _currentPage;
 
         if (typeof $page === 'string') {
-            currentPage = $page;
+            _currentPage = $page;
             if ($page.substr(0,1) != '#') {
                 $page = '#' + $page;
             }
             $page = $($page);
         } else {
-            currentPage = $page.attr('id');
+            _currentPage = $page.attr('id');
         }
 
         if (l === 0) {
-            pages.push($page);
+            _pages.push($page);
             this.goDirectly($page);
-            startedAnimation = true;
+            _startedAnimation = true;
             $page.trigger('transitionend');
             return;
         }
-        if (back || $page === pages[l - 2]) {
-            pages.pop();
+        if (back || $page === _pages[l - 2]) {
+            _pages.pop();
             this.goDirectly($page, 'page-left');
         } else {
-            pages.push($page);
+            _pages.push($page);
             this.goDirectly($page, 'page-right');
         }
 
@@ -191,11 +220,13 @@ function TopcoatTouch($container) {
     // Use this function if you want to control page movement without adding to the history...
     this.goDirectly = function (page, from) {
 
-        startedAnimation = true;
+        _startedAnimation = true;
 
-        if (!$currentPage || !from) {
+        _fastClick.trackingDisabled = true;
+
+        if (!_$currentPage || !from) {
             page.attr('class', 'page page-center');
-            $currentPage = page;
+            _$currentPage = page;
             return;
         }
 
@@ -209,49 +240,53 @@ function TopcoatTouch($container) {
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         page.attr('class', 'page transition page-center');
-        $currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
-        if (events[self.EVENTS.PAGE_END]) {
-            for (var i = 0; i < events[self.EVENTS.PAGE_END].length; i++) {
-                var pageEvent = events[self.EVENTS.PAGE_END][i];
-                if (!pageEvent.page || pageEvent.page == currentPage) {
-                    pageEvent.fn({page: previousPage});
+
+        _$currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
+        if (_events[self.EVENTS.PAGE_END]) {
+            for (var i = 0; i < _events[self.EVENTS.PAGE_END].length; i++) {
+                var pageEvent = _events[self.EVENTS.PAGE_END][i];
+                if (!pageEvent.page || pageEvent.page == _currentPage) {
+                    pageEvent.callback({page: _previousPage});
                 }
             }
         }
 
-        $currentPage = page;
+        _$currentPage = page;
     };
 
     // Remove the previous page from the history (not the current page)...
     this.removePageFromHistory = function() {
-        pages.splice(pages.length - 2, 1);
+        _pages.splice(_pages.length - 2, 1);
     };
 
     // Refreshes the iScroll in case the page size has changed without leaving and coming back to the page...
     this.refreshScroll = function() {
-        if (iScroll != null) {
-            iScroll.refresh();
+        if (_iScroll != null) {
+            _iScroll.refresh();
         }
     };
 
     this.scrollTo = function(x, y, duration, easing) {
-       if (iScroll != null) {
-            iScroll.scrollTo(x, y, duration, easing);
+       if (_iScroll != null) {
+            _iScroll.scrollTo(x, y, duration, easing);
         }
     };
 
     this.scrollToElement = function(el, time, offsetX, offsetY, easing) {
-        if (iScroll != null) {
+        if (_iScroll != null) {
             if (el instanceof jQuery) {
                 el = el[0];
             }
-            iScroll.scrollToElement(el, time, offsetX, offsetY, easing);
+            _iScroll.scrollToElement(el, time, offsetX, offsetY, easing);
         }
     };
 
     // Show a loading indciator with an optional message
     this.showLoading = function (msg) {
+        if (_loadingShowing) {
         self.hideLoading();
+        }
+        _loadingShowing = true;
         var html = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
             '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
                 '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
@@ -260,14 +295,22 @@ function TopcoatTouch($container) {
         $('.page-center').append(html);
     };
 
+    this.loadingMessage = function(msg) {
+        $('#topcoat-loading-message').html(msg);
+    };
+
     // Hides the loading indicator
     this.hideLoading = function () {
+        _loadingShowing = false;
         $('#topcoat-loading-div,#topcoat-loading-overlay-div').remove();
     };
 
     
     this.showDialog = function(content, title, buttons) {
+        if (self.dialogShowing()) {
         self.hideDialog();
+        }
+        _dialogShowing = true;
         if (typeof title == 'object') {
             buttons = title;
             title = '';
@@ -295,15 +338,47 @@ function TopcoatTouch($container) {
             '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
          '</div>');
                 
+        
         $('.page-center').append($dialog);
-        var dialogHeight = 40;
-        $dialog.find('div').each(function(index, div) { 
+        $dialog[1].style.top = "-1000px";
+        
+
+        var images = $dialog.find('img');
+        var imagesLoaded = images.length;
+        images.load(function() {
+            imagesLoaded--;
+        });
+        for (var i = 0; i < images.length; i++) {
+            if (images[i].complete || images[i].naturalWidth > 0) {
+                imagesLoaded--;
+            }
+        }
+        function setDialogHeight() {
+            if (imagesLoaded > 0) {
+                   setTimeout(setDialogHeight, 50);
+            } else {
+                var dialogHeight = 20;
+                $dialog.find('> div').each(function(index, div) {
             dialogHeight += $(div).height(); 
         });
         $('#topcoat-dialog-div').height(dialogHeight).css('visibility', 'visible');
+                $dialog[1].style.top = "0px";
+            }
+        }
+        setDialogHeight();
+
+    };
+
+    this.dialogShowing = function() {
+        return _dialogShowing;
+    };
+
+    this.loadingShowing = function() {
+        return _loadingShowing;
     };
     
     this.hideDialog = function() {
+        _dialogShowing = false;
         $('#topcoat-loading-overlay-div,#topcoat-dialog-div').remove();
     };
 
@@ -361,7 +436,7 @@ function TopcoatTouch($container) {
 
     /* End Dropdown Box */
 
-	/* Start events for next and previous page */
+
     // Add next and previous events that can be caught...
     if (window.history && history.pushState) { // check for history api support
         
@@ -381,48 +456,67 @@ function TopcoatTouch($container) {
             }
         }, false);
 
-        
     }
-
-	/* End events for next and previous page */
-
-
-    /* Add swipe functionality */
-    function createEvent(ev, name) {
         
-        evt = null;
-        return false
-    }
+    // Hammer events...
 
-    var notMoving = true;
-    var startingPoint = {x: 0, y: 0};
-    var endPoint = {x: 0, y: 0};
-    var touch = {
-        touchstart: function (ev) {
-            startingPoint = {x: ev.touches[0].pageX, y: ev.touches[0].pageY}
-        },
-        touchmove: function (ev) {
-            notMoving = false;
-            endPoint = {x: ev.touches[0].pageX, y: ev.touches[0].pageY}
-        },
-        touchend: function (ev) {
-            if (!notMoving) {
-                var x = endPoint.x - startingPoint.x, xr = Math.abs(x), y = endPoint.y - startingPoint.y, yr = Math.abs(y);
-                if (Math.max(xr, yr) > self.swipeDistance) {
-                    var name = (xr > yr ? (x < 0 ? 'swipeLeft' : 'swipeRight') : (y < 0 ? 'swipeUp' : 'swipeDown'));
-                    var evt = document.createEvent("CustomEvent");
-                    evt.initCustomEvent(name, true, true, ev.target);
-                    ev.target.dispatchEvent(evt);
+    function eventCallback(event) {
+        if (_events[event.type]) {
+            for (var i = 0; i < _events[event.type].length; i++) {
+                if (_events[event.type][i].page == self.currentPage() &&  
+                    $(event.target).is(_events[event.type][i].selector)) {
+                    _events[event.type][i].callback.apply(event.target, [event]);
                 }
             }
-            notMoving = true
         }
-    };
-    for (var ev in touch) {
-        document.addEventListener(ev, touch[ev], false);
     }
-	/* End Swipe Functionality */
 
+
+    function hammerOn(gesture, selector, page, callback) {
+        if (typeof page == 'function') {
+            callback = page;
+            page = undefined;
+        } else {
+            page = fixPage(page);
+        }
+        if (!_hammer) {
+            _hammer = Hammer(document.body, {swipe_velocity: 0.5});
+        }
+        var gestures = gesture.split(' ');
+        for (var i = 0; i < gestures.length; i++) {
+            if (!_events[gestures[i]]) {                
+                _events[gestures[i]] = [];
+                _hammer.on(gestures[i], eventCallback);            
+            }
+            _events[gestures[i]].push({selector: selector, callback: callback, page: page});
+        }
+    }
+
+    function hammerOff(gesture, selector, page, callback) {
+        if (typeof page == 'function') {
+            callback = page;
+            page = undefined;
+        } else {
+            page = fixPage(page);
+        }
+
+        var gestures = gesture.split(' ');
+        
+        for (var i = 0; i < gestures.length; i++) {
+            var event = _events[gestures[i]];
+            if (event) {
+                for (var j = 0; j < event.length; j++) {
+                    if (event[j].selector == selector && (!page || event[j].page == page) && (!callback || event[j].callback == callback)) {
+                        event.splice(j, 1);
+                    }
+                    if (event.length == 0) {
+                        _hammer.off(gesture, eventCallback);
+                        delete _events[gestures[i]];
+    }
+                }
+            }
+        }
+    }
 
 
 }
