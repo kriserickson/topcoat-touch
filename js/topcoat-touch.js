@@ -1,4 +1,4 @@
-function TopcoatTouch($container) {
+function TopcoatTouch($container, options) {
 
     var _$currentPage,
         _currentPage,
@@ -10,6 +10,8 @@ function TopcoatTouch($container) {
         _events = {},
         _hammer,
         _pages = [],
+        _controllers = {},
+        _controller,
         _fastClick,
         self = this;
 
@@ -21,7 +23,15 @@ function TopcoatTouch($container) {
     this.EVENTS.SCROLL_START = 'scrollStart';
     this.EVENTS.SCROLL_END = 'scrollEnd';
     this.isScrolling = false;
-	this.swipeDistance = 30;
+    var defaults = {swipeDistance: 30, templateDirectory : 'templates'};
+    options = options || {};
+    for (var defaultName in defaults) {
+        if (defaults.hasOwnProperty(defaultName)) {
+            this[defaultName] = options[defaultName] || defaults[defaultName];
+        }
+    }
+
+
 
 	// Setup FastClick...
     _fastClick = new FastClick(document.body);
@@ -76,8 +86,15 @@ function TopcoatTouch($container) {
                 }
             }
             $container.find('.page.transition').removeClass('transition');
-            $container.find('.page-left').removeClass('page-left').removeClass('page');
-            $container.find('.page-right').removeClass('page-right').removeClass('page');
+            if (_controller) {
+                _controller.preremove.call(self);
+                var $page = $container.find('.page-left,.page-right').remove();
+                _controller.postremove.call(self, $page);
+                _controller = null;
+            } else {
+	            $container.find('.page-left').removeClass('page-left').removeClass('page');
+	            $container.find('.page-right').removeClass('page-right').removeClass('page');
+            }
             _startedAnimation = false;
             _fastClick.trackingDisabled = false;
         }
@@ -186,36 +203,59 @@ function TopcoatTouch($container) {
     // GoTo page, including having history...
     this.goTo = function ($page, back) {
 
-        var l = _pages.length;
-
         _previousPage = _currentPage;
 
         if (typeof $page === 'string') {
             _currentPage = $page;
-            if ($page.substr(0,1) != '#') {
-                $page = '#' + $page;
+            if (_controllers[$page]) {
+                _controller = _controllers[$page];
+                _controller.prerender();
+                function renderPage() {
+                    if (_controller.template) {
+                        $page = _controller.render.call(self);
+                        _controller.postrender.call(self, $page);
+                        $container.append($page);
+                        _controller.postadd.call(self);
+                        goToPage($page, back);
+                    } else {
+                        setTimeout(renderPage, 50);
+                    }
+                }
+                renderPage();
+
+            } else {
+                if ($page.substr(0,1) != '#') {
+                    $page = '#' + $page;
+                }
+                goToPage($($page, back));
             }
-            $page = $($page);
         } else {
             _currentPage = $page.attr('id');
+            goToPage($page, back);
         }
 
-        if (l === 0) {
+
+    };
+
+    function goToPage($page, back) {
+        var pagesLength = _pages.length;
+
+        if (pagesLength === 0) {
             _pages.push($page);
-            this.goDirectly($page);
+            self.goDirectly($page);
             _startedAnimation = true;
             $page.trigger('transitionend');
             return;
         }
-        if (back || $page === _pages[l - 2]) {
+
+        if (back || $page === _pages[pagesLength - 2]) {
             _pages.pop();
-            this.goDirectly($page, 'page-left');
+            self.goDirectly($page, 'page-left');
         } else {
             _pages.push($page);
-            this.goDirectly($page, 'page-right');
+            self.goDirectly($page, 'page-right');
         }
-
-    };
+    }
 
     // Use this function if you want to control page movement without adding to the history...
     this.goDirectly = function (page, from) {
@@ -245,7 +285,7 @@ function TopcoatTouch($container) {
         if (_events[self.EVENTS.PAGE_END]) {
             for (var i = 0; i < _events[self.EVENTS.PAGE_END].length; i++) {
                 var pageEvent = _events[self.EVENTS.PAGE_END][i];
-                if (!pageEvent.page || pageEvent.page == _currentPage) {
+                if (!pageEvent.page || pageEvent.page == _previousPage) {
                     pageEvent.callback({page: _previousPage});
                 }
             }
@@ -518,5 +558,49 @@ function TopcoatTouch($container) {
         }
     }
 
+    // Page MVC
+
+    // The base Class implementation (does nothing)
+    this.createController = function(pageName, fns, data){
+        _controllers[pageName] = new PageController(self.templateDirectory, pageName, fns, data);
+        return _controllers[pageName];
+    };
+
+
+
+}
+
+function PageController(templateDirectory, pageName, fns, data) {
+    fns = fns || {};
+    var self = this;
+
+
+    this.data = data || {};
+
+    this.template = null;
+
+    var defaultFunctions = {
+        render: function() {
+            return $(self.template(self.data))
+        },
+        initialize: function(){
+            $.get(templateDirectory + '/' + pageName + '.ejs', function (data) {
+                self.template = _.template(data);
+            });
+        },
+        postrender: '',
+        postadd: '',
+        prerender: '',
+        preremove: '',
+        postremove: ''
+    };
+
+    for (var name in defaultFunctions) {
+        if (defaultFunctions.hasOwnProperty(name)) {
+            this[name] = fns[name] || defaultFunctions[name] || function() {};
+        }
+    }
+
+    this.initialize();
 
 }

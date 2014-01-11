@@ -59,7 +59,7 @@ $(document).ready(function() {
     });
     
     // Show a message when anyone clicks on button of the test form...
-    $('.testForm').submit(function(e) {
+    $('.testForm').submit(function() {
         tt.showDialog('<h3>Button Clicked</h3>');       
         return false;
     });
