@@ -284,7 +284,7 @@ describe('Simple Dialog tests', function() {
     it('Clicking the button should dismiss the dialog box', function() {
         $('#topcoat-button-1').trigger('click');
         if ($.fn.jquery) {
-            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
         }
         expect($('#topcoat-loading-overlay-div').css('display') == 'block').to.be.false;
         expect($('#topcoat-loading-overlay-div').css('visibility') == 'visible').to.be.false;

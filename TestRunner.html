@@ -3,18 +3,7 @@
 <head>
     <title> Topcoat Touch Tests </title>
     <link rel="stylesheet" href="./node_modules/mocha/mocha.css"/>
-<style>
-/* Shoudln't be necessary, but seems like the only way to get the report to show up... */
-#mocha-report {
-  position: fixed;
-  top: 15px;
-  left: 10px;
-  font-size: 12px;
-  margin: 0;
-  color: #888;
-  z-index: 1;
-}
-</style>
+
 </head>
 <body>
 <div id="mocha">
@@ -32,15 +21,20 @@
     <link href="css/topcoat-mobile-light.css" rel="stylesheet">
     <link href="css/topcoat-touch.css" rel="stylesheet">
     <script src="js/jquery-2.0.3.js"></script>
+    <script src="js/zepto.js"></script>
     <script src="js/topcoat-touch.js"></script>
     <script src="js/iscroll.js"></script>
     <script src="js/fastclick.js"></script>
     <script src="js/lodash-2.4.0.js"></script>
-<script src="test/tests.js"></script>
+    <script src="test/tests.js"></script>
 <script>
+    window.$ = jQuery;
+    // Uncomment to test zepto...
+    //        window.$ = Zepto;
     if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
     } else {
+    mocha.setup({globals: ['$']});
         mocha.run();
     }
 </script>

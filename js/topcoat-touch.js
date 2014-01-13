@@ -427,7 +427,7 @@ function TopcoatTouch($container, options) {
     // Writing up events...
 
     /* Dropdown Box */
-    $(document).on('click, tap', '.toggle-dropdown', function() {
+    $(document).on('click tap', '.toggle-dropdown', function() {
         var $dropdown = $(this).parent().find('.dropdown');
         $('.dropdown').removeClass('active');
         if (!$dropdown.hasClass('active')) {            
@@ -449,7 +449,7 @@ function TopcoatTouch($container, options) {
         }
     });
 
-    $(document).on('click, tap', '.dropdown-item', function() {
+    $(document).on('click tap', '.dropdown-item', function() {
         var $this = $(this),
             $dropDown = $this.parent().parent(),
             newId = $this.data('id');
@@ -465,14 +465,14 @@ function TopcoatTouch($container, options) {
 
 
     // Setup all the linked pages
-    $(document).on('click, tap', '[data-rel]', function (e) {
+    $(document).on('click tap', '[data-rel]', function (e) {
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
     });
 
     // setup the all the back buttons
-    $(document).on('click, tap', '.back-button',function () {
+    $(document).on('click tap', '.back-button',function () {
         self.goBack();
     });
 
