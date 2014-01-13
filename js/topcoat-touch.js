@@ -201,22 +201,22 @@ function TopcoatTouch($container, options) {
     };
 
     // GoTo page, including having history...
-    this.goTo = function ($page, back) {
+    this.goTo = function (page, back) {
 
         _previousPage = _currentPage;
 
-        if (typeof $page === 'string') {
-            _currentPage = $page;
-            if (_controllers[$page]) {
-                _controller = _controllers[$page];
+        if (typeof page === 'string') {
+            _currentPage = page;
+            if (_controllers[page]) {
+                _controller = _controllers[page];
                 _controller.prerender();
                 function renderPage() {
                     if (_controller.template) {
-                        $page = _controller.render.call(self);
+                        var $page = _controller.render.call(self);
                         _controller.postrender.call(self, $page);
                         $container.append($page);
                         _controller.postadd.call(self);
-                        goToPage($page, back);
+                        goToPage(page, $page, back);
                     } else {
                         setTimeout(renderPage, 50);
                     }
@@ -224,54 +224,56 @@ function TopcoatTouch($container, options) {
                 renderPage();
 
             } else {
-                if ($page.substr(0,1) != '#') {
-                    $page = '#' + $page;
+                if (page.substr(0,1) != '#') {
+                    page = '#' + page;
                 }
-                goToPage($($page, back));
+                var $page = $(page);
+                goToPage(page, $page, back);
             }
         } else {
+            $page = page;
             _currentPage = $page.attr('id');
-            goToPage($page, back);
+            goToPage(_currentPage, $page, back);
         }
 
 
     };
 
-    function goToPage($page, back) {
+    function goToPage(page, $page, back) {
         var pagesLength = _pages.length;
 
         if (pagesLength === 0) {
-            _pages.push($page);
+            _pages.push(page);
             self.goDirectly($page);
             _startedAnimation = true;
             $page.trigger('transitionend');
             return;
         }
 
-        if (back || $page === _pages[pagesLength - 2]) {
+        if (back || page === _pages[pagesLength - 2]) {
             _pages.pop();
             self.goDirectly($page, 'page-left');
         } else {
-            _pages.push($page);
+            _pages.push(page);
             self.goDirectly($page, 'page-right');
         }
     }
 
     // Use this function if you want to control page movement without adding to the history...
-    this.goDirectly = function (page, from) {
+    this.goDirectly = function ($page, from) {
 
         _startedAnimation = true;
 
         _fastClick.trackingDisabled = true;
 
         if (!_$currentPage || !from) {
-            page.attr('class', 'page page-center');
-            _$currentPage = page;
+            $page.attr('class', 'page page-center');
+            _$currentPage = $page;
             return;
         }
 
         // Position the page at the starting position of the animation
-        page.attr('class', 'page ' + from);
+        $page.attr('class', 'page ' + from);
 
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
@@ -279,7 +281,7 @@ function TopcoatTouch($container, options) {
         $container.get(0).offsetWidth;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        page.attr('class', 'page transition page-center');
+        $page.attr('class', 'page transition page-center');
 
         _$currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
         if (_events[self.EVENTS.PAGE_END]) {
@@ -291,7 +293,7 @@ function TopcoatTouch($container, options) {
             }
         }
 
-        _$currentPage = page;
+        _$currentPage = $page;
     };
 
     // Remove the previous page from the history (not the current page)...
@@ -398,11 +400,11 @@ function TopcoatTouch($container, options) {
                    setTimeout(setDialogHeight, 50);
             } else {
                 var dialogHeight = 20;
-                $dialog.find('> div').each(function(index, div) {
-            dialogHeight += $(div).height(); 
-        });
-        $('#topcoat-dialog-div').height(dialogHeight).css('visibility', 'visible');
-                $dialog[1].style.top = "0px";
+                $dialog.children('div').each(function(index, div) {
+                    dialogHeight += $(div).height();
+                });
+                $('#topcoat-dialog-div').height(dialogHeight).css('visibility', 'visible');
+                    $dialog[1].style.top = "0px";
             }
         }
         setDialogHeight();
@@ -425,7 +427,7 @@ function TopcoatTouch($container, options) {
     // Writing up events...
 
     /* Dropdown Box */
-    $(document).on('click', '.toggle-dropdown', function() {
+    $(document).on('click, tap', '.toggle-dropdown', function() {
         var $dropdown = $(this).parent().find('.dropdown');
         $('.dropdown').removeClass('active');
         if (!$dropdown.hasClass('active')) {            
@@ -447,7 +449,7 @@ function TopcoatTouch($container, options) {
         }
     });
 
-    $(document).on('click', '.dropdown-item', function() {
+    $(document).on('click, tap', '.dropdown-item', function() {
         var $this = $(this),
             $dropDown = $this.parent().parent(),
             newId = $this.data('id');
@@ -463,14 +465,14 @@ function TopcoatTouch($container, options) {
 
 
     // Setup all the linked pages
-    $(document).on('click', '[data-rel]', function (e) {
+    $(document).on('click, tap', '[data-rel]', function (e) {
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
     });
 
     // setup the all the back buttons
-    $(document).on('click', '.back-button',function () {
+    $(document).on('click, tap', '.back-button',function () {
         self.goBack();
     });
 
@@ -552,7 +554,7 @@ function TopcoatTouch($container, options) {
                     if (event.length == 0) {
                         _hammer.off(gesture, eventCallback);
                         delete _events[gestures[i]];
-    }
+                    }
                 }
             }
         }

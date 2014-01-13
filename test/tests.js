@@ -204,7 +204,7 @@ describe('Click to page 3 tests', function() {
     });
 
     it('should have scroll activated', function() {
-        expect($('.wrapper').css('transform').length).to.be.above(1);
+        expect($('.wrapper').css('-webkit-transform').length).to.be.above(1);
     });
 
 });
@@ -229,7 +229,11 @@ describe('Loading tests', function() {
 
 
     it('should have an overlay', function() {
-        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        if ($.fn.jquery) {
+            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        }
+        expect($('#topcoat-loading-overlay-div').css('display') == 'block').to.be.true;
+        expect($('#topcoat-loading-overlay-div').css('visibility') == 'visible').to.be.true;
     });
 
     it('should have a message block of at least 80px height', function() {
@@ -262,7 +266,11 @@ describe('Simple Dialog tests', function() {
 
 
     it('should have an overlay', function() {
-        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        if ($.fn.jquery) {
+            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        }
+        expect($('#topcoat-loading-overlay-div').css('display') == 'block').to.be.true;
+        expect($('#topcoat-loading-overlay-div').css('visibility') == 'visible').to.be.true;
     });
 
     it('should have dialog text equaling Dialog Test', function() {
@@ -275,7 +283,12 @@ describe('Simple Dialog tests', function() {
 
     it('Clicking the button should dismiss the dialog box', function() {
         $('#topcoat-button-1').trigger('click');
-        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
+        if ($.fn.jquery) {
+            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        }
+        expect($('#topcoat-loading-overlay-div').css('display') == 'block').to.be.false;
+        expect($('#topcoat-loading-overlay-div').css('visibility') == 'visible').to.be.false;
+
     });
 
 });
@@ -300,7 +313,11 @@ describe('Complex Dialog tests', function() {
 
 
     it('should have an overlay', function() {
-        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        if ($.fn.jquery) {
+            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(1);
+        }
+        expect($('#topcoat-loading-overlay-div').css('display') == 'block').to.be.true;
+        expect($('#topcoat-loading-overlay-div').css('visibility') == 'visible').to.be.true;
     });
 
     it('should have a ClickMe button with an id of topcoat-button-1', function() {
@@ -314,7 +331,11 @@ describe('Complex Dialog tests', function() {
     it('clicking ClickMe should change the value of tmpVal to 21 and dismiss the dialog', function() {
         $('#topcoat-button-1').trigger('click');
         expect(tmpVal).to.equal(21);
-        expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
+        if ($.fn.jquery) {
+            expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
+        }
+        expect($('#topcoat-loading-overlay-div').css('display') == 'block').to.be.false;
+        expect($('#topcoat-loading-overlay-div').css('visibility') == 'visible').to.be.false;
     });
 
 

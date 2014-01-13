@@ -46,15 +46,14 @@
     tt.createController('formExample');
     tt.createController('galleryExample', {
         postrender: function($page) {
-            $page.find('#gallery-picker').change(function(e, id) {
-                createPlaceHolder($page, id);
+            $page.find('#changeButton').click(function() {
+                createPlaceHolder($page, $('#gallery-picker').data('value'));
             });
-
             createPlaceHolder($page, 'kittens');
         }
     });
     tt.createController('waitingDialogExample', {
-        intiialize: function() {
+        postadd: function() {
             // Show the loading message...
             $(document).on('click', '#showLoading', function() {
                 tt.showLoading('10 seconds');
@@ -71,7 +70,7 @@
 
             // Show the dialog...
             $(document).on('click', '#showDialog', function() {
-                tt.showDialog('This is a dialog', 'Example Dialgo', {OK: function() { console.log('OK Pressed') }
+                tt.showDialog('This is a dialog', 'Example Dialog', {OK: function() { console.log('OK Pressed') }
                     , Cancel: function() { console.log('Cancel Pressed')}});
             });
 
