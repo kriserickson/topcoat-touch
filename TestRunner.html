@@ -3,7 +3,19 @@
 <head>
     <title> Topcoat Touch Tests </title>
     <link rel="stylesheet" href="./node_modules/mocha/mocha.css"/>
+    <style>
+        /** Quick hack to make the site visible within the test container... **/
+        #testContainer {
+            top: 50px;
+            width: 320px;
+            height: 480px;
+            border: 1px solid #000;
+        }
 
+        body > div > div {
+            position: absolute;
+            top: 9999px;
+        }</style>
 </head>
 <body>
 <div id="mocha">
@@ -18,15 +30,16 @@
     mocha.reporter('html');
     var expect = chai.expect;
 </script>
-    <link href="css/topcoat-mobile-light.css" rel="stylesheet">
-    <link href="css/topcoat-touch.css" rel="stylesheet">
-    <script src="js/jquery-2.0.3.js"></script>
-    <script src="js/zepto.js"></script>
-    <script src="js/topcoat-touch.js"></script>
-    <script src="js/iscroll.js"></script>
-    <script src="js/fastclick.js"></script>
-    <script src="js/lodash-2.4.0.js"></script>
-    <script src="test/tests.js"></script>
+<link href="css/topcoat-mobile-light.css" rel="stylesheet">
+<link href="css/topcoat-touch.css" rel="stylesheet">
+<script src="js/jquery-2.0.3.js"></script>
+<script src="js/zepto.js"></script>
+<script src="js/topcoat-touch.js"></script>
+<script src="js/iscroll.js"></script>
+<script src="js/fastclick.js"></script>
+<script src="js/lodash-2.4.0.js"></script>
+<!--<script src="test/testsSinglePage.js"></script>-->
+<script src="test/testMVC.js"></script>
 <script>
     window.$ = jQuery;
     // Uncomment to test zepto...
@@ -34,7 +47,7 @@
     if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
     } else {
-    mocha.setup({globals: ['$']});
+        mocha.setup({globals: ['$']});
         mocha.run();
     }
 </script>

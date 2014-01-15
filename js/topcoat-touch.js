@@ -15,15 +15,20 @@ function TopcoatTouch($container, options) {
         _fastClick,
         self = this;
 
+    var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft', 'dragright', 'swipe', 'swipeup', 'swipedown',
+        'swipeleft', 'swiperight', 'transform', 'transformstart', 'transformend', 'rotate', 'pinch', 'pinchin', 'pinchout', 'touch', 'release'];
+
     $container = $container || $('body');
 
     this.EVENTS = {};
-    this.EVENTS.PAGE_START = 'pageStart';
-    this.EVENTS.PAGE_END = 'pageEnd';
-    this.EVENTS.SCROLL_START = 'scrollStart';
-    this.EVENTS.SCROLL_END = 'scrollEnd';
+    this.EVENTS.PAGE_START = 'pagestart';
+    this.EVENTS.PAGE_END = 'pageend';
+    this.EVENTS.SCROLL_START = 'scrollstart';
+    this.EVENTS.SCROLL_END = 'scrollend';
     this.isScrolling = false;
-    var defaults = {swipeDistance: 30, templateDirectory : 'templates'};
+
+    // Setup deaults
+    var defaults = {templateDirectory : 'templates'};
     options = options || {};
     for (var defaultName in defaults) {
         if (defaults.hasOwnProperty(defaultName)) {
@@ -87,9 +92,15 @@ function TopcoatTouch($container, options) {
             }
             $container.find('.page.transition').removeClass('transition');
             if (_controller) {
-                _controller.preremove.call(self);
-                var $page = $container.find('.page-left,.page-right').remove();
-                _controller.postremove.call(self, $page);
+                var $page = $container.find('.page-left,.page-right');
+                if ($page.length > 0) {
+                    var prevController = _controllers[$page.attr('id')];
+                    if (prevController) {
+                        prevController.preremove.call(prevController);
+                        $page.remove();
+                        prevController.postremove.call(prevController, $page);
+                    }
+                }
                 _controller = null;
             } else {
 	            $container.find('.page-left').removeClass('page-left').removeClass('page');
@@ -131,24 +142,13 @@ function TopcoatTouch($container, options) {
 
     // Public functions
     this.on = function() {
-        var event = arguments[0];
+        var event = arguments[0].toLocaleLowerCase();
         if (checkForEvent(event)) {
-            if (arguments.length > 2) {
-                var page = fixPage(arguments[1]);
-                var callback = arguments[2];
+            eventOn(event, '', arguments[1], arguments[2], 'topcoat');
+        } else if (Hammer && HAMMER_EVENTS.indexOf(event) > -1) {
+            eventOn(event, arguments[1], arguments[2], arguments[3], 'hammer');
             } else {
-                callback = arguments[1];
-            page = undefined;
-        }
-
-            if (!_events[event]) {
-                _events[event] = [];
-            }
-            _events[event].push({page: page, callback:  callback});
-        } else if (Hammer) {
-            hammerOn(event, arguments[1], arguments[2], arguments[3]);
-        } else {
-            throw 'Invalid event: ' + event;
+            eventOn(event, arguments[1], arguments[2], arguments[3], 'jquery');
         }
         return self;
     };
@@ -156,27 +156,11 @@ function TopcoatTouch($container, options) {
     this.off = function() {
         var event = arguments[0];
         if (checkForEvent(event)) {
-            if (arguments.length > 2) {
-                var page = fixPage(arguments[1]);
-                var callback = arguments[2];
+            eventOff(event, '', arguments[1], arguments[2], 'topcoat');
+        } else if (Hammer && [HAMMER_EVENTS].indexOf(event) > -1) {
+            eventOff(event, arguments[1], arguments[2], arguments[3], 'hammer');
             } else {
-                callback = arguments[1];
-            page = undefined;
-        }
-            if (_events[event]) {
-                if (page || callback) {
-                    for (var i = 0; i < _events[event].length; i++) {
-                        if (_events[event].page == page && (!callback || callback == _events[event].callback)) {
-                            _events.splice(i,1);
-                        break;
-                    }
-                }
-            } else {
-                    _events[event] = [];
-            }
-        }
-        } else {
-            hammerOff(event, arguments[1], arguments[2], arguments[3]);
+            eventOff(event, arguments[1], arguments[2], arguments[3], 'jquery');
         }
         return self;
     };
@@ -184,6 +168,10 @@ function TopcoatTouch($container, options) {
     // Return the name of the current page
     this.currentPage = function() {
         return _currentPage;
+    };
+
+    this.currentPageFind = function(selector) {
+        return _$currentPage.find(selector);
     };
 
     this.previousPage = function() {
@@ -212,10 +200,10 @@ function TopcoatTouch($container, options) {
                 _controller.prerender();
                 function renderPage() {
                     if (_controller.template) {
-                        var $page = _controller.render.call(self);
-                        _controller.postrender.call(self, $page);
+                        var $page = _controller.render.call(_controller);
+                        _controller.postrender.call(_controller, $page);
                         $container.append($page);
-                        _controller.postadd.call(self);
+                        _controller.postadd.call(_controller);
                         goToPage(page, $page, back);
                     } else {
                         setTimeout(renderPage, 50);
@@ -503,38 +491,67 @@ function TopcoatTouch($container, options) {
     // Hammer events...
 
     function eventCallback(event) {
-        if (_events[event.type]) {
-            for (var i = 0; i < _events[event.type].length; i++) {
-                if (_events[event.type][i].page == self.currentPage() &&  
-                    $(event.target).is(_events[event.type][i].selector)) {
-                    _events[event.type][i].callback.apply(event.target, [event]);
+        var events = _events[event.type]; 
+        if (events) {
+            for (var i = 0; i < events.length; i++) {
+                if (events[i].page == self.currentPage()) {
+                    var target;
+                    var $target = $(event.target);
+                    var selector = events[i].selector;
+
+                    if ($target.is(selector)) {
+                        target = event.target
+                    } else {
+                        target = $target.closest(selector);                        
+                        target = target.length > 0 ? target[0] : false;                        
                 }
+
+                    if (target) {
+                        ret = events[i].callback.apply(target, [event]);
+                        if (ret === false) {
+                            return false;
             }
         }
     }
 
+            }
+        }
+        return undefined;        
+    }
+
+    function jqueryOn(gesture, selector, page, callback) {
+        eventOn(gesture, selector, page, callback, 'jquery');
+    }
 
     function hammerOn(gesture, selector, page, callback) {
+        eventOn(gesture, selector, page, callback, 'hammer');
+    }
+
+    function eventOn(gesture, selector, page, callback, type) {
         if (typeof page == 'function') {
             callback = page;
             page = undefined;
         } else {
             page = fixPage(page);
         }
-        if (!_hammer) {
+        if (type == 'hammer' && !_hammer) {
             _hammer = Hammer(document.body, {swipe_velocity: 0.5});
         }
         var gestures = gesture.split(' ');
         for (var i = 0; i < gestures.length; i++) {
             if (!_events[gestures[i]]) {                
                 _events[gestures[i]] = [];
+                if (type == 'hammer') {
                 _hammer.on(gestures[i], eventCallback);            
+                } else if (type == 'jquery') {
+                    $(document).on(gestures[i], eventCallback);
+                }
             }
             _events[gestures[i]].push({selector: selector, callback: callback, page: page});
         }
     }
 
-    function hammerOff(gesture, selector, page, callback) {
+    function eventOff(gesture, selector, page, callback, type) {
         if (typeof page == 'function') {
             callback = page;
             page = undefined;
@@ -552,7 +569,11 @@ function TopcoatTouch($container, options) {
                         event.splice(j, 1);
                     }
                     if (event.length == 0) {
-                        _hammer.off(gesture, eventCallback);
+                        if (type == 'hammer') {
+                        	_hammer.off(gesture, eventCallback);
+                        } else if (type == 'jquery') {
+                            $(document).off(gesture, eventCallback);
+                        }
                         delete _events[gestures[i]];
                     }
                 }

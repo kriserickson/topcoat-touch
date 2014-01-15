@@ -16,10 +16,8 @@ var pageHtml = '<div id="testContainer">' +
                    '</div>' +
                 '</div>';
 
-// Quick hack to make the site visible within the test container...
-$('head').append('<style>#testContainer { top: 50px; width: 320px; height: 480px; border: 1px solid #000; } body > div > div { position: absolute; top: 9999px; }</style>');
+describe("Single Page Initialization Tests", function () {
 
-describe("Initialization Tests", function () {
 
     var tt;
 
@@ -48,7 +46,7 @@ describe("Initialization Tests", function () {
 
 });
 
-describe('Go home tests', function() {
+describe('Single Page  Go home tests', function() {
 
     var tt;
 
@@ -78,7 +76,7 @@ describe('Go home tests', function() {
 });
 
 
-describe('Go to page2 tests', function() {
+describe('Single Page  Go to page2 tests', function() {
 
     var tt;
 
@@ -106,7 +104,7 @@ describe('Go to page2 tests', function() {
         expect($('#home').hasClass('page-center')).not.to.be.true;
     });
 
-    it('home should be visible', function() {
+    it('home should not be visible', function() {
         expect($('#home').position().top).to.be.above(window.innerHeight);
     });
 
@@ -127,7 +125,7 @@ describe('Go to page2 tests', function() {
 
 });
 
-describe('Go to back to home tests', function() {
+describe('Single Page  Go to back to home tests', function() {
 
     var tt;
 
@@ -160,7 +158,7 @@ describe('Go to back to home tests', function() {
 
 });
 
-describe('Click to page 3 tests', function() {
+describe('Single Page  Click to page 3 tests', function() {
 
     var tt;
 
@@ -209,7 +207,7 @@ describe('Click to page 3 tests', function() {
 
 });
 
-describe('Loading tests', function() {
+describe('Single Page  Loading tests', function() {
 
     var tt;
 
@@ -246,7 +244,7 @@ describe('Loading tests', function() {
 
 });
 
-describe('Simple Dialog tests', function() {
+describe('Single Page  Simple Dialog tests', function() {
 
     var tt;
 
@@ -293,7 +291,7 @@ describe('Simple Dialog tests', function() {
 
 });
 
-describe('Complex Dialog tests', function() {
+describe('Single Page  Complex Dialog tests', function() {
 
     var tt, tmpVal;
 
