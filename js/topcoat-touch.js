@@ -85,12 +85,14 @@ function TopcoatTouch($container, options) {
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
             if (_controller) {
-                _controller.pagestart(_controller);
+                _controller.pagestart.call(_controller);
+                _controller._pagestart.call(_controller);
                 var $page = $container.find('.page-left,.page-right');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
                     if (prevController) {
                         prevController.pageend.call(prevController);
+                        prevController._pageend.call(prevController);
                         $page.remove();
                         prevController.postremove.call(prevController, $page);
                     }
@@ -266,7 +268,7 @@ function TopcoatTouch($container, options) {
      * Goes to a page, helper function...
      *
      * @param page {String}
-     * @param $page {jQuery{
+     * @param $page {jQuery}
      * @param back {Boolean}
      */
     function goToPage(page, $page, back) {
@@ -404,6 +406,7 @@ function TopcoatTouch($container, options) {
 
     // Public functions
 
+
     /**
      * Turns on event delegation for event with selector on page...
      *
@@ -413,14 +416,14 @@ function TopcoatTouch($container, options) {
      * @param callback {Function}
      * @returns {TopcoatTouch}
      */
-    this.on = function () {
-        var event = arguments[0].toLocaleLowerCase();
+    this.on = function (event, selector, page, callback) {
+        event = event.toLocaleLowerCase();
         if (checkForEvent(event)) {
             eventOn(event, '', arguments[1], arguments[2], 'topcoat');
-        } else if (Hammer && HAMMER_EVENTS.indexOf(event) > -1) {
-            eventOn(event, arguments[1], arguments[2], arguments[3], 'hammer');
+        } else if (typeof Hammer === 'function' && HAMMER_EVENTS.indexOf(event) > -1) {
+            eventOn(event, selector, page, callback, 'hammer');
         } else {
-            eventOn(event, arguments[1], arguments[2], arguments[3], 'jquery');
+            eventOn(event, selector, page, callback, 'jquery');
         }
         return self;
     };
@@ -434,14 +437,14 @@ function TopcoatTouch($container, options) {
      * @param callback {Function}
      * @returns {TopcoatTouch}
      */
-    this.off = function () {
-        var event = arguments[0];
+    this.off = function (event, selector, page, callback) {
+        event = event.toLowerCase();
         if (checkForEvent(event)) {
             eventOff(event, '', arguments[1], arguments[2], 'topcoat');
-        } else if (Hammer && [HAMMER_EVENTS].indexOf(event) > -1) {
-            eventOff(event, arguments[1], arguments[2], arguments[3], 'hammer');
+        } else if (typeof Hammer === 'function' && [HAMMER_EVENTS].indexOf(event) > -1) {
+            eventOff(event, selector, page, callback, 'hammer');
         } else {
-            eventOff(event, arguments[1], arguments[2], arguments[3], 'jquery');
+            eventOff(event, selector, page, callback, 'jquery');
         }
         return self;
     };
@@ -532,6 +535,7 @@ function TopcoatTouch($container, options) {
             goToPage(_currentPage, $page, back);
         }
 
+        return self;
 
     };
 
@@ -652,6 +656,7 @@ function TopcoatTouch($container, options) {
      */
     this.loadingMessage = function (msg) {
         $('#topcoat-loading-message').html(msg);
+        return self;
     };
 
     /**
@@ -660,6 +665,7 @@ function TopcoatTouch($container, options) {
     this.hideLoading = function () {
         _loadingShowing = false;
         $('#topcoat-loading-div,#topcoat-loading-overlay-div').remove();
+        return self;
     };
 
     /**
@@ -730,7 +736,7 @@ function TopcoatTouch($container, options) {
         }
 
         setDialogHeight();
-
+        return self;
     };
 
     /**
@@ -758,6 +764,7 @@ function TopcoatTouch($container, options) {
     this.hideDialog = function () {
         _dialogShowing = false;
         $('#topcoat-loading-overlay-div,#topcoat-dialog-div').remove();
+        return self;
     };
 
 
@@ -766,22 +773,28 @@ function TopcoatTouch($container, options) {
      * @param pageName {String}
      * @param [fns] {Object}
      * @param [data] {Object}
+     * @param [events] [Array]
      * @returns PageController
      */
     this.createController = function (pageName, fns, data) {
-        _controllers[pageName] = new PageController(self.templateDirectory, pageName, fns, data);
+        _controllers[pageName] = new PageController(self.templateDirectory, pageName, fns, data, self);
         return _controllers[pageName];
     };
 
 
 }
 
-function PageController(templateDirectory, pageName, fns, data) {
+/**
+ * Privately created object, don't use the constructor...
+ * @constructor
+ */
+function PageController(templateDirectory, pageName, fns, data, tt) {
     fns = fns || {};
     var self = this;
 
-
+    this.tt = tt;
     this.data = data || {};
+    this.events = [];
 
     this.template = null;
 
@@ -799,7 +812,17 @@ function PageController(templateDirectory, pageName, fns, data) {
         prerender: '',
         pageend: '',
         postremove: '',
-        pagestart: ''
+        pagestart: '',
+        _pagestart: function() {
+            for (var i = 0; i < self.events.length; i++) {
+                self.tt.on(self.events[i].event, self.events[i].selector, pageName, self.events[i].callback);
+            }
+        },
+        _pageend: function() {
+            for (var i = 0; i < self.events.length; i++) {
+                self.tt.off(self.events[i].event, self.events[i].selector, pageName, self.events[i].callback);
+            }
+        }
     };
 
     for (var name in defaultFunctions) {
@@ -808,6 +831,34 @@ function PageController(templateDirectory, pageName, fns, data) {
             };
         }
     }
+
+    /**
+     *
+     * @param key {String|Object}
+     * @param [value] {String}
+     */
+    this.addData = function(key, value) {
+        if (typeof key === 'Object') {
+            value = key;
+            for (key in value) {
+                if (value.hasOwnProperty(key)) {
+                    this.data[key] = value[key];
+                }
+            }
+        } else {
+            this.data[key] = value;
+        }
+    };
+
+    /**
+     *
+     * @param event {String}
+     * @param [selector] {String}
+     * @param callback {Function}
+     */
+    this.addEvent = function(event, selector, callback) {
+        this.events.push({event: event, selector: selector, callback: callback});
+    };
 
     this.initialize();
 

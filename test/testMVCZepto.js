@@ -149,12 +149,18 @@ describe('Zepto MVC Dynamic Page', function () {
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         var controller = tt.createController('page2');
-        controller.data = {title: 'Page2', list: {item1: 'Item 1', item2: 'Item 2', item3: 'Item 3'}};
+        controller.data = {list: {item1: 'Item 1', item2: 'Item 2', item3: 'Item 3'}};
+        controller.addData('title', 'Page2');
         tt.on(tt.EVENTS.PAGE_START, 'page2', function () {
             done();
         });
         tt.goTo('page2');
     });
+
+    after(function () {
+        $('#testContainer').remove();
+    });
+
 
     it('should be on page 2', function() {
         expect($('#page2').hasClass('page-center')).to.be.true;
@@ -168,6 +174,49 @@ describe('Zepto MVC Dynamic Page', function () {
         expect($('#list li').length).to.equal(3);
     });
 
+
+});
+
+describe('Zepto MVC Validate Added Events Fire', function () {
+
+    var tt;
+    var buttonClicked = false;
+    var formSubmitted = false;
+
+    before(function (done) {
+        window.$ = Zepto;
+        $('body').append('<div id="testContainer">');
+        tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
+        var controller = tt.createController('home');
+        controller.addEvent('click', '#testClick', function() {
+            buttonClicked = true;
+        });
+        controller.addEvent('submit', '#testForm', function(e) {
+            e.preventDefault();
+            formSubmitted = true;
+        });
+        controller.pagestart = function () {
+            setTimeout(function() {
+                $('#testClick').trigger('click');
+                done();
+            }, 1);
+        };
+        tt.goTo('home');
+    });
+
+    after(function () {
+        $('#testContainer').remove();
+    });
+
+
+
+    it('should be on page 2', function() {
+        expect(buttonClicked).to.be.true;
+    });
+
+    it('page 2 should have a header title Page2', function() {
+        expect(formSubmitted).to.be.true;
+    });
 
 });
 
@@ -199,6 +248,11 @@ describe('Zepto MVC Goto Page2', function () {
         );
         tt.goTo('home');
     });
+
+    after(function () {
+        $('#testContainer').remove();
+    });
+
 
     it('should be on page 2', function() {
         expect($('#page2').hasClass('page-center')).to.be.true;
