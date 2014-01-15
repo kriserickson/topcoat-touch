@@ -3,20 +3,7 @@
 <head>
     <title> Topcoat Touch Tests </title>
     <link rel="stylesheet" href="./node_modules/mocha/mocha.css"/>
-    <style>
-        /** Quick hack to make the site visible within the test container... **/
-        #testContainer {
-            top: 50px;
-            width: 320px;
-            height: 480px;
-            border: 1px solid #000;
-        }
-
-        body > div > div {
-            position: absolute;
-            top: 9999px;
-        }</style>
-
+    
     <link href="css/topcoat-mobile-light.css" rel="stylesheet">
     <link href="css/topcoat-touch.css" rel="stylesheet">
     <script src="./node_modules/mocha/mocha.js"></script>
@@ -27,6 +14,31 @@
     <script src="js/iscroll.js"></script>
     <script src="js/fastclick.js"></script>
     <script src="js/lodash-2.4.0.js"></script>
+    <style>
+        /** Quick hack to make the site visible within the test container... **/
+        #testContainer {
+            width: 320px;
+            height: 480px;
+            border: 1px solid #000;
+            position: fixed;
+            left: calc(50% - 160px);
+            top: calc(50% - 240px);
+        }
+
+        #testContainer > div {
+            position: absolute;
+            top: 9999px;
+        }
+        body > div {
+            position: static;
+            top: 0;
+        }        
+        body {
+            overflow: visible;
+        }
+    
+    </style>
+
     <script>
         mocha.ui('bdd');
         mocha.reporter('html');
@@ -34,6 +46,7 @@
     </script>
 
     <script src="test/testsSinglePage.js"></script>
+    <script src="test/testsSinglePageZepto.js"></script>
     <script src="test/testMVC.js"></script>
 </head>
 <body>
@@ -42,8 +55,6 @@
     </div>
 <script>
     window.$ = jQuery;
-    // Uncomment to test zepto...
-    //        window.$ = Zepto;
     if (window.mochaPhantomJS) {
         mochaPhantomJS.run();
     } else {
