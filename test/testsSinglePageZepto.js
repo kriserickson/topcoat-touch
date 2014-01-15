@@ -18,10 +18,10 @@ var pageHtml = '<div id="testContainer">' +
 
 describe('Zepto Single Page Initialization Tests', function () {
 
-    window.$ = Zepto;
     var tt;
 
     before(function() {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
     });
@@ -46,11 +46,12 @@ describe('Zepto Single Page Initialization Tests', function () {
 
 });
 
-describe('Zepto Single Page  Go home tests', function() {
+describe('Zepto Single Page Go home tests', function() {
 
     var tt;
 
     before(function() {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.goTo('home');
@@ -76,11 +77,12 @@ describe('Zepto Single Page  Go home tests', function() {
 });
 
 
-describe('Zepto Single Page  Go to page2 tests', function() {
+describe('Zepto Single Page Go to page2 tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -125,11 +127,12 @@ describe('Zepto Single Page  Go to page2 tests', function() {
 
 });
 
-describe('Zepto Single Page  Go to back to home tests', function() {
+describe('Zepto Single Page Go to back to home tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -158,11 +161,12 @@ describe('Zepto Single Page  Go to back to home tests', function() {
 
 });
 
-describe('Zepto Single Page  Click to page 3 tests', function() {
+describe('Zepto Single Page Click to page 3 tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -207,11 +211,12 @@ describe('Zepto Single Page  Click to page 3 tests', function() {
 
 });
 
-describe('Zepto Single Page  Loading tests', function() {
+describe('Zepto Single Page Loading tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -244,11 +249,12 @@ describe('Zepto Single Page  Loading tests', function() {
 
 });
 
-describe('Zepto Single Page  Simple Dialog tests', function() {
+describe('Zepto Single Page Simple Dialog tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -291,11 +297,12 @@ describe('Zepto Single Page  Simple Dialog tests', function() {
 
 });
 
-describe('Zepto Single Page  Complex Dialog tests', function() {
+describe('Zepto Single Page Complex Dialog tests', function() {
 
     var tt, tmpVal;
 
     before(function(done) {
+        window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {

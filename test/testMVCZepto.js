@@ -1,9 +1,9 @@
-describe('MVC Initialization Tests', function () {
+describe('Zepto MVC Initialization Tests', function () {
 
     var tt;
 
     before(function () {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'));
 
@@ -28,12 +28,12 @@ describe('MVC Initialization Tests', function () {
 
 });
 
-describe('MVC Go home tests', function () {
+describe('Zepto MVC Go home tests', function () {
 
     var tt;
 
     before(function (done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home');
@@ -62,13 +62,13 @@ describe('MVC Go home tests', function () {
 
 });
 
-describe('MVC Validate Events fire...', function () {
+describe('Zepto MVC Validate Events fire...', function () {
 
     var tt;
     var events = {};
 
     before(function (done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
@@ -140,13 +140,12 @@ describe('MVC Validate Events fire...', function () {
 
 });
 
-describe('MVC Dynamic Page', function () {
+describe('Zepto MVC Dynamic Page', function () {
 
     var tt;
-    var postRemovePage = false;
 
     before(function (done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         var controller = tt.createController('page2');
@@ -172,14 +171,14 @@ describe('MVC Dynamic Page', function () {
 
 });
 
-describe('MVC Goto Page2', function () {
+describe('Zepto MVC Goto Page2', function () {
 
     var tt;
     var postRemovePage;
     var pageEndCalled = true;
 
     before(function (done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
@@ -236,13 +235,13 @@ describe('MVC Goto Page2', function () {
 
 
 
-describe('MVC Go to back to home tests', function() {
+describe('Zepto MVC Go to back to home tests', function() {
 
     var tt;
     var goneToPage2;
 
     before(function(done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
@@ -293,12 +292,12 @@ describe('MVC Go to back to home tests', function() {
 
 });
 
-describe('MVC Click to page 3 tests', function() {
+describe('Zepto MVC Click to page 3 tests', function() {
 
     var tt;
 
     before(function(done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
@@ -344,12 +343,12 @@ describe('MVC Click to page 3 tests', function() {
 
 });
 
-describe('MVC Show Loading tests', function() {
+describe('Zepto MVC Show Loading tests', function() {
 
     var tt;
 
     before(function(done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
@@ -384,12 +383,12 @@ describe('MVC Show Loading tests', function() {
 
 });
 
-describe('MVC Dialog tests', function() {
+describe('Zepto MVC Dialog tests', function() {
 
     var tt;
 
     before(function(done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
@@ -434,12 +433,12 @@ describe('MVC Dialog tests', function() {
 
 });
 
-describe('MVC Complex Dialog tests', function() {
+describe('Zepto MVC Complex Dialog tests', function() {
 
     var tt, tmpVal;
 
     before(function(done) {
-        window.$ = jQuery;
+        window.$ = Zepto;
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {

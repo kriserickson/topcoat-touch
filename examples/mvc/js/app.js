@@ -34,7 +34,7 @@
                 }
             });
         },
-        preremove: function() {
+        pageend: function() {
              if (this.carouselScroll != null) {
                 this.carouselScroll.destroy();
                 this.carouselScroll = null;

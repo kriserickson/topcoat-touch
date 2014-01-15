@@ -85,11 +85,12 @@ function TopcoatTouch($container, options) {
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
             if (_controller) {
+                _controller.pagestart(_controller);
                 var $page = $container.find('.page-left,.page-right');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
                     if (prevController) {
-                        prevController.preremove.call(prevController);
+                        prevController.pageend.call(prevController);
                         $page.remove();
                         prevController.postremove.call(prevController, $page);
                     }
@@ -796,8 +797,9 @@ function PageController(templateDirectory, pageName, fns, data) {
         postrender: '',
         postadd: '',
         prerender: '',
-        preremove: '',
-        postremove: ''
+        pageend: '',
+        postremove: '',
+        pagestart: ''
     };
 
     for (var name in defaultFunctions) {

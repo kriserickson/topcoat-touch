@@ -22,6 +22,7 @@ describe("Single Page Initialization Tests", function () {
     var tt;
 
     before(function() {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
     });
@@ -46,11 +47,12 @@ describe("Single Page Initialization Tests", function () {
 
 });
 
-describe('Single Page  Go home tests', function() {
+describe('Single Page Go home tests', function() {
 
     var tt;
 
     before(function() {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.goTo('home');
@@ -76,11 +78,12 @@ describe('Single Page  Go home tests', function() {
 });
 
 
-describe('Single Page  Go to page2 tests', function() {
+describe('Single Page Go to page2 tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -125,11 +128,12 @@ describe('Single Page  Go to page2 tests', function() {
 
 });
 
-describe('Single Page  Go to back to home tests', function() {
+describe('Single Page Go to back to home tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -158,11 +162,12 @@ describe('Single Page  Go to back to home tests', function() {
 
 });
 
-describe('Single Page  Click to page 3 tests', function() {
+describe('Single Page Click to page 3 tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -207,11 +212,12 @@ describe('Single Page  Click to page 3 tests', function() {
 
 });
 
-describe('Single Page  Loading tests', function() {
+describe('Single Page Show Loading tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -244,11 +250,12 @@ describe('Single Page  Loading tests', function() {
 
 });
 
-describe('Single Page  Simple Dialog tests', function() {
+describe('Single Page Simple Dialog tests', function() {
 
     var tt;
 
     before(function(done) {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
@@ -291,11 +298,12 @@ describe('Single Page  Simple Dialog tests', function() {
 
 });
 
-describe('Single Page  Complex Dialog tests', function() {
+describe('Single Page Complex Dialog tests', function() {
 
     var tt, tmpVal;
 
     before(function(done) {
+        window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
