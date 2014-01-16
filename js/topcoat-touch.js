@@ -55,9 +55,10 @@ function TopcoatTouch($container, options) {
     $container.on('transitionend webkitTransitionEnd', '.page', function () {
         if (_startedAnimation) {
 
-            // Remove old iScroll from previous apge...
-            if (_iScroll != null) {
+            // Remove old iScroll from previous page...
+            if (_iScroll) {
                 _iScroll.destroy();
+                _iScroll = null;
             }
 
 
@@ -192,7 +193,9 @@ function TopcoatTouch($container, options) {
     function turnOnScrolling($scrollable, scrollable) {
         var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
         $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
-        _iScroll = new IScroll(scrollable);
+        var scrollY = (!$scrollable.attr('data-scroll-y') || $scrollable.data('scroll-y'));
+        var scrollX = $scrollable.data('scroll-x');
+        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY});
         _iScroll.on('scrollStart', function () {
             self.isScrolling = true;
             if (_events[self.EVENTS.SCROLL_START]) {
@@ -772,8 +775,7 @@ function TopcoatTouch($container, options) {
      * Create a page controller
      * @param pageName {String}
      * @param [fns] {Object}
-     * @param [data] {Object}
-     * @param [events] [Array]
+     * @param [data] {Object}     
      * @returns PageController
      */
     this.createController = function (pageName, fns, data) {
@@ -800,11 +802,20 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
 
     var defaultFunctions = {
         render: function () {
-            return $(self.template(self.data))
+            try {
+                return $(self.template(self.data));                 
+            } catch (e) {
+                console.error(e + '\nRendering page: ' + pageName);
+                return '<div id="' + pageName + '"></div>';
+            }
         },
         initialize: function () {
             $.get(templateDirectory + '/' + pageName + '.ejs', function (data) {
-                self.template = _.template(data);
+                try {
+                    self.template = _.template(data);                
+                } catch (e) {
+                    console.error(e + '\in template for page: ' + pageName);
+                }
             });
         },
         postrender: '',
@@ -827,15 +838,16 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            this[name] = fns[name] || defaultFunctions[name] || function () {
-            };
+            this[name] = fns[name] || defaultFunctions[name] || function () {};
         }
     }
 
     /**
+     * Sets or Adds data to the data object used for rendering templates...
      *
      * @param key {String|Object}
      * @param [value] {String}
+     * @returns PageController
      */
     this.addData = function(key, value) {
         if (typeof key === 'Object') {
@@ -848,16 +860,20 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
         } else {
             this.data[key] = value;
         }
+        return this;
     };
 
     /**
+     * Adds an event to the page, automatically added before the page is shown and automatically removed when the page is exited..
      *
      * @param event {String}
      * @param [selector] {String}
      * @param callback {Function}
+     * @returns PageController
      */
     this.addEvent = function(event, selector, callback) {
         this.events.push({event: event, selector: selector, callback: callback});
+        return this;
     };
 
     this.initialize();

@@ -16,7 +16,8 @@ using a [collection of controllers and templates](/example/mvc/).  It uses a col
     but a templating plugin infrastructure is planned.
 
 
-Uses some of the CSS for page flipping from the Christopher Coenraets [topcoat/backbone example](http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbone-js-and-topcoat)
+Uses some of the CSS for page flipping from the Christopher Coenraets [topcoat/backbone](http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbone-js-and-topcoat) example
+and screencasts.
 
 See the example files [index.html](/example/index.html) and [app.js](/example/js/app.js) to see how it is used.
 
