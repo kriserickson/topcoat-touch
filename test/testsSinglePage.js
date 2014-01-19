@@ -128,7 +128,7 @@ describe('Single Page Go to page2 tests', function() {
 
 });
 
-describe('Single Page Go to back to home tests', function() {
+describe('Single Page back to home tests', function() {
 
     var tt;
 
@@ -137,11 +137,15 @@ describe('Single Page Go to back to home tests', function() {
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
-            tt.goTo('page2');
+            setTimeout(function() {
+                tt.goTo('page2');
+            }, 1);
         });
         tt.on(tt.EVENTS.PAGE_START, 'page2', function() {
-            tt.goBack();
-            done();
+            setTimeout(function() {
+                tt.goBack();
+                done();
+            }, 1);
         });
         tt.goTo('home');
     });
@@ -171,7 +175,9 @@ describe('Single Page Click to page 3 tests', function() {
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
-            tt.goTo('page2');
+            setTimeout(function() {
+                tt.goTo('page2');
+            }, 1);
         });
         tt.on(tt.EVENTS.PAGE_START, 'page2', function() {
             setTimeout(function() {

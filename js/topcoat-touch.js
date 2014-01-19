@@ -13,6 +13,7 @@ function TopcoatTouch($container, options) {
         _controllers = {},
         _controller,
         _fastClick,
+        _showingMenu,
         self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -27,14 +28,17 @@ function TopcoatTouch($container, options) {
     this.EVENTS.PAGE_END = 'pageend';
     this.EVENTS.SCROLL_START = 'scrollstart';
     this.EVENTS.SCROLL_END = 'scrollend';
+    this.EVENTS.MENU_ITEM_CLICKED = 'menuitem';
+    this.EVENTS.SHOW_MENU = 'showmenu';
     this.isScrolling = false;
 
     // Setup the defaults
-    var defaults = {templateDirectory: 'templates'};
+    var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50};
     options = options || {};
+    this.options = {};
     for (var defaultName in defaults) {
         if (defaults.hasOwnProperty(defaultName)) {
-            this[defaultName] = options[defaultName] || defaults[defaultName];
+            this.options[defaultName] = options[defaultName] || defaults[defaultName];
         }
     }
 
@@ -71,14 +75,9 @@ function TopcoatTouch($container, options) {
             }
 
             // If we have a PAGE_START event fire the event...
-            if (_events[self.EVENTS.PAGE_START]) {
-                for (var i = 0; i < _events[self.EVENTS.PAGE_START].length; i++) {
-                    var pageEvent = _events[self.EVENTS.PAGE_START][i];
-                    if (!pageEvent.page || pageEvent.page == _currentPage) {
-                        pageEvent.callback({page: _currentPage});
-                    }
-                }
-            }
+            arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function(callback) {
+                callback(_currentPage);
+            });
 
             // Remove the transition class, it isn't needed any more...
             $container.find('.page.transition').removeClass('transition');
@@ -94,7 +93,9 @@ function TopcoatTouch($container, options) {
                     if (prevController) {
                         prevController.pageend.call(prevController);
                         prevController._pageend.call(prevController);
-                        $page.remove();
+                    }
+                    $page.remove();
+                    if (prevController) {
                         prevController.postremove.call(prevController, $page);
                     }
                 }
@@ -198,25 +199,15 @@ function TopcoatTouch($container, options) {
         _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY});
         _iScroll.on('scrollStart', function () {
             self.isScrolling = true;
-            if (_events[self.EVENTS.SCROLL_START]) {
-                for (var i = 0; i < _events[self.EVENTS.SCROLL_START].length; i++) {
-                    var pageEvent = _events[self.EVENTS.SCROLL_START][i];
-                    if (!pageEvent.page || pageEvent.page == _currentPage) {
-                        pageEvent.callback({page: _currentPage});
-                    }
-                }
-            }
+            arrayEach(getActiveEvents(self.EVENTS.SCROLL_START, _currentPage), function(callback) {
+                 callback(_currentPage);
+            });
         });
         _iScroll.on('scrollEnd', function () {
             self.isScrolling = false;
-            if (_events[self.EVENTS.SCROLL_END]) {
-                for (var i = 0; i < _events[self.EVENTS.SCROLL_END].length; i++) {
-                    var pageEvent = _events[self.EVENTS.SCROLL_END][i];
-                    if (!pageEvent.page || pageEvent.page == _currentPage) {
-                        pageEvent.callback({page: _currentPage});
-                    }
-                }
-            }
+            arrayEach(getActiveEvents(self.EVENTS.SCROLL_END, _currentPage), function(callback) {
+                 callback(_currentPage);
+            });
         });
     }
 
@@ -266,6 +257,30 @@ function TopcoatTouch($container, options) {
         }
     }
 
+    function arrayEach(arr, callback) {
+        for (var index = 0; index < arr.length; index++) {
+            callback(arr[index], index);
+        }
+    }
+
+    function clone(arr) {
+        return arr.slice(0);
+    }
+
+    function getActiveEvents(event, page) {
+        var callbacks = [];
+        if (_events[event]) {
+            for (var i = 0; i < _events[event].length; i++) {
+                var pageEvent = _events[event][i];
+                if (!pageEvent.page || pageEvent.page == page) {
+                    callbacks.push(pageEvent.callback);
+                }
+            }
+        }
+        return callbacks;
+    }
+
+
 
     /**
      * Goes to a page, helper function...
@@ -285,7 +300,7 @@ function TopcoatTouch($container, options) {
             $page.trigger('transitionend');
 
         } else {
-            if (back || page === _pages[pagesLength - 2]) {
+            if (back) {
                 _pages.pop();
                 self.goDirectly($page, 'page-left');
             } else {
@@ -295,13 +310,13 @@ function TopcoatTouch($container, options) {
         }
     }
 
-        // Hammer events...
+    // Hammer events...
 
     /**
      * Callback to handle when events are called..
      *
      * @param event {Object}
-     * @returns {false|undefined}
+     * @returns {*}
      */
     function eventCallback(event) {
         var events = _events[event.type];
@@ -320,7 +335,7 @@ function TopcoatTouch($container, options) {
                     }
 
                     if (target) {
-                        ret = events[i].callback.apply(target, [event]);
+                        var ret = events[i].callback.apply(target, [event]);
                         if (ret === false) {
                             return false;
                         }
@@ -415,7 +430,7 @@ function TopcoatTouch($container, options) {
      *
      * @param event {String}
      * @param [selector] {String}
-     * @param page {String}
+     * @param [page] {String}
      * @param callback {Function}
      * @returns {TopcoatTouch}
      */
@@ -493,7 +508,7 @@ function TopcoatTouch($container, options) {
      * Goes back one page
      */
     this.goBack = function () {
-        this.goTo(_pages[_pages.length - 2]);
+        this.goTo(_pages[_pages.length - 2], true);
     };
 
     /**
@@ -574,14 +589,10 @@ function TopcoatTouch($container, options) {
         $page.attr('class', 'page transition page-center');
 
         _$currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
-        if (_events[self.EVENTS.PAGE_END]) {
-            for (var i = 0; i < _events[self.EVENTS.PAGE_END].length; i++) {
-                var pageEvent = _events[self.EVENTS.PAGE_END][i];
-                if (!pageEvent.page || pageEvent.page == _previousPage) {
-                    pageEvent.callback({page: _previousPage});
-                }
-            }
-        }
+
+        _.each(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function(callback) {
+            callback(_previousPage);
+        });
 
         _$currentPage = $page;
     };
@@ -775,14 +786,95 @@ function TopcoatTouch($container, options) {
      * Create a page controller
      * @param pageName {String}
      * @param [fns] {Object}
-     * @param [data] {Object}     
+     * @param [data] {Object}
      * @returns PageController
      */
     this.createController = function (pageName, fns, data) {
-        _controllers[pageName] = new PageController(self.templateDirectory, pageName, fns, data, self);
+        _controllers[pageName] = new PageController(self.options.templateDirectory, pageName, fns, data, self);
         return _controllers[pageName];
     };
 
+
+    // Setup the Menu, requires access to public function so it has to be declared here:
+    if (this.options.menu) {
+
+        if (!Array.isArray(this.options.menu)) {
+            this.options.menu = [];
+        }
+
+        var $menuDiv = $('<div id="menuDiv"></div>');
+        $('body').append($menuDiv);
+
+        // Hide the menu one mousedown
+        $(document).on('mousedown click tap', function () {
+            if (!_showingMenu) {
+                $menuDiv.fadeOut(50);
+            } else {
+                _showingMenu = false;
+            }
+        });
+
+        self.on(self.EVENTS.PAGE_END, function () {
+            if ($menuDiv.is(':visible')) {
+                $menuDiv.hide();
+                _showingMenu = false;
+            }
+        });
+
+        // Show the menu when it is clicked...
+        $(document).on('click tap', '.menu-button', showMenu);
+
+        // setup menu handlers
+        $menuDiv.on('click tap', '.menuItem', function () {
+            $('#menuDiv').hide();
+            var menuId = $(this).attr('id');
+            _.each(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function(callback) {
+                 callback(menuId);
+            });
+        });
+
+        $menuDiv.on('mousedown touchstart', '.menuItem', function() {
+            this.addClass('selected');
+        });
+
+        $menuDiv.on('mouseup touchend touchcancel touchleave', '.menuItem', function() {
+            this.removeClass('selected');
+        });
+
+        function showMenu(e) {
+
+            if (!$menuDiv.is(':visible')) {
+
+                var menuItems = clone(self.options.menu);
+
+                arrayEach(getActiveEvents(self.EVENTS.SHOW_MENU, _currentPage), function(callback) {
+                     callback(menuItems, _currentPage);
+                });
+
+                var menuDiv = '<ul id="menuList">';
+                for (var i = 0; i < menuItems.length; i++) {
+                    menuDiv += '<li><div class="menuItem" id="' + menuItems[i].id + '">' + menuItems[i].name + '</a></li>';
+                }
+                menuDiv += '</ul>';
+
+                $menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
+                _showingMenu = true;
+                e.preventDefault();
+                setTimeout(function () {
+                    _showingMenu = false;
+                }, 100);
+
+                return false;
+            } else {
+                $menuDiv.fadeOut(self.options.menuFadeOut);
+            }
+
+            // Difference between false and undefined in jQuery events...
+            return undefined;
+        }
+
+
+    }
 
 }
 
@@ -803,18 +895,18 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
     var defaultFunctions = {
         render: function () {
             try {
-                return $(self.template(self.data));                 
+                return $(self.template(self.data));
             } catch (e) {
                 console.error(e + '\nRendering page: ' + pageName);
-                return '<div id="' + pageName + '"></div>';
+                return $('<div id="' + pageName + '"></div>');
             }
         },
         initialize: function () {
             $.get(templateDirectory + '/' + pageName + '.ejs', function (data) {
                 try {
-                    self.template = _.template(data);                
+                    self.template = _.template(data);
                 } catch (e) {
-                    console.error(e + '\in template for page: ' + pageName);
+                    console.error(e + '\nin template for page: ' + pageName);
                 }
             });
         },
@@ -824,12 +916,12 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
         pageend: '',
         postremove: '',
         pagestart: '',
-        _pagestart: function() {
+        _pagestart: function () {
             for (var i = 0; i < self.events.length; i++) {
                 self.tt.on(self.events[i].event, self.events[i].selector, pageName, self.events[i].callback);
             }
         },
-        _pageend: function() {
+        _pageend: function () {
             for (var i = 0; i < self.events.length; i++) {
                 self.tt.off(self.events[i].event, self.events[i].selector, pageName, self.events[i].callback);
             }
@@ -849,8 +941,8 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
      * @param [value] {String}
      * @returns PageController
      */
-    this.addData = function(key, value) {
-        if (typeof key === 'Object') {
+    this.addData = function (key, value) {
+        if (typeof key === 'object') {
             value = key;
             for (key in value) {
                 if (value.hasOwnProperty(key)) {
@@ -871,7 +963,7 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
      * @param callback {Function}
      * @returns PageController
      */
-    this.addEvent = function(event, selector, callback) {
+    this.addEvent = function (event, selector, callback) {
         this.events.push({event: event, selector: selector, callback: callback});
         return this;
     };
