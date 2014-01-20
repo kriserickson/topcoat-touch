@@ -67,7 +67,7 @@ function TopcoatTouch($container, options) {
 
 
             // Setup iScroll automatically if there is a scrollable class on the page...
-            var scrollable = '#' + self.currentPage() + ' .scrollable';
+            var scrollable = '#' + _currentPage + ' .scrollable';
             var $scrollable = $(scrollable);
 
             if ($scrollable.length > 0 && typeof IScroll == 'function') {
@@ -289,23 +289,24 @@ function TopcoatTouch($container, options) {
      * @param $page {jQuery}
      * @param back {Boolean}
      */
-    function goToPage(page, $page, back) {
+    function goToPage(page, $page, back, transition, dialog) {
         var pagesLength = _pages.length;
+        transition = ['page-right'].indexOf(transition) >= 0 || 'page-right';
 
         // If this is the first page...
         if (pagesLength === 0) {
             _pages.push(page);
-            self.goDirectly($page);
+            self.goDirectly($page, transition, false);
             _startedAnimation = true;
             $page.trigger('transitionend');
 
         } else {
             if (back) {
                 _pages.pop();
-                self.goDirectly($page, 'page-left');
+                self.goDirectly($page, 'page-left', false);
             } else {
                 _pages.push(page);
-                self.goDirectly($page, 'page-right');
+                self.goDirectly($page, transition, dialog);
             }
         }
     }
@@ -322,7 +323,7 @@ function TopcoatTouch($container, options) {
         var events = _events[event.type];
         if (events) {
             for (var i = 0; i < events.length; i++) {
-                if (events[i].page == self.currentPage()) {
+                if (events[i].page == _currentPage) {
                     var target;
                     var $target = $(event.target);
                     var selector = events[i].selector;
@@ -516,13 +517,21 @@ function TopcoatTouch($container, options) {
      *
      * @param page {String|jQuery}
      * @param [back] {Boolean}
+     * @param [transition] {String}
+     * @param [dialog] {Boolean}
      */
-    this.goTo = function (page, back) {
+    this.goTo = function (page, back, transition, dialog) {
+
+        if (typeof back === 'string') {
+            dialog = transition;
+            transition = back;
+            back = false;
+        }
 
         _previousPage = _currentPage;
 
         if (typeof page === 'string') {
-            _currentPage = page;
+            _currentPage = fixPage(page);
             if (_controllers[page]) {
                 _controller = _controllers[page];
                 _controller.prerender();
@@ -532,7 +541,7 @@ function TopcoatTouch($container, options) {
                         _controller.postrender.call(_controller, $page);
                         $container.append($page);
                         _controller.postadd.call(_controller);
-                        goToPage(page, $page, back);
+                        goToPage(page, $page, back, transition, dialog);
                     } else {
                         setTimeout(renderPage, 50);
                     }
@@ -545,12 +554,12 @@ function TopcoatTouch($container, options) {
                     page = '#' + page;
                 }
                 var $page = $(page);
-                goToPage(page, $page, back);
+                goToPage(page, $page, back, transition, dialog);
             }
         } else {
             $page = page;
             _currentPage = $page.attr('id');
-            goToPage(_currentPage, $page, back);
+            goToPage(_currentPage, $page, back, transition, dialog);
         }
 
         return self;
@@ -562,23 +571,26 @@ function TopcoatTouch($container, options) {
      * Use this function if you want to control page movement without adding to the history...
      * Use with caution, it may go away in later versions...
      *
-     * @param $page
-     * @param from
+     * @param $page {jQuery}
+     * @param transitionType {String}
+     * @param [dialog] {Boolean}
      */
-    this.goDirectly = function ($page, from) {
+    this.goDirectly = function ($page, transitionType, dialog) {
+
+        // Transition type one of page-left, page-right, page-down, pop and flip...
 
         _startedAnimation = true;
 
         _fastClick.trackingDisabled = true;
 
-        if (!_$currentPage || !from) {
+        if (!_$currentPage || !transitionType) {
             $page.attr('class', 'page page-center');
             _$currentPage = $page;
             return;
         }
 
         // Position the page at the starting position of the animation
-        $page.attr('class', 'page ' + from);
+        $page.attr('class', 'page ' + transitionType);
 
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
@@ -588,7 +600,7 @@ function TopcoatTouch($container, options) {
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         $page.attr('class', 'page transition page-center');
 
-        _$currentPage.attr('class', 'page transition ' + (from === 'page-left' ? 'page-right' : 'page-left'));
+        _$currentPage.attr('class', 'page transition ' + (transitionType === 'page-left' ? 'page-right' : 'page-left'));
 
         _.each(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function(callback) {
             callback(_previousPage);
