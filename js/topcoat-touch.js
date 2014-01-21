@@ -538,6 +538,9 @@ function TopcoatTouch($container, options) {
                 function renderPage() {
                     if (_controller.template) {
                         var $page = _controller.render.call(_controller);
+                        if (typeof $page == 'string') {
+                            $page = $($page);
+                        }
                         _controller.postrender.call(_controller, $page);
                         $container.append($page);
                         _controller.postadd.call(_controller);
@@ -901,6 +904,7 @@ function PageController(templateDirectory, pageName, fns, data, tt) {
     this.tt = tt;
     this.data = data || {};
     this.events = [];
+    this.pageName = pageName;
 
     this.template = null;
 
