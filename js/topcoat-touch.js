@@ -14,12 +14,20 @@ function TopcoatTouch($container, options) {
         _controller,
         _fastClick,
         _showingMenu,
+        _touchStartEvent = 'ontouchstart' in window ? 'touchstart' : 'mousedown',
+        _touchEndEvent = 'ontouchend' in window ? 'touchend touchcancel touchleave' : 'mouseup',
+        _clickEvent = 'ontouchend' in window ? 'touchend' : 'click',
         self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
         'dragright', 'swipe', 'swipeup', 'swipedown', 'swipeleft', 'swiperight', 'transform', 'transformstart',
         'transformend', 'rotate', 'pinch', 'pinchin', 'pinchout', 'touch', 'release'];
-
+    
+    // If the container is empty but the options exist...
+    if (typeof $container == 'object' && !options && !$container.jquery && !Array.isArray($container)) {
+        options = $container;
+        $container = false;
+    } 
     $container = $container || $('body');
 
     // The TT events...
@@ -30,10 +38,14 @@ function TopcoatTouch($container, options) {
     this.EVENTS.SCROLL_END = 'scrollend';
     this.EVENTS.MENU_ITEM_CLICKED = 'menuitem';
     this.EVENTS.SHOW_MENU = 'showmenu';
+    this.EVENTS.BACK = 'back';
     this.isScrolling = false;
+    this.clickEvent = _clickEvent;
+    this.touchStartEvent = _touchStartEvent;
+    this.touchEndEvent = _touchEndEvent;
 
     // Setup the defaults
-    var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50};
+    var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50, menuHasIcons: false};
     options = options || {};
     this.options = {};
     for (var defaultName in defaults) {
@@ -45,6 +57,7 @@ function TopcoatTouch($container, options) {
     // Setup FastClick...
     if (typeof FastClick == 'function') {
         _fastClick = new FastClick(document.body);
+        _clickEvent = 'click';
     }
 
     // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
@@ -113,7 +126,7 @@ function TopcoatTouch($container, options) {
 
 
     // Dropdown Box
-    $(document).on('click tap', '.toggle-dropdown', function () {
+    $(document).on(_clickEvent, '.toggle-dropdown', function () {
         var $dropdown = $(this).parent().find('.dropdown');
         $('.dropdown').removeClass('active');
         if (!$dropdown.hasClass('active')) {
@@ -135,7 +148,7 @@ function TopcoatTouch($container, options) {
         }
     });
 
-    $(document).on('click tap', '.dropdown-item', function () {
+    $(document).on(_clickEvent, '.dropdown-item', function () {
         var $this = $(this),
             $dropDown = $this.parent().parent(),
             newId = $this.data('id');
@@ -151,14 +164,14 @@ function TopcoatTouch($container, options) {
 
 
     // Setup all the linked pages
-    $(document).on('click tap', '[data-rel]', function (e) {
+    $(document).on(_clickEvent, '[data-rel]', function (e) {
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
     });
 
     // setup the all the back buttons
-    $(document).on('click tap', '.back-button', function () {
+    $(document).on(_clickEvent, '.back-button', function () {
         self.goBack();
     });
 
@@ -176,9 +189,15 @@ function TopcoatTouch($container, options) {
         window.addEventListener('popstate', function (event) {
             var state = event.state;
             if (state) {
-                var newEvent = document.createEvent('Event');
-                newEvent.initEvent(state > 0 ? 'next' : 'previous', true, true);
-                this.dispatchEvent(newEvent);
+                var goBack = true;
+                arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function(callback) {
+                    if (callback(_currentPage) === false) {
+                        goBack = false;                                                        
+                    }
+                });
+                if (goBack) {
+                    self.goBack();
+                }
                 // reset state to what it should be
                 history.go(-state);
             }
@@ -209,6 +228,10 @@ function TopcoatTouch($container, options) {
                  callback(_currentPage);
             });
         });
+    }
+
+    function ucFirst(str) {
+        return str.substr(0,1).toUpperCase() + str.substr(1);
     }
 
     /**
@@ -509,7 +532,9 @@ function TopcoatTouch($container, options) {
      * Goes back one page
      */
     this.goBack = function () {
-        this.goTo(_pages[_pages.length - 2], true);
+        if (self.hasBack()) {
+            this.goTo(_pages[_pages.length - 2], true);
+        }
     };
 
     /**
@@ -720,7 +745,8 @@ function TopcoatTouch($container, options) {
             if (buttons.hasOwnProperty(buttonCaption)) {
                 var buttonId = 'topcoat-button-' + buttonCount++;
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
-                $(document).off('click', '#' + buttonId).on('click', '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
+                $(document).off(_clickEvent, '#' + buttonId).
+                    on(_clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
             }
 
             buttonCount++;
@@ -818,7 +844,7 @@ function TopcoatTouch($container, options) {
         $('body').append($menuDiv);
 
         // Hide the menu one mousedown
-        $(document).on('mousedown click tap', function () {
+        $(document).on(_touchStartEvent, function () {
             if (!_showingMenu) {
                 $menuDiv.fadeOut(50);
             } else {
@@ -834,23 +860,23 @@ function TopcoatTouch($container, options) {
         });
 
         // Show the menu when it is clicked...
-        $(document).on('click tap', '.menu-button', showMenu);
+        $(document).on(_clickEvent, '.menu-button', showMenu);
 
         // setup menu handlers
-        $menuDiv.on('click tap', '.menuItem', function () {
+        $menuDiv.on(_clickEvent, '.menuItem', function () {
             $('#menuDiv').hide();
-            var menuId = $(this).attr('id');
+            var menuId = $(this).data('id');
             _.each(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function(callback) {
-                 callback(menuId);
+                 callback.apply(this, [_currentPage, menuId]);
             });
         });
 
-        $menuDiv.on('mousedown touchstart', '.menuItem', function() {
-            this.addClass('selected');
+        $menuDiv.on(_touchStartEvent, '.menuItem', function() {
+            $(this).addClass('selected');
         });
 
-        $menuDiv.on('mouseup touchend touchcancel touchleave', '.menuItem', function() {
-            this.removeClass('selected');
+        $menuDiv.on(_touchEndEvent, '.menuItem', function() {
+            $(this).removeClass('selected');
         });
 
         function showMenu(e) {
@@ -860,12 +886,18 @@ function TopcoatTouch($container, options) {
                 var menuItems = clone(self.options.menu);
 
                 arrayEach(getActiveEvents(self.EVENTS.SHOW_MENU, _currentPage), function(callback) {
-                     callback(menuItems, _currentPage);
+                     menuItems = callback(_currentPage, menuItems);
                 });
 
                 var menuDiv = '<ul id="menuList">';
                 for (var i = 0; i < menuItems.length; i++) {
-                    menuDiv += '<li><div class="menuItem" id="' + menuItems[i].id + '">' + menuItems[i].name + '</a></li>';
+                    if (menuItems[i].id) {
+                        menuDiv += '<li class="menuItem" id="menuItem' + ucFirst(menuItems[i].id) + '" data-id="' + menuItems[i].id + '">' +
+                            (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
+                            '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
+                    } else {
+                        menuDiv += '<li class="menuItem"><hr></li>';
+                    }
                 }
                 menuDiv += '</ul>';
 
