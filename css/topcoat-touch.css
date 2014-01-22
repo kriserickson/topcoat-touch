@@ -372,3 +372,16 @@ body > div {
 }
 
 /** End Menu **/
+
+/** Make navigation bar height a little more standard **/
+
+.topcoat-navigation-bar {
+    height: 3rem;
+}
+
+.topcoat-navigation-bar__item {
+    height: 3rem;
+    line-height: 3rem;
+}
+
+/** End navigation bar fixes **/
