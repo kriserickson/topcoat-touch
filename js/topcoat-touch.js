@@ -71,18 +71,14 @@ function TopcoatTouch($container, options) {
         if (_startedAnimation) {
 
             // Remove old iScroll from previous page...
-            if (_iScroll) {
-                _iScroll.destroy();
-                _iScroll = null;
-            }
-
+            self.destroyScroll();
 
             // Setup iScroll automatically if there is a scrollable class on the page...
             var scrollable = '#' + _currentPage + ' .scrollable';
             var $scrollable = $(scrollable);
 
             if ($scrollable.length > 0 && typeof IScroll == 'function') {
-                turnOnScrolling($scrollable, scrollable);
+                self.turnOnScrolling(scrollable, $scrollable);
             }
 
             // If we have a PAGE_START event fire the event...
@@ -204,29 +200,7 @@ function TopcoatTouch($container, options) {
     }
 
 
-    // Page MVC
 
-    // The base Class implementation (does nothing)
-
-    function turnOnScrolling($scrollable, scrollable) {
-        var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
-        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
-        var scrollY = (!$scrollable.attr('data-scroll-y') || $scrollable.data('scroll-y'));
-        var scrollX = $scrollable.data('scroll-x');
-        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY});
-        _iScroll.on('scrollStart', function () {
-            self.isScrolling = true;
-            arrayEach(getActiveEvents(self.EVENTS.SCROLL_START, _currentPage), function (callback) {
-                callback(_currentPage);
-            });
-        });
-        _iScroll.on('scrollEnd', function () {
-            self.isScrolling = false;
-            arrayEach(getActiveEvents(self.EVENTS.SCROLL_END, _currentPage), function (callback) {
-                callback(_currentPage);
-            });
-        });
-    }
 
     function ucFirst(str) {
         return str.substr(0, 1).toUpperCase() + str.substr(1);
@@ -639,6 +613,51 @@ function TopcoatTouch($container, options) {
      */
     this.removePageFromHistory = function () {
         _pages.splice(_pages.length - 2, 1);
+    };
+
+    /**
+     *
+     * @param scrollable {String}
+     * @param [$scrollable] {jQuery}
+     */
+    this.turnOnScrolling = function(scrollable, $scrollable) {
+
+
+        $scrollable = $scrollable || $(scrollable);
+
+        // Resize the scroller to fit...
+        var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
+        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
+
+        // Clean up the old scroller if required...
+        self.destroyScroll();
+
+        var scrollY = (!$scrollable.attr('data-scroll-y') || $scrollable.data('scroll-y'));
+        var scrollX = $scrollable.data('scroll-x');
+
+        // Create the iScroll object...
+        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY});
+
+        _iScroll.on('scrollStart', function () {
+            self.isScrolling = true;
+            arrayEach(getActiveEvents(self.EVENTS.SCROLL_START, _currentPage), function (callback) {
+                callback(_currentPage);
+            });
+        });
+
+        _iScroll.on('scrollEnd', function () {
+            self.isScrolling = false;
+            arrayEach(getActiveEvents(self.EVENTS.SCROLL_END, _currentPage), function (callback) {
+                callback(_currentPage);
+            });
+        });
+    };
+
+    this.destroyScroll = function() {
+        if (_iScroll != null) {
+            _iScroll.destroy();
+            _iScroll = null;
+        }
     };
 
     /**
