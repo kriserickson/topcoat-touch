@@ -316,11 +316,11 @@ function TopcoatTouch($container, options) {
      * @param event {Object}
      * @returns {*}
      */
-    function eventCallback(event) {
+    function eventHandler(event) {
         var events = _events[event.type];
         if (events) {
             for (var i = 0; i < events.length; i++) {
-                if (events[i].page == _currentPage) {
+                if (!events[i].page || events[i].page == _currentPage) {
                     var target;
                     var $target = $(event.target);
                     var selector = events[i].selector;
@@ -370,9 +370,9 @@ function TopcoatTouch($container, options) {
             if (!_events[gestures[i]]) {
                 _events[gestures[i]] = [];
                 if (type == 'hammer') {
-                    _hammer.on(gestures[i], eventCallback);
+                    _hammer.on(gestures[i], eventHandler);
                 } else if (type == 'jquery') {
-                    $(document).on(gestures[i], eventCallback);
+                    $(document).on(gestures[i], eventHandler);
                 }
             }
             _events[gestures[i]].push({selector: selector, callback: callback, page: page});
@@ -408,9 +408,9 @@ function TopcoatTouch($container, options) {
                     }
                     if (event.length == 0) {
                         if (type == 'hammer') {
-                            _hammer.off(gesture, eventCallback);
+                            _hammer.off(gesture, eventHandler);
                         } else if (type == 'jquery') {
-                            $(document).off(gesture, eventCallback);
+                            $(document).off(gesture, eventHandler);
                         }
                         delete _events[gestures[i]];
                     }
