@@ -16,7 +16,7 @@ body {
 }
 
 .topcoat-navigation-bar__item > .topcoat-icon-button--quiet {
-    margin-top: 10px;
+    line-height: 2.9rem;
 }
 
 .topcoat-list {
@@ -340,7 +340,7 @@ body > div {
 #menuDiv {
     display: none;
     position: absolute;
-    top: 45px;
+    top: 53px;
     right: 12px;
     background-color: #e0e0e0;
     z-index: 1;
@@ -358,6 +358,10 @@ body > div {
 #menuList li {
     border-bottom: 1px solid #bbb;
     min-width: 150px
+}
+
+#menuList li:hover, #menuList li:active  {
+    background-color: #bbb;    
 }
 
 

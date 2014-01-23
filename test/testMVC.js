@@ -1,3 +1,9 @@
+function wrapperEnabled(tt) {
+    var $wrapper = tt.currentPageFind('.wrapper');
+    return !!($wrapper.css('-webkit-transform')  || $wrapper.css('transform'));
+}
+
+
 describe('MVC Initialization Tests', function () {
 
     var tt;
@@ -392,7 +398,7 @@ describe('MVC Click to page 3 tests', function() {
     });
 
     it('should have scroll activated', function() {
-        expect($('.wrapper').css('-webkit-transform').length).to.be.above(1);
+        expect(wrapperEnabled(tt)).to.be.true;
     });
 
 });

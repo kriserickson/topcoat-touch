@@ -10,6 +10,13 @@ $(document).ready(function() {
 
     var carouselScroll = null;
 
+    tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(id) {
+        if (id == 'help') {
+            tt.showDialog('This would be the help dialog', 'Help');
+        } else if (id == 'about') {
+            tt.showDialog('TopCoat Touch Kitchen Sink Demo', 'About');
+        }
+    });
 
 
     // Show the loading message...

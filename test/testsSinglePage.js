@@ -16,6 +16,14 @@ var pageHtml = '<div id="testContainer">' +
                    '</div>' +
                 '</div>';
 
+function wrapperEnabled(tt) {
+    var $wrapper = tt.currentPageFind('.wrapper');
+    return !!($wrapper.css('-webkit-transform')  || $wrapper.css('transform'));
+}
+
+
+
+
 describe("Single Page Initialization Tests", function () {
 
 
@@ -213,10 +221,11 @@ describe('Single Page Click to page 3 tests', function() {
     });
 
     it('should have scroll activated', function() {
-        expect($('.wrapper').css('-webkit-transform').length).to.be.above(1);
+        expect(wrapperEnabled(tt)).to.be.true;
     });
 
 });
+
 
 describe('Single Page Show Loading tests', function() {
 
