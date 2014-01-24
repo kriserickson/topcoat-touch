@@ -1,3 +1,6 @@
+Version 0.1.0
+- Initial version
+
 Version 0.2.0
 - Added optional minimalistic MVC framework support (no model or binding yet).
 
