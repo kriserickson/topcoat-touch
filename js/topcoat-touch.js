@@ -14,6 +14,7 @@ function TopcoatTouch($container, options) {
         _controller,
         _fastClick,
         _showingMenu,
+        _isDialog,
         self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -27,15 +28,14 @@ function TopcoatTouch($container, options) {
     }
     $container = $container || $('body');
 
+    var TRANSITIONS = {'slideleft' : {next: 'page-right', 'prev' : 'page-left'}, 'slideright' : {next: 'page-left', prev: 'page-right'},
+        slidedown : {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'scale-0', prev: ''},
+        none: {next: '', prev: ''}};
+
     // The TT events...
-    this.EVENTS = {};
-    this.EVENTS.PAGE_START = 'pagestart';
-    this.EVENTS.PAGE_END = 'pageend';
-    this.EVENTS.SCROLL_START = 'scrollstart';
-    this.EVENTS.SCROLL_END = 'scrollend';
-    this.EVENTS.MENU_ITEM_CLICKED = 'menuitem';
-    this.EVENTS.SHOW_MENU = 'showmenu';
-    this.EVENTS.BACK = 'back';
+    this.EVENTS = {PAGE_START : 'pagestart', PAGE_END: 'pageend', SCROLL_START : 'scrollstart', SCROLL_END : 'scrollend',
+        MENU_ITEM_CLICKED : 'menuitem', SHOW_MENU : 'showmenu', BACK : 'back'};
+
     this.isScrolling = false;
     this.clickEvent = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
     this.touchStartEvent = 'ontouchend' in window ? 'touchend touchcancel touchleave' : 'mouseup';
@@ -94,7 +94,7 @@ function TopcoatTouch($container, options) {
             if (_controller) {
                 _controller.pagestart.call(_controller);
                 _controller._pagestart.call(_controller);
-                var $page = $container.find('.page-left,.page-right');
+                var $page = $container.find('.page-remove');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
                     if (prevController) {
@@ -109,7 +109,7 @@ function TopcoatTouch($container, options) {
                 _controller = null;
             } else {
                 // Remove unused classes
-                $container.find('.page-left, .page-right').removeClass('page-left').removeClass('page').removeClass('page-right');
+                $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale-0');
             }
             _startedAnimation = false;
 
@@ -288,27 +288,79 @@ function TopcoatTouch($container, options) {
      */
     function goToPage(page, $page, back, transition, dialog) {
         var pagesLength = _pages.length;
-        transition = ['page-right'].indexOf(transition) >= 0 || 'page-right';
 
         // If this is the first page...
         if (pagesLength === 0) {
             _pages.push(page);
-            self.goDirectly($page, transition, false);
+            goDirectly($page, transition, false);
             _startedAnimation = true;
             $page.trigger('transitionend');
 
         } else {
             if (back) {
                 _pages.pop();
-                self.goDirectly($page, 'page-left', false);
             } else {
                 _pages.push(page);
-                self.goDirectly($page, transition, dialog);
             }
+            goDirectly($page, transition, dialog);
         }
     }
 
-    // Hammer events...
+    /**
+     *
+     * @param $page {jQuery}
+     * @param pageClass {String}
+     * @param [dialog] {Boolean}
+     */
+    function goDirectly($page, transition, dialog) {
+
+        // Transition type one of page-left, page-right, page-down, pop and flip...
+
+        _startedAnimation = true;
+
+        transition = transition ? transition.toLowerCase() : 'slideleft';
+        
+        var pageClass = TRANSITIONS[transition] || TRANSITIONS['slideleft'];
+
+        _fastClick.trackingDisabled = true;
+
+        if (!_$currentPage) {
+            $page.attr('class', 'page page-center');
+            _$currentPage = $page;
+            return;
+        }
+
+        if (_isDialog) {
+            pageClass = {next: '', prev: _isDialog};
+            _isDialog = false;
+        } else {
+            if (dialog) {
+                _isDialog = pageClass.next;
+            } else {
+                _isDialog = false;
+            }
+        }
+
+        // Position the page at the starting position of the animation
+        $page.attr('class', 'page ' + pageClass.next);
+
+
+        // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
+        //noinspection BadExpressionStatementJS
+        $container.get(0).offsetWidth;
+
+        // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
+        $page.attr('class', 'page transition page-center');
+
+        _$currentPage.attr('class', 'page transition ' + pageClass.prev + (!_isDialog ? ' page-remove' : ''));
+
+        arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
+            callback(_previousPage);
+        });
+
+        _$currentPage = $page;
+    }
+
 
     /**
      * Callback to handle when events are called..
@@ -507,7 +559,7 @@ function TopcoatTouch($container, options) {
      */
     this.goBack = function () {
         if (self.hasBack()) {
-            this.goTo(_pages[_pages.length - 2], true);
+            this.goTo(_pages[_pages.length - 2], 'slideright', false, true);
         }
     };
 
@@ -515,17 +567,16 @@ function TopcoatTouch($container, options) {
      * GoTo page, including having history...
      *
      * @param page {String|jQuery}
-     * @param [back] {Boolean}
      * @param [transition] {String}
      * @param [dialog] {Boolean}
+     * @param [back] {Boolean}
      */
-    this.goTo = function (page, back, transition, dialog) {
+    this.goTo = function (page, transition, dialog, back) {
 
-        if (typeof back === 'string') {
-            dialog = transition;
-            transition = back;
-            back = false;
+        if (_isDialog && !back) {
+            throw 'Cannot goTo a page when a dialog is showing, can only go back..';
         }
+
 
         _previousPage = _currentPage;
 
@@ -566,47 +617,7 @@ function TopcoatTouch($container, options) {
     };
 
 
-    /**
-     * Use this function if you want to control page movement without adding to the history...
-     * Use with caution, it may go away in later versions...
-     *
-     * @param $page {jQuery}
-     * @param transitionType {String}
-     * @param [dialog] {Boolean}
-     */
-    this.goDirectly = function ($page, transitionType, dialog) {
 
-        // Transition type one of page-left, page-right, page-down, pop and flip...
-
-        _startedAnimation = true;
-
-        _fastClick.trackingDisabled = true;
-
-        if (!_$currentPage || !transitionType) {
-            $page.attr('class', 'page page-center');
-            _$currentPage = $page;
-            return;
-        }
-
-        // Position the page at the starting position of the animation
-        $page.attr('class', 'page ' + transitionType);
-
-
-        // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
-        //noinspection BadExpressionStatementJS
-        $container.get(0).offsetWidth;
-
-        // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        $page.attr('class', 'page transition page-center');
-
-        _$currentPage.attr('class', 'page transition ' + (transitionType === 'page-left' ? 'page-right' : 'page-left'));
-
-        _.each(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
-            callback(_previousPage);
-        });
-
-        _$currentPage = $page;
-    };
 
     /**
      * Remove the previous page from the history (not the current page)...
@@ -885,7 +896,7 @@ function TopcoatTouch($container, options) {
         $menuDiv.on(self.clickEvent, '.menuItem', function () {
             $('#menuDiv').hide();
             var menuId = $(this).data('id');
-            _.each(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
+            arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
                 callback.apply(this, [_currentPage, menuId]);
             });
         });

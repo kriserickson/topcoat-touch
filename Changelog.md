@@ -8,3 +8,6 @@ Version 0.2.2
 - Removed previous event as a global event, made it a topcoat touch event.
 - Unified click handling.
 - Improved menu.
+
+Version 0.2.3
+- Added real dialog support with

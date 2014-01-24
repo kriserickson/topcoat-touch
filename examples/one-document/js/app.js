@@ -10,12 +10,16 @@ $(document).ready(function() {
 
     var carouselScroll = null;
 
-    tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(id) {
+    tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(page, id) {
         if (id == 'help') {
-            tt.showDialog('This would be the help dialog', 'Help');
+            tt.goTo('help', 'slidedown', true);
         } else if (id == 'about') {
-            tt.showDialog('TopCoat Touch Kitchen Sink Demo', 'About');
+            tt.goTo('about', 'pop', true);
         }
+    });
+
+    tt.on('click', 'button', 'help', function() {
+        tt.goBack();
     });
 
 
@@ -35,7 +39,7 @@ $(document).ready(function() {
 
     // Show the dialog...
     $('#showDialog').click(function() {
-        tt.showDialog('This is a dialog', 'Example Dialgo', {OK: function() { console.log('OK Pressed') }
+        tt.showDialog('This is a dialog', 'Example Dialog', {OK: function() { console.log('OK Pressed') }
             , Cancel: function() { console.log('Cancel Pressed')}});
     });
 
