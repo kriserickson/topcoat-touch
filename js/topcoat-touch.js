@@ -305,6 +305,10 @@ function TopcoatTouch($container, options) {
      * @param [callback] {Function} - optional callback when render is complete...
      */
     function renderPage(page, callback) {
+        if (typeof page == 'function') {
+            callback = page;
+            page = false;            
+        }
         _controller.prerender();
         if (_controller.template) {
             var $page = $(_controller.render.call(_controller));
@@ -687,10 +691,14 @@ function TopcoatTouch($container, options) {
      * Reloads a page...
      */
     this.reloadPage = function() {
-        renderPage(function() {
-            _controller.pagestart.call(_controller);
+        _controller = _controllers[_currentPage]; 
+        renderPage(function($page) {
             // Note we don't have to call _pagestart since we haven't unwired any events for the page so we don't have
-            //   rewire them...
+            //   rewire them...    
+            _$currentPage.empty();
+            _$currentPage.append($page.children());
+            _controller.pagestart.call(_controller);            
+            _controller = null;
         });
 
     };
