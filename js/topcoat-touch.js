@@ -43,7 +43,7 @@ function TopcoatTouch($container, options) {
 
     // Setup the defaults
     var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50, menuHasIcons: false,
-        renderFunction: false, initializeFunction: false};
+        renderFunction: false, initializeFunction: false, exceptionOnError: false};
     options = options || {};
     this.options = {};
     for (var defaultName in defaults) {
@@ -200,7 +200,12 @@ function TopcoatTouch($container, options) {
     }
 
 
-
+    /**
+     * Uppercases the first character of a string...
+     *
+     * @param str
+     * @returns {string}
+     */
 
     function ucFirst(str) {
         return str.substr(0, 1).toUpperCase() + str.substr(1);
@@ -252,16 +257,34 @@ function TopcoatTouch($container, options) {
         }
     }
 
+    /**
+     * _.map() if _ is not available...
+     *
+     * @param arr
+     * @param callback
+     */
     function arrayEach(arr, callback) {
         for (var index = 0; index < arr.length; index++) {
             callback(arr[index], index);
         }
     }
 
+    /**
+     * Clones an array...
+     *
+     * @param arr {Array}
+     * @returns {Array}
+     */
     function clone(arr) {
         return arr.slice(0);
     }
 
+    /**
+     *
+     * @param event
+     * @param page
+     * @returns {Array}
+     */
     function getActiveEvents(event, page) {
         var callbacks = [];
         if (_events[event]) {
@@ -275,6 +298,27 @@ function TopcoatTouch($container, options) {
         return callbacks;
     }
 
+    /**
+     *
+     * @param [page] {String} - used for checking if the current page is correct, not required for reload
+     * @param [callback] {Function} - optional callback when render is complete...
+     */
+    function renderPage(page, callback) {
+        _controller.prerender();
+        if (_controller.template) {
+            var $page = $(_controller.render.call(_controller));
+            if (page && $page.attr('id') != page) {
+                self._error('page id for page "' + page + '" does not match, it is currently set to "' + $page.attr('id') + '"');
+            }
+            _controller.postrender.call(_controller, $page);
+            $container.append($page);
+            if (callback) {
+                callback($page);
+            }
+        } else {
+            setTimeout(function() { renderPage(page, callback); }, 50);
+        }
+    }
 
 
     /**
@@ -471,6 +515,22 @@ function TopcoatTouch($container, options) {
         }
     }
 
+    // Private functions
+
+    /**
+     * Handles error messages with either console.error so the current function doesn't stop or Throw is you want to stop.
+     * Use exceptionOnError in development and probably turn it off in production.
+     *
+     * @param message
+     * @private
+     */
+    this._error = function(message) {
+        if (this.options.exceptionOnError) {
+            throw message;
+        } else {
+            console.error(message);
+        }
+    };
 
     // Public functions
 
@@ -556,10 +616,26 @@ function TopcoatTouch($container, options) {
 
     /**
      * Goes back one page
+     * @param [numberOfPages] {Number}
      */
-    this.goBack = function () {
+    this.goBack = function (numberOfPages) {
+        if (numberOfPages) {
+            if (_pages.length > numberOfPages) {
+                // Remove all but the last page...
+                for (var i = 0; i < numberOfPages - 1; i++) {
+                    _pages.pop();
+                }
+
+            } else {
+                this._error('Cannot go back ' + numberOfPages + ', there are only ' + _pages.length + ' pages on the backstack');
+                return;
+            }
+        }
+
         if (self.hasBack()) {
             this.goTo(_pages[_pages.length - 2], 'slideright', false, true);
+        } else {
+            this._error('Cannot go back, there are no pages on the backstack');
         }
     };
 
@@ -584,21 +660,11 @@ function TopcoatTouch($container, options) {
             _currentPage = fixPage(page);
             if (_controllers[page]) {
                 _controller = _controllers[page];
-                _controller.prerender();
-                function renderPage() {
-                    if (_controller.template) {
-                        var $page = $(_controller.render.call(_controller));
-                        _controller.postrender.call(_controller, $page);
-                        $container.append($page);
-                        _controller.postadd.call(_controller);
-                        goToPage(page, $page, back, transition, dialog);
-                    } else {
-                        setTimeout(renderPage, 50);
-                    }
-                }
-
-                renderPage();
-
+                renderPage(page, function($page) {
+                    // We call postAdd here since reloadPage should not call postAdd.
+                    _controller.postadd.call(_controller);
+                    goToPage(page, $page, back, transition, dialog);
+                });
             } else {
                 if (page.substr(0, 1) != '#') {
                     page = '#' + page;
@@ -616,7 +682,17 @@ function TopcoatTouch($container, options) {
 
     };
 
+    /**
+     * Reloads a page...
+     */
+    this.reloadPage = function() {
+        renderPage(function() {
+            _controller.pagestart.call(_controller);
+            // Note we don't have to call _pagestart since we haven't unwired any events for the page so we don't have
+            //   rewire them...
+        });
 
+    };
 
 
     /**
@@ -664,6 +740,9 @@ function TopcoatTouch($container, options) {
         });
     };
 
+    /**
+     * Destroys the iScroll object if it is instantiated to free memory and resources.
+     */
     this.destroyScroll = function() {
         if (_iScroll != null) {
             _iScroll.destroy();
@@ -970,21 +1049,28 @@ function PageController(pageName, fns, data, tt) {
 
     this.template = null;
 
+    /**
+     * Default render of a page, can be overridden with options.renderFunction
+     * @returns {String}
+     */
     function render () {
         try {
             return self.template(self.data);
         } catch (e) {
-            console.error(e + '\nRendering page: ' + pageName);
-            return $('<div id="' + pageName + '"></div>');
+            tt._error(e + '\nRendering page: ' + pageName);
+            return '<div id="' + pageName + '"></div>';
         }
     }
 
+    /**
+     * Default initialize of a page, can be overridden with options.initializeFunction
+     */
     function initialize() {
         $.get(tt.options.templateDirectory + '/' + pageName + '.ejs', function (data) {
             try {
                 self.template = _.template(data);
             } catch (e) {
-                console.error(e + '\nin template for page: ' + pageName);
+                tt._error(e + '\nin template for page: ' + pageName);
             }
         });
     }

@@ -11,3 +11,6 @@ Version 0.2.2
 
 Version 0.2.3
 - Added real dialog support with
+
+Version 0.2.4
+- Added the ability to reload a page.

@@ -8,10 +8,6 @@ body {
     overflow: hidden;
 }
 
-.scrollable {
-    overflow: hidden;
-}
-
 .hidden {
 	display: none;
 }
@@ -403,6 +399,26 @@ body > div {
 }
 
 /** End Menu **/
+
+.topcoat-button-bar__item-third {
+	display: inline-block;
+	width: 33.3%;
+}
+
+.tab-bar .topcoat-button-bar__button {
+	width: 100%;
+}
+
+.tab-bar {
+	width: 100%	
+;
+	border:  1px solid #817A56;
+}
+
+.tab-bar .topcoat-button-bar__button.selected {
+	background-color: #938953; 
+}
+
 
 /** Make navigation bar height a little more standard **/
 
