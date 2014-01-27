@@ -1,6 +1,7 @@
 function TopcoatTouch($container, options) {
 
     var _$currentPage,
+        _$loadingDiv,
         _currentPage,
         _previousPage,
         _startedAnimation,
@@ -353,7 +354,7 @@ function TopcoatTouch($container, options) {
     /**
      *
      * @param $page {jQuery}
-     * @param pageClass {String}
+     * @param transition {String}
      * @param [dialog] {Boolean}
      */
     function goDirectly($page, transition, dialog) {
@@ -791,22 +792,23 @@ function TopcoatTouch($container, options) {
     };
 
     /**
-     * Show a loading indciator with an optional message
+     * Show a loading indicator with an optional message
      * TODO: Make this more configurable...
      *
      * @param msg {String}
-     */
-    this.showLoading = function (msg) {
+     * @param [ui] {String}
+     * */
+    this.showLoading = function (msg, ui) {
         if (_loadingShowing) {
             self.hideLoading();
         }
         _loadingShowing = true;
-        var html = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
-            '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
+        var html = '<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>';
+        _$loadingDiv = $(ui || '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
             '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
-            '<span class="topcoat-spinner"></span>' +
-            '</aside>');
-        $('.page-center').append(html);
+            '<span class="topcoat-spinner"></span></aside>');
+        $container.append(html);
+        $container.append(_$loadingDiv);        
     };
 
     /**
@@ -823,8 +825,11 @@ function TopcoatTouch($container, options) {
      * Hides the loading indicator
      */
     this.hideLoading = function () {
-        _loadingShowing = false;
-        $('#topcoat-loading-div,#topcoat-loading-overlay-div').remove();
+        if (_loadingShowing) {
+            _loadingShowing = false;
+            $('#topcoat-loading-overlay-div').remove();
+            _$loadingDiv.remove();
+        }
         return self;
     };
 
@@ -1008,7 +1013,7 @@ function TopcoatTouch($container, options) {
                             (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
                             '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
                     } else {
-                        menuDiv += '<li class="menuItem"><hr></li>';
+                        menuDiv += '<li><hr></li>';
                     }
                 }
                 menuDiv += '</ul>';
