@@ -58,10 +58,13 @@ describe('Zepto Single Page Go home tests', function() {
 
     var tt;
 
-    before(function() {
+    before(function(done) {
         window.$ = Zepto;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
+        tt.on(tt.EVENTS.PAGE_START, 'home', function () {
+            done();
+        });
         tt.goTo('home');
     });
 

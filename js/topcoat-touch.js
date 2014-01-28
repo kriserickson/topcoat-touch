@@ -340,11 +340,14 @@ function TopcoatTouch($container, options) {
 
         // If this is the first page...
         if (pagesLength === 0) {
-            _pages.push(page);
-            goDirectly($page, transition, false);
-            _startedAnimation = true;
-            $page.trigger('transitionend');
-
+            // When we add the first page there is sometimes a blank screen without
+            // this hack for loading the first page...
+            setTimeout(function() {
+                _pages.push(page);
+                goDirectly($page, transition, false);
+                _startedAnimation = true;
+                $page.trigger('transitionend');
+            },0);
         } else {
             if (back) {
                 _pages.pop();
@@ -367,17 +370,18 @@ function TopcoatTouch($container, options) {
 
         _startedAnimation = true;
 
-        transition = transition ? transition.toLowerCase() : 'slideleft';
-        
-        var pageClass = TRANSITIONS[transition] || TRANSITIONS['slideleft'];
-
         _fastClick.trackingDisabled = true;
 
         if (!_$currentPage) {
-            $page.attr('class', 'page page-center');
+            $page.addClass('page page-center');
             _$currentPage = $page;
             return;
         }
+
+        // Transition type one of page-left, page-right, page-down, pop and flip...
+        transition = transition ? transition.toLowerCase() : 'slideleft';
+
+        var pageClass = TRANSITIONS[transition] || TRANSITIONS['slideleft'];
 
         if (_isDialog) {
             pageClass = {next: '', prev: _isDialog};

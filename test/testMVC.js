@@ -43,10 +43,11 @@ describe('MVC Go home tests', function () {
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home');
-        tt.goTo('home');
         tt.on(tt.EVENTS.PAGE_START, 'home', function () {
             done();
         });
+        tt.goTo('home');
+
     });
 
     after(function () {

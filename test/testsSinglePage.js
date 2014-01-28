@@ -59,11 +59,14 @@ describe('Single Page Go home tests', function() {
 
     var tt;
 
-    before(function() {
+    before(function(done) {
         window.$ = jQuery;
         $('body').append(pageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.goTo('home');
+        tt.on(tt.EVENTS.PAGE_START, 'home', function () {
+            done();
+        });
     });
 
     after(function() {

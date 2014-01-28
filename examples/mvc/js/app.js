@@ -3,9 +3,23 @@
  */
 (function() {
     // Create the topcoatTouch object
-    var tt = new TopcoatTouch();
+    var tt = new TopcoatTouch({menu: [{id: 'help', name: 'Help'}, {id: 'about', name: 'About'}]});
+
+    tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(page, id) {
+        if (id == 'help') {
+            tt.goTo('help', 'slidedown', true);
+        } else if (id == 'about') {
+            tt.goTo('about', 'pop', true);
+        }
+    });
 
     tt.createController('home');
+    tt.createController('about').addEvent('click', 'button', function() {
+        tt.goBack();
+    });
+    tt.createController('help').addEvent('click', 'button', function() {
+        tt.goBack();
+    });
     tt.createController('buttonExample', {
         postrender: function($page) {
             // Show a message when anyone clicks on button of the test form...

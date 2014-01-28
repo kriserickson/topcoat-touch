@@ -22,6 +22,9 @@ $(document).ready(function() {
         tt.goBack();
     });
 
+    tt.on('click', 'button', 'about', function() {
+        tt.goBack();
+    });
 
     // Show the loading message...
     $('#showLoading').click(function() {
