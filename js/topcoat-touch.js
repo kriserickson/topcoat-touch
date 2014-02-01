@@ -29,13 +29,13 @@ function TopcoatTouch($container, options) {
     }
     $container = $container || $('body');
 
-    var TRANSITIONS = {'slideleft' : {next: 'page-right', 'prev' : 'page-left'}, 'slideright' : {next: 'page-left', prev: 'page-right'},
-        slidedown : {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'scale-0', prev: ''},
+    var TRANSITIONS = {slideleft: {next: 'page-right', prev: 'page-left'}, slideright: {next: 'page-left', prev: 'page-right'},
+        slidedown: {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'scale-0', prev: ''},
         none: {next: '', prev: ''}};
 
     // The TT events...
-    this.EVENTS = {PAGE_START : 'pagestart', PAGE_END: 'pageend', SCROLL_START : 'scrollstart', SCROLL_END : 'scrollend',
-        MENU_ITEM_CLICKED : 'menuitem', SHOW_MENU : 'showmenu', BACK : 'back'};
+    this.EVENTS = {PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
+        MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', BACK: 'back'};
 
     this.isScrolling = false;
     this.clickEvent = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
@@ -307,7 +307,7 @@ function TopcoatTouch($container, options) {
     function renderPage(page, callback) {
         if (typeof page == 'function') {
             callback = page;
-            page = false;            
+            page = false;
         }
         _controller.prerender();
         if (_controller.template) {
@@ -321,7 +321,9 @@ function TopcoatTouch($container, options) {
                 callback($page);
             }
         } else {
-            setTimeout(function() { renderPage(page, callback); }, 50);
+            setTimeout(function () {
+                renderPage(page, callback);
+            }, 50);
         }
     }
 
@@ -342,12 +344,12 @@ function TopcoatTouch($container, options) {
         if (pagesLength === 0) {
             // When we add the first page there is sometimes a blank screen without
             // this hack for loading the first page...
-            setTimeout(function() {
+            setTimeout(function () {
                 _pages.push(page);
                 goDirectly($page, transition, false);
                 _startedAnimation = true;
                 $page.trigger('transitionend');
-            },0);
+            }, 0);
         } else {
             if (back) {
                 _pages.pop();
@@ -373,7 +375,7 @@ function TopcoatTouch($container, options) {
         _fastClick.trackingDisabled = true;
 
         if (!_$currentPage) {
-            $page.addClass('page page-center');
+            $page.attr('class', 'page page-center');
             _$currentPage = $page;
             return;
         }
@@ -533,7 +535,7 @@ function TopcoatTouch($container, options) {
      * @param message
      * @private
      */
-    this._error = function(message) {
+    this._error = function (message) {
         if (this.options.exceptionOnError) {
             throw message;
         } else {
@@ -669,7 +671,7 @@ function TopcoatTouch($container, options) {
             _currentPage = fixPage(page);
             if (_controllers[page]) {
                 _controller = _controllers[page];
-                renderPage(page, function($page) {
+                renderPage(page, function ($page) {
                     // We call postAdd here since reloadPage should not call postAdd.
                     _controller.postadd.call(_controller);
                     goToPage(page, $page, back, transition, dialog);
@@ -694,14 +696,14 @@ function TopcoatTouch($container, options) {
     /**
      * Reloads a page...
      */
-    this.reloadPage = function() {
-        _controller = _controllers[_currentPage]; 
-        renderPage(function($page) {
+    this.reloadPage = function () {
+        _controller = _controllers[_currentPage];
+        renderPage(function ($page) {
             // Note we don't have to call _pagestart since we haven't unwired any events for the page so we don't have
             //   rewire them...    
             _$currentPage.empty();
             _$currentPage.append($page.children());
-            _controller.pagestart.call(_controller);            
+            _controller.pagestart.call(_controller);
             _controller = null;
         });
 
@@ -720,7 +722,7 @@ function TopcoatTouch($container, options) {
      * @param scrollable {String}
      * @param [$scrollable] {jQuery}
      */
-    this.turnOnScrolling = function(scrollable, $scrollable) {
+    this.turnOnScrolling = function (scrollable, $scrollable) {
 
 
         $scrollable = $scrollable || $(scrollable);
@@ -756,7 +758,7 @@ function TopcoatTouch($container, options) {
     /**
      * Destroys the iScroll object if it is instantiated to free memory and resources.
      */
-    this.destroyScroll = function() {
+    this.destroyScroll = function () {
         if (_iScroll != null) {
             _iScroll.destroy();
             _iScroll = null;
@@ -820,7 +822,7 @@ function TopcoatTouch($container, options) {
             '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
             '<span class="topcoat-spinner"></span></aside>');
         $container.append(html);
-        $container.append(_$loadingDiv);        
+        $container.append(_$loadingDiv);
     };
 
     /**
@@ -1070,7 +1072,7 @@ function PageController(pageName, fns, data, tt) {
      * Default render of a page, can be overridden with options.renderFunction
      * @returns {String}
      */
-    function render () {
+    function render() {
         try {
             return self.template(self.data);
         } catch (e) {
@@ -1118,7 +1120,8 @@ function PageController(pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            this[name] = fns[name] || defaultFunctions[name] || function () {};
+            	this[name] = fns[name] || defaultFunctions[name] || function () {
+            };
         }
     }
 
