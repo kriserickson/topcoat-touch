@@ -17,6 +17,8 @@ using a [collection of controllers and templates](/example/mvc/).  It uses a col
     using [Handlebars](https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-handlebars-as-the-templating-engine) or
     [Mustache](//github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine).  You can also easily add your own templating engines following these examples.
 
+It has a [generator](https://github.com/kriserickson/generator-topcoat-touch) for [Yeoman](http://yeoman.io) that allows for rapid initial creation of your project, as well as integration with [phonegap/cordova](http://phonegap.com) and [grunt](http://gruntjs.com).
+
 Uses some of the CSS for page flipping from the Christopher Coenraets [topcoat/backbone](http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbone-js-and-topcoat) example
 and screencasts.
 
