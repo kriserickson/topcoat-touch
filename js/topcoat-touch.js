@@ -71,16 +71,7 @@ function TopcoatTouch($container, options) {
     $container.on('transitionend webkitTransitionEnd', '.page', function () {
         if (_startedAnimation) {
 
-            // Remove old iScroll from previous page...
-            self.destroyScroll();
-
-            // Setup iScroll automatically if there is a scrollable class on the page...
-            var scrollable = '#' + _currentPage + ' .scrollable';
-            var $scrollable = $(scrollable);
-
-            if ($scrollable.length > 0 && typeof IScroll == 'function') {
-                self.turnOnScrolling(scrollable, $scrollable);
-            }
+            setupIScroll();
 
             // If we have a PAGE_START event fire the event...
             arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
@@ -271,6 +262,24 @@ function TopcoatTouch($container, options) {
     }
 
     /**
+     * Sets up the IScroll if necessary
+     */
+    function setupIScroll() {
+        // Remove old iScroll from previous page...
+        self.destroyScroll();
+
+        // Setup iScroll automatically if there is a scrollable class on the page...
+        var scrollable = '#' + _currentPage + ' .scrollable';
+        var $scrollable = $(scrollable);
+
+        if ($scrollable.length > 0 && typeof IScroll == 'function') {
+            self.turnOnScrolling(scrollable, $scrollable);
+        }
+    }
+
+
+
+    /**
      * Clones an array...
      *
      * @param arr {Array}
@@ -311,11 +320,19 @@ function TopcoatTouch($container, options) {
         }
         _controller.prerender();
         if (_controller.template) {
-            var $page = $(_controller.render.call(_controller));
+            try {
+            	var $page = $(_controller.render.call(_controller));
+            } catch (e) {
+                self._error('Error calling render on page : ' + page + '\nError: ' + e);
+            }
             if (page && $page.attr('id') != page) {
                 self._error('page id for page "' + page + '" does not match, it is currently set to "' + $page.attr('id') + '"');
             }
-            _controller.postrender.call(_controller, $page);
+            try {
+            	_controller.postrender.call(_controller, $page);
+            } catch(e) {
+                self._error('Error calling postrender on page : ' + page + '\nError: ' + e);
+            }
             $container.append($page);
             if (callback) {
                 callback($page);
@@ -342,12 +359,11 @@ function TopcoatTouch($container, options) {
         if (pagesLength === 0) {
             // When we add the first page there is sometimes a blank screen without
             // this hack for loading the first page...
-            setTimeout(function() {
-                _pages.push(page);
-                goDirectly($page, transition, false);
-                _startedAnimation = true;
-                $page.trigger('transitionend');
-            },0);
+            setTimeout(function() {	            _pages.push(page);
+	            goDirectly($page, transition, false);
+	            _startedAnimation = true;
+	            $page.trigger('transitionend');
+			}, 0);
         } else {
             if (back) {
                 _pages.pop();
@@ -373,7 +389,7 @@ function TopcoatTouch($container, options) {
         _fastClick.trackingDisabled = true;
 
         if (!_$currentPage) {
-            $page.addClass('page page-center');
+            $page.attr('class', 'page page-center');
             _$currentPage = $page;
             return;
         }
@@ -382,7 +398,6 @@ function TopcoatTouch($container, options) {
         transition = transition ? transition.toLowerCase() : 'slideleft';
 
         var pageClass = TRANSITIONS[transition] || TRANSITIONS['slideleft'];
-
         if (_isDialog) {
             pageClass = {next: '', prev: _isDialog};
             _isDialog = false;
@@ -699,8 +714,12 @@ function TopcoatTouch($container, options) {
         renderPage(function($page) {
             // Note we don't have to call _pagestart since we haven't unwired any events for the page so we don't have
             //   rewire them...    
-            _$currentPage.empty();
-            _$currentPage.append($page.children());
+            _$currentPage.remove();
+            _$currentPage = $page;
+            $page.attr('class', 'page page-center');
+            
+            setupIScroll();
+
             _controller.pagestart.call(_controller);            
             _controller = null;
         });
@@ -714,6 +733,10 @@ function TopcoatTouch($container, options) {
     this.removePageFromHistory = function () {
         _pages.splice(_pages.length - 2, 1);
     };
+
+    this.clearHistory = function() {
+        _pages = [];
+    }
 
     /**
      *
@@ -871,8 +894,8 @@ function TopcoatTouch($container, options) {
             if (buttons.hasOwnProperty(buttonCaption)) {
                 var buttonId = 'topcoat-button-' + buttonCount++;
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
-                $(document).off(self.clickEvent, '#' + buttonId).
-                    on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
+                $(document).off(self.clickEvent, '#' + buttonId)
+                    .on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
             }
 
             buttonCount++;
