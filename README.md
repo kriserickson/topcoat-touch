@@ -12,10 +12,7 @@ using a [collection of controllers and templates](/example/mvc/).  It uses a col
 * [iScroll](https://github.com/cubiq/iscroll) is an optional plugin that can be used to provide smooth scrolling automatically.
 * [hammer.js](http://eightmedia.github.io/hammer.js) is an optional plugin to allow TopcoatTouch to provide event brokering for mobile touch options (swipe, tap, hold, doubletap, drag, roate, pinch, etc).
 * [lodash](http://lodash.com/) is a plugin that is only required when using [templating strategy](/example/mvc/), of course you could also use [underscore](http://underscorejs.org/).
-    Currently the default is underscore style templates, but you can easily use [Handlebars](http://handlebarsjs.com/) or [Mustache](https://github.com/janl/mustache.js).
-    See [tips and tricks](//github.com/kriserickson/topcoat-touch/wiki/Tips-Tricks) for a simple example
-    using [Handlebars](https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-handlebars-as-the-templating-engine) or
-    [Mustache](//github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine).  Also there is an [example](//github.com/kriserickson/topcoat-touch/tree/master/examples/handlebars) using handlerbars.   You can also easily add your own templating engines following these examples.
+* Currently the default is underscore style templates, but you can easily use [Handlebars](http://handlebarsjs.com/) or [Mustache](https://github.com/janl/mustache.js).   See [tips and tricks](//github.com/kriserickson/topcoat-touch/wiki/Tips-Tricks) for a simple example using [Handlebars](https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-handlebars-as-the-templating-engine) or     [Mustache](//github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine).  There is also an [example](//github.com/kriserickson/topcoat-touch/tree/master/examples/handlebars) using handlerbars.   Or you can also easily add your own templating engines following these examples.
 
 It has a [generator](https://github.com/kriserickson/generator-topcoat-touch) for [Yeoman](http://yeoman.io) that allows for rapid initial creation of your project, as well as integration with [phonegap/cordova](http://phonegap.com) and [grunt](http://gruntjs.com).
 
