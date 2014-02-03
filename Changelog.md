@@ -19,3 +19,6 @@ Version 0.2.3
 
 Version 0.2.4
 - Added the ability to reload a page.
+
+Version 0.2.5
+- Added a flip transition, improved support for the dark theme.

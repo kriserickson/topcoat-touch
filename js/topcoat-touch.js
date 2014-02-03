@@ -30,8 +30,8 @@ function TopcoatTouch($container, options) {
     $container = $container || $('body');
 
     var TRANSITIONS = {slideleft: {next: 'page-right', prev: 'page-left'}, slideright: {next: 'page-left', prev: 'page-right'},
-        slidedown: {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'scale-0', prev: ''},
-        none: {next: '', prev: ''}};
+        slidedown: {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'page-scale', prev: ''},
+        flip: {next: 'page-flip', prev: 'page-flip'}, none: {next: '', prev: ''}};
 
     // The TT events...
     this.EVENTS = {PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
@@ -80,6 +80,7 @@ function TopcoatTouch($container, options) {
 
             // Remove the transition class, it isn't needed any more...
             $container.find('.page.transition').removeClass('transition');
+            $container.find('.page.transition-slow').removeClass('transition-slow');
 
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
@@ -92,16 +93,16 @@ function TopcoatTouch($container, options) {
                     if (prevController) {
                         prevController.pageend.call(prevController);
                         prevController._pageend.call(prevController);
-                    }
+                    }                    
                     $page.remove();
                     if (prevController) {
                         prevController.postremove.call(prevController, $page);
-                    }
+                    }                    
                 }
                 _controller = null;
             } else {
                 // Remove unused classes
-                $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale-0');
+                $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
             }
             _startedAnimation = false;
 
@@ -366,7 +367,7 @@ function TopcoatTouch($container, options) {
                 goDirectly($page, transition, false);
                 _startedAnimation = true;
                 $page.trigger('transitionend');
-            }, 0);
+            }, 20);
         } else {
             if (back) {
                 _pages.pop();
@@ -420,10 +421,12 @@ function TopcoatTouch($container, options) {
         //noinspection BadExpressionStatementJS
         $container.get(0).offsetWidth;
 
-        // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        $page.attr('class', 'page transition page-center');
+        var transition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
 
-        _$currentPage.attr('class', 'page transition ' + pageClass.prev + (!_isDialog ? ' page-remove' : ''));
+		// Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation            
+        $page.attr('class', 'page page-center ' + transition);
+        
+        _$currentPage.attr('class', 'page page-remove ' + transition + ' ' + pageClass.prev);
 
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
             callback(_previousPage);
@@ -739,7 +742,7 @@ function TopcoatTouch($container, options) {
 
     this.clearHistory = function() {
         _pages = [];
-    }
+    };
 
     /**
      *
@@ -753,8 +756,9 @@ function TopcoatTouch($container, options) {
 
         // Resize the scroller to fit...
         var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
-        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
-
+        if (!$scrollable[0].style.height) {
+	        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
+        }
         // Clean up the old scroller if required...
         self.destroyScroll();
 
@@ -980,8 +984,7 @@ function TopcoatTouch($container, options) {
      * @returns PageController
      */
     this.createController = function (pageName, fns, data) {
-        _controllers[pageName] = new PageController(pageName, fns, data, self);
-        return _controllers[pageName];
+        return _controllers[pageName] = new PageController(pageName, fns, data, self);        
     };
 
 

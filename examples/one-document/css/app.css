@@ -101,17 +101,13 @@ textarea {
 
 .menu-item {
     cursor: pointer;
-
-    /* font-size: 14pt; */
-
-    line-height: 17pt;
+	line-height: 17pt;
     padding: 5px 10px;
 }
 
 ul.photo-gallery {
 	list-style: none;		
-	padding: 0px;
-	/* margin: 0px; */
+	padding: 0px;	
 }
 
 .photoClass {
@@ -120,6 +116,9 @@ ul.photo-gallery {
     padding-bottom: 33%;
     display: inline-block;
     background-color: #fff;
-    box-sizing: border-box;
-    border: 4px solid #dfe2e2;
+    box-sizing: border-box;	
+    border: 4px solid #dfe2e2;	
+	/* For dark ui use the follwoing  */
+	border: 4px solid #4B4D4E;
+	
 }

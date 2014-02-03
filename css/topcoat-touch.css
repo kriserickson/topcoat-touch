@@ -6,6 +6,7 @@ body {
 
 .scrollable {
     overflow: hidden;
+    /* overflow-wrap: inherit; */
 }
 
 .hidden {
@@ -13,7 +14,7 @@ body {
 }
 
 .quarter, .half, .three-quarters, .third, .two-thirds {
-	display: inline-block;		
+	display: inline-block;
 }
 
 /** List View **/
@@ -78,8 +79,8 @@ body > div {
     left: 0;
     width: 100%;
     height: 100%;
-    -webkit-transform: translate3d(0, 0, 0) scale(1);
-    transform: translate3d(0, 0, 0) scale(1);
+    -webkit-transform: translate3d(0, 0, 0) scale(1) rotateY(0deg);
+    transform: translate3d(0, 0, 0) scale(1) rotateY(0deg);
 }
 
 .page.page-left {
@@ -107,7 +108,14 @@ body > div {
     transform: translate3d(100%, 0, 0);
 }
 
-.page.scale-0 {
+.page.page-flip {
+    -webkit-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.page.page-scale {
     -webkit-transform: translate3d(0, -25%, 0) scale(0.1);
     transform: translate3d(0, -25%, 0) scale(0.1);
 }
@@ -117,6 +125,11 @@ body > div {
     transition-duration: .25s;
 }
 
+.page.transition-slow {
+    -webkit-transition-duration: .5s;
+    transition-duration: .5s;
+}
+
 
 .button-small {
     line-height: 1.5rem;	
@@ -124,6 +137,15 @@ body > div {
 }
 
 /** Dropdown **/
+.topcoat-bottom-bar.dark .dropdown {
+	color: #fff;
+	background-color: #333434;
+}
+
+.topcoat-bottom-bar.dark .dropdown li {
+    border-bottom: 2px solid #777;
+	
+}
 
 .dropdown {
     -webkit-border-radius: 2px;
@@ -134,6 +156,7 @@ body > div {
     list-style: none;
     line-height: 1.1em;
     background-color: #fff;
+    color: #333;
     background-clip: border-box;
     opacity: 0;
     margin: 0;
@@ -214,7 +237,17 @@ body > div {
     color: #000;
     border-bottom: 1px solid #3c3c3c;
     vertical-align: middle;
+	text-decoration: none;
     outline: none;    
+}
+
+.topcoat-bottom-bar.dark .form-dropdown .toggle-dropdown {
+	color: #fff;
+	border-bottom: 1px solid #eaeaea;
+}
+
+.topcoat-bottom-bar.dark .form-dropdown .toggle-dropdown:after {
+	border-top: 12px solid #eaeaea;	
 }
 
 .form-dropdown .toggle-dropdown:after {
@@ -242,12 +275,13 @@ body > div {
   width: 36px;
   height: 36px;
   background: url("../img/spinner.png") no-repeat;
-  -webkit-animation: spinner 1s infinite linear;  
+  -webkit-animation: spinner 1s infinite linear;
   top: 45%;
-  left: 45%;
   top: calc(50% - 18px);
-  position: absolute;
-  left: calc(50% - 18px);  
+  left: 45%;
+  
+  left: calc(50% - 18px);
+  position: absolute;  
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 2),
@@ -344,11 +378,17 @@ body > div {
 .topcoat-bottom-bar {
 	position: absolute;
 	height: 50px;
-	bottom: 0px;
+	bottom: 0;
 	width:  100%;
 	background: #e5e9e8;
 	color: #454545;
 	box-shadow: inset 0 -1px #9daca9, 0 1px #d6dcdb;
+}
+
+.topcoat-bottom-bar.dark {
+	background: #595B5B;
+	color: #FFF;
+	box-shadow: inset 0 -1px #333434, 0 1px #454646;
 }
 
 .topcoat-bottom-bar-item {
@@ -434,22 +474,17 @@ body > div {
 /** End navigation bar fixes **/
 
 /** Topcoat touch dialog **/
-div[data-role="dialog"] {
-    background: #fff;
-}
-
 .topcoat-touch-dialog  {
     width: 92.5%;
     max-width: 500px;
-    margin: 10% auto 15px auto;
-    /* padding: 20px; */
-    background: #dfe2e2;
+    margin: 10% auto 15px auto;   
+    background: #c7c7c7;
     box-sizing: border-box;
     border-radius: 10px;
 }
 
 .topcoat-touch-header  {
-	background: #bbb; 
+	background: #aaa; 
 	text-align: center;
 	padding: 10px 10px;
 	border-radius: 10px 10px 0 0;
@@ -473,5 +508,5 @@ div[data-role="dialog"] {
 }
 
 .topcoat-touch-grid.buttons button {
-	width: 90%;
+	width: 95%;
 }

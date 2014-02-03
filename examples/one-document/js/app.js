@@ -4,7 +4,7 @@
 $(document).ready(function() {
 
     // Create the topcoatTouch object
-    var tt = new TopcoatTouch({menu: [{id: 'help', name: 'Help'}, {id: 'about', name: 'About'}]});
+    var tt = new TopcoatTouch({menu: [{id: 'help', name: 'Help'}, {id: 'info', name: 'Info'},   {id: 'about', name: 'About'}]});
     // First page we go to home...  This could be done in code by setting the class to 'page page-center', but here is how to do it in code...
     tt.goTo('home');
 
@@ -13,6 +13,8 @@ $(document).ready(function() {
     tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(page, id) {
         if (id == 'help') {
             tt.goTo('help', 'slidedown', true);
+        } else if (id == 'info') {
+            tt.goTo('info', 'flip', true);
         } else if (id == 'about') {
             tt.goTo('about', 'pop', true);
         }
@@ -23,6 +25,10 @@ $(document).ready(function() {
     });
 
     tt.on('click', 'button', 'about', function() {
+        tt.goBack();
+    });
+    
+    tt.on('click', 'button', 'info', function() {
         tt.goBack();
     });
 

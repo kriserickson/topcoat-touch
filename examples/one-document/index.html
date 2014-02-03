@@ -6,7 +6,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <!-- link to the topcoat stylesheet, feel free to change this with topcoat-mobile-dark.css to get a dark theme -->
-    <link href="../../css/topcoat-mobile-light.css" rel="stylesheet">
+    <link href="../../css/topcoat-mobile-dark.css" rel="stylesheet">
     <!-- Additions to the topcoat stylesheet for page swapping and a couple of other widgets
         see https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions for more information -->
     <link href="../../css/topcoat-touch.css" rel="stylesheet">
@@ -390,7 +390,7 @@
             </ul>
         </div>
     </div>
-    <div class="topcoat-bottom-bar"> <!-- A bottom bar, note this screen is resized automatically
+    <div class="topcoat-bottom-bar dark"> <!-- A bottom bar, note this screen is resized automatically
                                     and bottom-bar is absolute positioned at the bottom of the page -->
         <div class="topcoat-bottom-bar-item" style="width: 70%">
             <!-- To see how dropdowns are created go to https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions#drop-down -->
@@ -477,6 +477,40 @@
         </div>
     </div>
 </div>
+<div data-role="dialog" id="info">
+    <div class="topcoat-touch-dialog">
+        <div class="topcoat-touch-header">
+            <h1>Info</h1>
+        </div>
+
+        <div class="topcoat-touch-dialog-content">
+            <div class="scrollable" style="height:300px"> 
+                <div>
+Bacon ipsum dolor sit amet cow tenderloin fatback bacon, ham tail boudin jerky tri-tip pork ball tip chuck. Leberkas swine tri-tip jowl bacon. Brisket bresaola chuck beef ribs chicken leberkas tenderloin jerky tail ball tip biltong. Ham hock jowl frankfurter kevin pastrami strip steak. Pork chop hamburger pancetta, pork chicken tail ball tip venison.
+
+Ground round landjaeger drumstick turducken, meatloaf kielbasa biltong pig t-bone ribeye fatback corned beef. Bacon corned beef chicken pastrami swine t-bone meatball hamburger short ribs pig spare ribs tenderloin ball tip kevin boudin. Sirloin rump boudin, bacon chicken kielbasa andouille. Salami chicken pork loin, pancetta t-bone beef brisket rump fatback drumstick porchetta ribeye cow. Pig short loin prosciutto porchetta, frankfurter pork chop rump t-bone ham kielbasa meatball pork loin meatloaf leberkas.
+
+Salami prosciutto bacon kevin. Prosciutto kielbasa chicken ribeye biltong pork ground round shoulder cow. Beef ribs tri-tip t-bone porchetta tongue chicken ribeye frankfurter hamburger shankle brisket jowl short ribs. Pork chop short ribs pork loin, beef ribs hamburger salami strip steak sausage ball tip tenderloin. Shoulder filet mignon leberkas landjaeger shankle salami pork loin.
+
+Chicken beef ribs pancetta short loin salami kielbasa kevin short ribs strip steak brisket meatball turducken ground round filet mignon spare ribs. Shankle meatloaf doner shank andouille pork loin biltong, sirloin spare ribs beef ribs beef. Flank venison t-bone, fatback bresaola short ribs chicken pancetta hamburger rump ball tip sirloin. Fatback corned beef leberkas short ribs, flank filet mignon tenderloin pig cow meatball kevin pancetta landjaeger ham hock pork chop.
+
+Strip steak hamburger capicola, pork chop chicken short ribs pork belly turducken shoulder fatback pastrami pancetta chuck drumstick. Tenderloin pastrami kevin rump spare ribs. Boudin swine rump cow turducken pork chop. Pastrami rump pork loin, brisket landjaeger tenderloin boudin ham hock shankle shank pork belly. Fatback ham hock capicola brisket.
+                </div>
+            </div>
+
+            <div class="topcoat-touch-grid  buttons">
+                <div class="half">
+                    <button class="topcoat-button">Cancel</button>
+                </div>
+                <div class="half">
+                    <button class="topcoat-button--cta">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div data-role="dialog" id="about">
     <div class="topcoat-touch-dialog">
         <div class="topcoat-touch-header">
@@ -505,6 +539,7 @@
         </div>
     </div>
 </div>
+
 
 </body>
 </html>
