@@ -26,6 +26,7 @@ Read more about why topcoat-touch was created on my blog post, [It Appears You a
 
 * [Getting Started](//github.com/kriserickson/topcoat-touch/wiki/Getting-Started) -- Getting started with topcoat touch.
 * [Wiki](//github.com/kriserickson/topcoat-touch/wiki) - Browse the Wiki for more detailed documentation.
+* [Faq](//github.com/kriserickson/topcoat-touch/wiki/FAQ) - Small Faq for now, but will expand over time.
 * [MVC Example App](https://github.com/kriserickson/topcoat-touch/tree/master/examples/mvc) - Check out the MVC example app in the source code to see how to create an MVC Topcoat Touch App
 * [Single Document Example App](https://github.com/kriserickson/topcoat-touch/tree/master/examples/one-document) - Examine the Single Document App if you are going to create a small app and want to keep things as simple as possible.
 
