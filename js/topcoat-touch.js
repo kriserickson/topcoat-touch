@@ -484,7 +484,7 @@ function TopcoatTouch($container, options) {
     function eventOn(gesture, selector, page, callback, type) {
         if (typeof page == 'function') {
             callback = page;
-            page = undefined;
+            page = '';
         } else {
             page = fixPage(page);
         }
@@ -501,7 +501,10 @@ function TopcoatTouch($container, options) {
                     $(document).on(gestures[i], eventHandler);
                 }
             }
-            _events[gestures[i]].push({selector: selector, callback: callback, page: page});
+            var pages = page.split(' ');
+            for (j = 0; j < pages.length; j++) {
+                _events[gestures[i]].push({selector: selector, callback: callback, page: pages[j].trim()});
+            }
         }
     }
 

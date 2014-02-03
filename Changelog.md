@@ -22,3 +22,6 @@ Version 0.2.4
 
 Version 0.2.5
 - Added a flip transition, improved support for the dark theme.
+
+Version 0.2.6
+- Added the ability to trigger events on multiple pages.

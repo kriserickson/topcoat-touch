@@ -16,6 +16,7 @@
     });
 
     tt.createController('home');
+    
     tt.createController('about').addEvent('click', 'button', function() {
         tt.goBack();
     });
@@ -25,6 +26,7 @@
     tt.createController('help').addEvent('click', 'button', function() {
         tt.goBack();
     });
+
     tt.createController('buttonExample', {
         postrender: function($page) {
             // Show a message when anyone clicks on button of the test form...

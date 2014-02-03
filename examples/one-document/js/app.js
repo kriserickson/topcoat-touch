@@ -20,15 +20,7 @@ $(document).ready(function() {
         }
     });
 
-    tt.on('click', 'button', 'help', function() {
-        tt.goBack();
-    });
-
-    tt.on('click', 'button', 'about', function() {
-        tt.goBack();
-    });
-    
-    tt.on('click', 'button', 'info', function() {
+    tt.on('click', 'button', 'help about info', function() {
         tt.goBack();
     });
 
