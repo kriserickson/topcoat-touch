@@ -1,0 +1,27 @@
+<div id="home">
+    <div class="topcoat-navigation-bar"> <!-- Navigation bar -->
+        <div class="topcoat-navigation-bar__item left quarter">
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Topcoat Touch</h1>
+        </div>
+        <div class="topcoat-navigation-bar__item right quarter">
+            <a class="topcoat-icon-button--quiet menu-button" href="#">
+                <span class="topcoat-icon topcoat-icon--menu-stack"></span>
+            </a>
+        </div>
+    </div>
+    <div class="content scrollable"> <!-- containers with the class scrollable are automatically hooked into iscroll -->
+        <div class="topcoat-list__container">
+            <ul id="demoList" class="topcoat-list list">
+                {{#each items}}
+                <!-- setting the data-rel means that when that element is clicked it goes to the page in the data-rel -->
+                <li class="topcoat-list__item" data-id="{{id}}">
+                    <span class="formItem">{{name}}</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                {{/each}}
+
+            </ul>
+        </div>
+    </div>
+</div>
