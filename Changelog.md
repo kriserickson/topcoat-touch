@@ -25,3 +25,6 @@ Version 0.2.5
 
 Version 0.2.6
 - Added the ability to trigger events on multiple pages.
+
+Version 0.2.7
+- Minor bugfixes.
