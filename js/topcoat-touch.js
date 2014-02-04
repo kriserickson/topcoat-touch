@@ -55,13 +55,13 @@ function TopcoatTouch($container, options) {
 
     // Setup FastClick...
     if (typeof FastClick == 'function') {
-        _fastClick = new FastClick(document.body);
+        _fastClick = new FastClick($container[0]);
         this.clickEvent = 'click';
     }
 
     // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
     if (typeof IScroll == 'function') {
-        document.addEventListener('touchmove', function (e) {
+        $container.on('touchmove', function (e) {
             e.preventDefault();
         }, false);
     }
@@ -113,7 +113,7 @@ function TopcoatTouch($container, options) {
 
 
     // Dropdown Box
-    $(document).on(self.clickEvent, '.toggle-dropdown', function () {
+    $container.on(self.clickEvent, '.toggle-dropdown', function () {
         var $dropdown = $(this).parent().find('.dropdown');
         $('.dropdown').removeClass('active');
         if (!$dropdown.hasClass('active')) {
@@ -135,7 +135,7 @@ function TopcoatTouch($container, options) {
         }
     });
 
-    $(document).on(self.clickEvent, '.dropdown-item', function () {
+    $container.on(self.clickEvent, '.dropdown-item', function () {
         var $this = $(this),
             $dropDown = $this.parent().parent(),
             newId = $this.data('id');
@@ -151,15 +151,18 @@ function TopcoatTouch($container, options) {
 
 
     // Setup all the linked pages
-    $(document).on(self.clickEvent, '[data-rel]', function (e) {
+    $container.on(self.clickEvent, '[data-rel]', function (e) {
+        console.log('data rel event..');
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
     });
 
     // setup the all the back buttons
-    $(document).on(self.clickEvent, '.back-button', function () {
+    $container.on(self.clickEvent, '.back-button', function (e) {
         self.goBack();
+        e.preventDefault();
+        return false;
     });
 
     // End Dropdown Box
@@ -482,7 +485,11 @@ function TopcoatTouch($container, options) {
      * @param type {String}
      */
     function eventOn(gesture, selector, page, callback, type) {
-        if (typeof page == 'function') {
+        if (typeof selector == 'function') {
+            callback = selector;
+            selector = '';
+            page = '';
+        } else if (typeof page == 'function') {
             callback = page;
             page = '';
         } else {
@@ -498,11 +505,11 @@ function TopcoatTouch($container, options) {
                 if (type == 'hammer') {
                     _hammer.on(gestures[i], eventHandler);
                 } else if (type == 'jquery') {
-                    $(document).on(gestures[i], eventHandler);
+                    $container.on(gestures[i], eventHandler);
                 }
             }
-            var pages = page.split(' ');
-            for (j = 0; j < pages.length; j++) {
+            var pages = page ? page.split(' ') : [''];
+            for (var j = 0; j < pages.length; j++) {
                 _events[gestures[i]].push({selector: selector, callback: callback, page: pages[j].trim()});
             }
         }
@@ -539,7 +546,7 @@ function TopcoatTouch($container, options) {
                         if (type == 'hammer') {
                             _hammer.off(gesture, eventHandler);
                         } else if (type == 'jquery') {
-                            $(document).off(gesture, eventHandler);
+                            $container.off(gesture, eventHandler);
                         }
                         delete _events[gestures[i]];
                     }
@@ -904,7 +911,7 @@ function TopcoatTouch($container, options) {
             if (buttons.hasOwnProperty(buttonCaption)) {
                 var buttonId = 'topcoat-button-' + buttonCount++;
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
-                $(document).off(self.clickEvent, '#' + buttonId)
+                $container.off(self.clickEvent, '#' + buttonId)
                     .on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
             }
 
@@ -1002,7 +1009,7 @@ function TopcoatTouch($container, options) {
         $container.append($menuDiv);
 
         // Hide the menu one mousedown
-        $(document).on(self.touchStartEvent, function () {
+        $container.on(self.touchStartEvent, function () {
             if (!_showingMenu) {
                 $menuDiv.fadeOut(50);
             } else {
@@ -1018,7 +1025,7 @@ function TopcoatTouch($container, options) {
         });
 
         // Show the menu when it is clicked...
-        $(document).on(self.clickEvent, '.menu-button', showMenu);
+        $container.on(self.clickEvent, '.menu-button', showMenu);
 
         // setup menu handlers
         $menuDiv.on(self.clickEvent, '.menuItem', function () {

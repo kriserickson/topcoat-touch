@@ -17,6 +17,7 @@ describe('MVC Initialization Tests', function () {
 
     after(function () {
         $('#testContainer').remove();
+
     });
 
 
@@ -52,6 +53,7 @@ describe('MVC Go home tests', function () {
 
     after(function () {
         $('#testContainer').remove();
+
     });
 
 
@@ -112,6 +114,7 @@ describe('MVC Validate Topcoat Events fire...', function () {
 
     after(function () {
         $('#testContainer').remove();
+
     });
 
     it('should be on the home page', function () {
@@ -166,6 +169,7 @@ describe('MVC Dynamic Page', function () {
 
     after(function () {
         $('#testContainer').remove();
+
     });
 
 
@@ -195,7 +199,7 @@ describe('MVC Validate Added Events Fire', function () {
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         var controller = tt.createController('home');
-        controller.addEvent('click', '#testClick', function() {
+        controller.addEvent(tt.clickEvent, '#testClick', function() {
             buttonClicked = true;
         });
         controller.addEvent('submit', '#testForm', function(e) {
@@ -204,7 +208,7 @@ describe('MVC Validate Added Events Fire', function () {
         });
         controller.pagestart = function () {
             setTimeout(function() {
-                $('#testClick').trigger('click');
+                $('#testClick').trigger(tt.clickEvent);
                 done();
             }, 1);
         };
@@ -213,6 +217,7 @@ describe('MVC Validate Added Events Fire', function () {
 
     after(function () {
         $('#testContainer').remove();
+
     });
 
 
@@ -258,6 +263,7 @@ describe('MVC Goto Page2', function () {
 
     after(function () {
         $('#testContainer').remove();
+
     });
 
 
@@ -294,6 +300,46 @@ describe('MVC Goto Page2', function () {
     });
 });
 
+
+describe('MVC Page Go to cssSelector tests', function() {
+
+    var tt;
+
+    before(function(done) {
+        window.$ = jQuery;
+        $('body').append('<div id="testContainer">');
+        tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
+        tt.createController('home', {
+            pagestart: function() {
+                tt.goTo('#page2');
+                done();
+            }
+        });
+        tt.createController('page2',
+            {pagestart: function() { done(); }},    // events...
+            {title: 'Page2', list: {item1: 'Item 1', item2: 'Item 2', item3: 'Item 3'}} // data
+        );
+        tt.goTo('#home');
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+
+    });
+
+    it('currentPage should be page2', function() {
+        expect(tt.currentPage()).to.equal('page2');
+    });
+
+    it('should be on page 2', function() {
+        expect($('#page2').hasClass('page-center')).to.be.true;
+    });
+
+    it('should not be on the home page', function() {
+        expect($('#home').hasClass('page-center')).not.to.be.true;
+    });
+
+});
 
 
 describe('MVC Go to back to home tests', function() {
@@ -336,6 +382,7 @@ describe('MVC Go to back to home tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
     it('should be on the home page', function() {
@@ -371,7 +418,7 @@ describe('MVC Click to page 3 tests', function() {
         tt.createController('page2', {
                  pagestart: function() {
                      setTimeout(function() {
-                        $('#gotoPage3Button').trigger('click');
+                        $('#gotoPage3Button').trigger(tt.clickEvent);
                      }, 1);
                  }
             },
@@ -384,6 +431,7 @@ describe('MVC Click to page 3 tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
     it('topcoat touch should have a back page', function() {
@@ -423,6 +471,7 @@ describe('MVC Show Loading tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -463,6 +512,7 @@ describe('MVC Dialog tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -483,7 +533,7 @@ describe('MVC Dialog tests', function() {
     });
 
     it('Clicking the button should dismiss the dialog box', function() {
-        $('#topcoat-button-1').trigger('click');
+        $('#topcoat-button-1').trigger(tt.clickEvent);
         if ($.fn.jquery) {
             expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
         }
@@ -513,6 +563,7 @@ describe('MVC Complex Dialog tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -533,7 +584,7 @@ describe('MVC Complex Dialog tests', function() {
     });
 
     it('clicking ClickMe should change the value of tmpVal to 21 and dismiss the dialog', function() {
-        $('#topcoat-button-1').trigger('click');
+        $('#topcoat-button-1').trigger(tt.clickEvent);
         expect(tmpVal).to.equal(21);
         if ($.fn.jquery) {
             expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);

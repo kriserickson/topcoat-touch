@@ -1,4 +1,4 @@
-var pageHtml = '<div id="testContainer">' +
+var zeptoPageHtml = '<div id="testContainer">' +
                     '<div id="home">' +
                        '<div class="content">' +
                             '<h1>Hello Home</h1>' +
@@ -30,12 +30,13 @@ describe('Zepto Single Page Initialization Tests', function () {
 
     before(function() {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
     });
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -60,7 +61,7 @@ describe('Zepto Single Page Go home tests', function() {
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function () {
             done();
@@ -70,6 +71,7 @@ describe('Zepto Single Page Go home tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -94,7 +96,7 @@ describe('Zepto Single Page Go to page2 tests', function() {
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
             tt.goTo('page2');
@@ -105,6 +107,7 @@ describe('Zepto Single Page Go to page2 tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -138,13 +141,83 @@ describe('Zepto Single Page Go to page2 tests', function() {
 
 });
 
+describe('Zepto Single Page Go to Zepto object tests', function() {
+
+    var tt;
+
+    before(function(done) {
+        window.$ = Zepto;
+        $('body').append(zeptoPageHtml);
+        tt = new TopcoatTouch($('#testContainer'));
+        tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+            tt.goTo($('#page2'));
+            done();
+        });
+        tt.goTo($('#home'));
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+
+    });
+
+
+
+    it('currentPage should be page2', function() {
+        expect(tt.currentPage()).to.equal('page2');
+    });
+
+    it('should be on page 2', function() {
+        expect($('#page2').hasClass('page-center')).to.be.true;
+    });
+
+    it('should not be on the home page', function() {
+        expect($('#home').hasClass('page-center')).not.to.be.true;
+    });
+
+});
+
+describe('Zepto Single Page Go to cssSelector tests', function() {
+
+    var tt;
+
+    before(function(done) {
+        window.$ = Zepto;
+        $('body').append(zeptoPageHtml);
+        tt = new TopcoatTouch($('#testContainer'));
+        tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+            tt.goTo('#page2');
+            done();
+        });
+        tt.goTo('#home');
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+
+    });
+
+    it('currentPage should be page2', function() {
+        expect(tt.currentPage()).to.equal('page2');
+    });
+
+    it('should be on page 2', function() {
+        expect($('#page2').hasClass('page-center')).to.be.true;
+    });
+
+    it('should not be on the home page', function() {
+        expect($('#home').hasClass('page-center')).not.to.be.true;
+    });
+
+});
+
 describe('Zepto Single Page back to home tests', function() {
 
     var tt;
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
             setTimeout(function() {
@@ -162,6 +235,7 @@ describe('Zepto Single Page back to home tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
     it('should be on the home page', function() {
@@ -182,7 +256,7 @@ describe('Zepto Single Page Click to page 3 tests', function() {
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
             setTimeout(function() {
@@ -191,7 +265,7 @@ describe('Zepto Single Page Click to page 3 tests', function() {
         });
         tt.on(tt.EVENTS.PAGE_START, 'page2', function() {
             setTimeout(function() {
-                $('#gotoPage3Button').trigger('click');
+                $('#gotoPage3Button').trigger(tt.clickEvent);
             }, 1);
         });
         tt.on(tt.EVENTS.PAGE_START, 'page3', function() {
@@ -202,6 +276,7 @@ describe('Zepto Single Page Click to page 3 tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
     it('should be on the page3', function() {
@@ -234,7 +309,7 @@ describe('Zepto Single Page Loading tests', function() {
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
             tt.showLoading('Loading Test');
@@ -245,6 +320,7 @@ describe('Zepto Single Page Loading tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -272,7 +348,7 @@ describe('Zepto Single Page Simple Dialog tests', function() {
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
             tt.showDialog('Dialog Test');
@@ -283,6 +359,7 @@ describe('Zepto Single Page Simple Dialog tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -303,7 +380,7 @@ describe('Zepto Single Page Simple Dialog tests', function() {
     });
 
     it('Clicking the button should dismiss the dialog box', function() {
-        $('#topcoat-button-1').trigger('click');
+        $('#topcoat-button-1').trigger(tt.clickEvent);
         if ($.fn.jquery) {
             expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);
         }
@@ -320,7 +397,7 @@ describe('Zepto Single Page Complex Dialog tests', function() {
 
     before(function(done) {
         window.$ = Zepto;
-        $('body').append(pageHtml);
+        $('body').append(zeptoPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
         tt.on(tt.EVENTS.PAGE_START, 'home', function() {
             tt.showDialog('Complex Dialog Test', {'Click Me': function() { tmpVal = 21; }, 'Dont Click Me': function() {}});
@@ -331,6 +408,7 @@ describe('Zepto Single Page Complex Dialog tests', function() {
 
     after(function() {
         $('#testContainer').remove();
+
     });
 
 
@@ -351,7 +429,7 @@ describe('Zepto Single Page Complex Dialog tests', function() {
     });
 
     it('clicking ClickMe should change the value of tmpVal to 21 and dismiss the dialog', function() {
-        $('#topcoat-button-1').trigger('click');
+        $('#topcoat-button-1').trigger(tt.clickEvent);
         expect(tmpVal).to.equal(21);
         if ($.fn.jquery) {
             expect($('#topcoat-loading-overlay-div:visible').length).to.equal(0);

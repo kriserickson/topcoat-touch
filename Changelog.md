@@ -28,3 +28,6 @@ Version 0.2.6
 
 Version 0.2.7
 - Minor bugfixes.
+
+Version 0.2.8
+- Minor bugfixes.
