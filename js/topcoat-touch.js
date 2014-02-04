@@ -211,7 +211,7 @@ function TopcoatTouch($container, options) {
      * @returns {String}
      */
     function fixPage(page) {
-        if (page.substr(0, 1) == '#') {
+        if (page && page.substr(0, 1) == '#') {
             page = page.substr(1);
         }
         return page;
@@ -451,7 +451,7 @@ function TopcoatTouch($container, options) {
                     var $target = $(event.target);
                     var selector = events[i].selector;
 
-                    if ($target.is(selector)) {
+                    if ($target.is(selector) || !selector) {
                         target = event.target
                     } else {
                         target = $target.closest(selector);
@@ -691,12 +691,12 @@ function TopcoatTouch($container, options) {
 
         if (typeof page === 'string') {
             _currentPage = fixPage(page);
-            if (_controllers[page]) {
-                _controller = _controllers[page];
-                renderPage(page, function ($page) {
+            if (_controllers[_currentPage]) {
+                _controller = _controllers[_currentPage];
+                renderPage(_currentPage, function ($page) {
                     // We call postAdd here since reloadPage should not call postAdd.
                     _controller.postadd.call(_controller);
-                    goToPage(page, $page, back, transition, dialog);
+                    goToPage(_currentPage, $page, back, transition, dialog);
                 });
             } else {
                 if (page.substr(0, 1) != '#') {
