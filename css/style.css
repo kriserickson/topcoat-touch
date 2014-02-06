@@ -1,0 +1,27 @@
+body {
+  padding-top: 50px;
+}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+.btn-git {
+    color: #FFF;
+    padding: 10px 15px 10px 50px ;
+    margin: 5px 20px 0 0;
+}
+
+#download-zip {
+  background: #3498DB url(../images/zip-icon.png) 12px 50% no-repeat;
+}
+#download-tar-gz {
+  background: #3498DB url(../images/tar-gz-icon.png) 12px 50% no-repeat;
+}
+#view-on-github {
+  background: #3498DB url(../images/octocat-icon.png) 12px 50% no-repeat;
+}
+
+#downloads {
+    text-align: right;
+}
