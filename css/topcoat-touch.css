@@ -1,7 +1,7 @@
 /** iScroll **/
 body {
     overflow: hidden;
-	user-select: none;
+	user-select: none;    
 }
 
 .scrollable {
@@ -90,6 +90,7 @@ body > div {
 .page.page-center {
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
+    z-index: 20;
 }
 
 .page.page-up {
@@ -110,8 +111,7 @@ body > div {
 .page.page-flip {
     -webkit-transform: rotateY(180deg);
     transform: rotateY(180deg);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+    z-index: 20;
 }
 
 .page.page-scale {
@@ -405,7 +405,7 @@ body > div {
     top: 53px;
     right: 12px;
     background-color: #e0e0e0;
-    z-index: 1;
+    z-index: 25;
     border: 1px solid #a0a0a0;
     -webkit-box-shadow: -3px 3px 3px #303030;      
     box-shadow: -3px 3px 3px #303030;

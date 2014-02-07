@@ -103,10 +103,11 @@ function TopcoatTouch($container, options) {
                     prevController._pageend.call(prevController);
                 }
                 
-				if (_isDialog) {
-                    $page.removeClass('page page-left page-right page-up page-down page-scale page-flip');
-                } else {
+				if (!_isDialog) {                    
                     $page.remove();
+                }
+                if (_skipUserEvents) {
+                    removeOverlay();
                 }
                 if (prevController && !_isDialog) {
                     prevController.postremove.call(prevController, $page);
@@ -116,7 +117,12 @@ function TopcoatTouch($container, options) {
                 _controller = null;
             } else {
                 // Remove unused classes
-                $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
+                if (!_isDialog) { 
+                    $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
+                }
+                if (_skipUserEvents) {
+                    removeOverlay();
+                }
             }
             _startedAnimation = false;
 
@@ -443,13 +449,33 @@ function TopcoatTouch($container, options) {
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
 
-        $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
+       if (_skipUserEvents) {
+             $prevPage.css('z-index', 30);
+             $('#topcoat-loading-overlay-div').css('z-index', 25);
+        }
+        
+        if (_isDialog) {
+            showOverlay();
+            $prevPage.attr('class', 'page page-remove');
+        } else {
+            $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
+        }
+        
+ 
 
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
             callback(_previousPage);
         });
 
         
+    }
+    
+    function showOverlay() {
+        $container.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');        
+    }
+    
+    function removeOverlay() {
+        $('#topcoat-loading-overlay-div').remove();
     }
 
 
@@ -875,11 +901,10 @@ function TopcoatTouch($container, options) {
             self.hideLoading();
         }
         _loadingShowing = true;
-        var html = '<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>';
         _$loadingDiv = $(ui || '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
             '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
             '<span class="topcoat-spinner"></span></aside>');
-        $container.append(html);
+        showOverlay();
         $container.append(_$loadingDiv);
     };
 
@@ -899,7 +924,7 @@ function TopcoatTouch($container, options) {
     this.hideLoading = function () {
         if (_loadingShowing) {
             _loadingShowing = false;
-            $('#topcoat-loading-overlay-div').remove();
+            removeOverlay();            
             _$loadingDiv.remove();
         }
         return self;
