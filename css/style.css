@@ -10,16 +10,18 @@ body {
     color: #FFF;
     padding: 10px 15px 10px 50px ;
     margin: 5px 20px 0 0;
+    background-color: #18BC9C;  
+    border-color: #128F76;
 }
 
 #download-zip {
-  background: #3498DB url(../images/zip-icon.png) 12px 50% no-repeat;
+  background: #18BC9C url(../images/zip-icon.png) 12px 50% no-repeat;
 }
 #download-tar-gz {
-  background: #3498DB url(../images/tar-gz-icon.png) 12px 50% no-repeat;
+  background: #18BC9C url(../images/tar-gz-icon.png) 12px 50% no-repeat;
 }
 #view-on-github {
-  background: #3498DB url(../images/octocat-icon.png) 12px 50% no-repeat;
+  background: #18BC9C url(../images/octocat-icon.png) 12px 50% no-repeat;
 }
 
 #downloads {
