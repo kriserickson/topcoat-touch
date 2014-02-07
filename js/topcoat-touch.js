@@ -16,6 +16,7 @@ function TopcoatTouch($container, options) {
         _fastClick,
         _showingMenu,
         _isDialog,
+        _skipUserEvents,
         self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -55,13 +56,13 @@ function TopcoatTouch($container, options) {
 
     // Setup FastClick...
     if (typeof FastClick == 'function') {
-        _fastClick = new FastClick($container[0]);
+        _fastClick = new FastClick(document.body);
         this.clickEvent = 'click';
     }
 
     // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
     if (typeof IScroll == 'function') {
-        $container.on('touchmove', function (e) {
+        document.addEventListener('touchmove', function (e) {
             e.preventDefault();
         }, false);
     }
@@ -85,20 +86,31 @@ function TopcoatTouch($container, options) {
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
             if (_controller) {
-                _controller.pagestart.call(_controller);
                 _controller._pagestart.call(_controller);
                 var $page = $container.find('.page-remove');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
-                    if (prevController) {
-                        prevController.pageend.call(prevController);
-                        prevController._pageend.call(prevController);
-                    }                    
-                    $page.remove();
-                    if (prevController) {
-                        prevController.postremove.call(prevController, $page);
-                    }                    
                 }
+
+                if (!_skipUserEvents) {
+                    _controller.pagestart.call(_controller);
+                }
+                if (prevController) {
+                    if (!_isDialog) {
+                        prevController.pageend.call(prevController);
+                    }
+                    prevController._pageend.call(prevController);
+                }
+                if (_isDialog) {
+                    $page.removeClass('page page-left page-right page-up page-down page-scale page-flip');
+                } else {
+                    $page.remove();
+                }
+                if (prevController && !_isDialog) {
+                    prevController.postremove.call(prevController, $page);
+                }
+
+
                 _controller = null;
             } else {
                 // Remove unused classes
@@ -152,7 +164,6 @@ function TopcoatTouch($container, options) {
 
     // Setup all the linked pages
     $container.on(self.clickEvent, '[data-rel]', function (e) {
-        console.log('data rel event..');
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
@@ -282,7 +293,6 @@ function TopcoatTouch($container, options) {
     }
 
 
-
     /**
      * Clones an array...
      *
@@ -325,7 +335,7 @@ function TopcoatTouch($container, options) {
         _controller.prerender();
         if (_controller.template) {
             try {
-            	var $page = $(_controller.render.call(_controller));
+                var $page = $(_controller.render.call(_controller));
             } catch (e) {
                 self._error('Error calling render on page : ' + page + '\nError: ' + e);
             }
@@ -333,8 +343,8 @@ function TopcoatTouch($container, options) {
                 self._error('page id for page "' + page + '" does not match, it is currently set to "' + $page.attr('id') + '"');
             }
             try {
-            	_controller.postrender.call(_controller, $page);
-            } catch(e) {
+                _controller.postrender.call(_controller, $page);
+            } catch (e) {
                 self._error('Error calling postrender on page : ' + page + '\nError: ' + e);
             }
             $container.append($page);
@@ -408,12 +418,10 @@ function TopcoatTouch($container, options) {
         if (_isDialog) {
             pageClass = {next: '', prev: _isDialog};
             _isDialog = false;
+            _skipUserEvents = true;
         } else {
-            if (dialog) {
-                _isDialog = pageClass.next;
-            } else {
-                _isDialog = false;
-            }
+            _skipUserEvents = false;
+            _isDialog = dialog ? pageClass.next : false;
         }
 
         // Position the page at the starting position of the animation
@@ -424,12 +432,12 @@ function TopcoatTouch($container, options) {
         //noinspection BadExpressionStatementJS
         $container.get(0).offsetWidth;
 
-        var transition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
+        var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
 
-		// Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation            
-        $page.attr('class', 'page page-center ' + transition);
-        
-        _$currentPage.attr('class', 'page page-remove ' + transition + ' ' + pageClass.prev);
+        // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
+        $page.attr('class', 'page page-center ' + pageTransition);
+
+        _$currentPage.attr('class', 'page page-remove ' + pageTransition + ' ' + pageClass.prev);
 
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
             callback(_previousPage);
@@ -654,6 +662,9 @@ function TopcoatTouch($container, options) {
         return _pages.length > 1;
     };
 
+    this.closeDialog = function () {
+        this.goBack();
+    };
     /**
      * Goes back one page
      * @param [numberOfPages] {Number}
@@ -698,7 +709,7 @@ function TopcoatTouch($container, options) {
 
         if (typeof page === 'string') {
             _currentPage = fixPage(page);
-            if (_controllers[_currentPage]) {
+            if (_controllers[_currentPage] && !_isDialog) {
                 _controller = _controllers[_currentPage];
                 renderPage(_currentPage, function ($page) {
                     // We call postAdd here since reloadPage should not call postAdd.
@@ -706,6 +717,9 @@ function TopcoatTouch($container, options) {
                     goToPage(_currentPage, $page, back, transition, dialog);
                 });
             } else {
+                if (_controllers[_currentPage] && _isDialog) {
+                    _controller = _controllers[_currentPage];
+                }
                 if (page.substr(0, 1) != '#') {
                     page = '#' + page;
                 }
@@ -733,7 +747,7 @@ function TopcoatTouch($container, options) {
             _$currentPage.remove();
             _$currentPage = $page;
             $page.attr('class', 'page page-center');
-            
+
             setupIScroll();
 
             _controller.pagestart.call(_controller);
@@ -750,7 +764,7 @@ function TopcoatTouch($container, options) {
         _pages.splice(_pages.length - 2, 1);
     };
 
-    this.clearHistory = function() {
+    this.clearHistory = function () {
         _pages = [];
     };
 
@@ -767,7 +781,7 @@ function TopcoatTouch($container, options) {
         // Resize the scroller to fit...
         var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
         if (!$scrollable[0].style.height) {
-	        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
+            $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
         }
         // Clean up the old scroller if required...
         self.destroyScroll();
@@ -994,7 +1008,7 @@ function TopcoatTouch($container, options) {
      * @returns PageController
      */
     this.createController = function (pageName, fns, data) {
-        return _controllers[pageName] = new PageController(pageName, fns, data, self);        
+        return _controllers[pageName] = new PageController(pageName, fns, data, self);
     };
 
 
@@ -1157,7 +1171,7 @@ function PageController(pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            	this[name] = fns[name] || defaultFunctions[name] || function () {
+            this[name] = fns[name] || defaultFunctions[name] || function () {
             };
         }
     }

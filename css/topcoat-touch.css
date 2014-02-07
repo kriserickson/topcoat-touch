@@ -5,8 +5,7 @@ body {
 }
 
 .scrollable {
-    overflow: hidden;
-    /* overflow-wrap: inherit; */
+    overflow: hidden;    
 }
 
 .hidden {

@@ -31,3 +31,7 @@ Version 0.2.7
 
 Version 0.2.8
 - Minor bugfixes.
+
+Version 0.2.9
+- Fix iScroll regression on mobile devices (broken in 0.2.8), improve 
+  modal dialogs so that pages before do not need to be reloaded.
