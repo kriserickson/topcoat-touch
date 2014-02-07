@@ -86,22 +86,24 @@ function TopcoatTouch($container, options) {
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
             if (_controller) {
-                _controller._pagestart.call(_controller);
+				if (!_skipUserEvents) {
+                    _controller.pagestart.call(_controller);
+                }                
+				_controller._pagestart.call(_controller);
                 var $page = $container.find('.page-remove');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
                 }
 
-                if (!_skipUserEvents) {
-                    _controller.pagestart.call(_controller);
-                }
+                
                 if (prevController) {
                     if (!_isDialog) {
                         prevController.pageend.call(prevController);
                     }
                     prevController._pageend.call(prevController);
                 }
-                if (_isDialog) {
+                
+				if (_isDialog) {
                     $page.removeClass('page page-left page-right page-up page-down page-scale page-flip');
                 } else {
                     $page.remove();
@@ -164,6 +166,7 @@ function TopcoatTouch($container, options) {
 
     // Setup all the linked pages
     $container.on(self.clickEvent, '[data-rel]', function (e) {
+        console.log('data rel event..');
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
@@ -411,6 +414,9 @@ function TopcoatTouch($container, options) {
             return;
         }
 
+        var $prevPage = _$currentPage;
+        _$currentPage = $page;
+
         // Transition type one of page-left, page-right, page-down, pop and flip...
         transition = transition ? transition.toLowerCase() : 'slideleft';
 
@@ -425,25 +431,25 @@ function TopcoatTouch($container, options) {
         }
 
         // Position the page at the starting position of the animation
-        $page.attr('class', 'page ' + pageClass.next);
-
-
+        _$currentPage.attr('class', 'page ' + pageClass.next);        
+        
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
-        //noinspection BadExpressionStatementJS
+        //noinspection BadExpressionStatementJS  
         $container.get(0).offsetWidth;
 
+        // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
-        $page.attr('class', 'page page-center ' + pageTransition);
+        _$currentPage.attr('class', 'page page-center ' + pageTransition);
 
-        _$currentPage.attr('class', 'page page-remove ' + pageTransition + ' ' + pageClass.prev);
+        $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
 
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
             callback(_previousPage);
         });
 
-        _$currentPage = $page;
+        
     }
 
 

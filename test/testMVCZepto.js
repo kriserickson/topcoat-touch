@@ -243,8 +243,10 @@ describe('Zepto MVC Goto Page2', function () {
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         tt.createController('home', {
             pagestart: function() {
-                tt.goTo('page2');
-                done();
+                setTimeout(function() {
+                    tt.goTo('page2');  
+                }, 0);
+                
             },
             pageend: function() {
                 pageEndCalled = true;
@@ -253,10 +255,13 @@ describe('Zepto MVC Goto Page2', function () {
                 postRemovePage = $page;
             }
         });
-        tt.createController('page2',
-            {pagestart: function() { done(); }},    // events...
-            {title: 'Page2', list: {item1: 'Item 1', item2: 'Item 2', item3: 'Item 3'}} // data
-        );
+        tt.createController('page2', {
+            pagestart: function() { 
+                done(); 
+            }
+        },    // events...
+        {title: 'Page2', list: {item1: 'Item 1', item2: 'Item 2', item3: 'Item 3'} // data
+        });
         tt.goTo('home');
     });
 
