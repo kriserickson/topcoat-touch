@@ -17,6 +17,7 @@ function TopcoatTouch($container, options) {
         _showingMenu,
         _isDialog,
         _skipUserEvents,
+        _stashedScroll,
         self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -73,6 +74,10 @@ function TopcoatTouch($container, options) {
         if (_startedAnimation) {
 
             setupIScroll();
+            
+            if (_skipUserEvents && _iScroll && _stashedScroll) {
+                _iScroll.scrollTo(0,_stashedScroll);
+            }
 
             // If we have a PAGE_START event fire the event...
             arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
@@ -172,7 +177,6 @@ function TopcoatTouch($container, options) {
 
     // Setup all the linked pages
     $container.on(self.clickEvent, '[data-rel]', function (e) {
-        console.log('data rel event..');
         self.goTo($(this).data('rel'));
         e.preventDefault();
         return false;
@@ -445,6 +449,10 @@ function TopcoatTouch($container, options) {
 
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
+        
+        if (_isDialog && _iScroll) {
+            _stashedScroll = _iScroll.y;
+        }
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
@@ -455,6 +463,7 @@ function TopcoatTouch($container, options) {
         }
         
         if (_isDialog) {
+            
             showOverlay();
             $prevPage.attr('class', 'page page-remove');
         } else {
@@ -1202,8 +1211,7 @@ function PageController(pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            this[name] = fns[name] || defaultFunctions[name] || function () {
-            };
+            this[name] = fns[name] || defaultFunctions[name] || function () { };
         }
     }
 

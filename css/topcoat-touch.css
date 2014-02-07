@@ -1,11 +1,11 @@
 /** iScroll **/
 body {
     overflow: hidden;
-	user-select: none;    
+	user-select: none;
 }
 
 .scrollable {
-    overflow: hidden;    
+    overflow: hidden;
 }
 
 .hidden {
