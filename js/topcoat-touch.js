@@ -76,7 +76,7 @@ function TopcoatTouch($container, options) {
             setupIScroll();
             
             if (_skipUserEvents && _iScroll && _stashedScroll) {
-                _iScroll.scrollTo(0,_stashedScroll);
+                _iScroll.scrollTo(_stashedScroll.x, _stashedScroll.y);
             }
 
             // If we have a PAGE_START event fire the event...
@@ -450,9 +450,8 @@ function TopcoatTouch($container, options) {
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
         
-        if (_isDialog && _iScroll) {
-            _stashedScroll = _iScroll.y;
-        }
+        _stashedScroll = _isDialog && _iScroll ? {x: iScroll.x, y: _iScroll.y} : false;
+        
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
