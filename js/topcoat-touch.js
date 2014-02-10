@@ -450,13 +450,13 @@ function TopcoatTouch($container, options) {
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
         
-        _stashedScroll = _isDialog && _iScroll ? {x: iScroll.x, y: _iScroll.y} : false;
+        _stashedScroll = _isDialog && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
         
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
 
-       if (_skipUserEvents) {
+        if (_skipUserEvents) {
              $prevPage.css('z-index', 30);
              $('#topcoat-loading-overlay-div').css('z-index', 25);
         }
@@ -1250,6 +1250,14 @@ function PageController(pageName, fns, data, tt) {
         }
         this.events.push({event: event, selector: selector, callback: callback});
         return this;
+    };
+
+    /**
+     * Helper funciton to go to a page.
+     * @param [transition] {String}
+     */
+    this.goTo = function(transition) {
+        self.tt.goTo(self.pageName, transition);
     };
 
     this.initialize();
