@@ -48,7 +48,7 @@
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
 <div class="jumbotron">
-    <div class="container">
+    <div class="container-fluid">
         <section id="downloads" class="clearfix">
             <a href="https://github.com/kriserickson/topcoat-touch/zipball/master" id="download-zip" class="btn btn-git"
                role="button"><span>Download .zip</span></a>
@@ -58,102 +58,105 @@
                role="button"><span>View on GitHub</span></a>
         </section>
     </div>
-    <div id="container">
-        <div class="row">
-            <div class="col-sm-4 hidden-sm hidde-xs"><img src="images/tt_screenshot_angle.png"></div>
-            <div class="col-sm-8">
-                <h2>The Lean Mobile Framework</h2>
-                <ul>
-                    <li>Designed from the ground up to build mobile apps on Phonegap</li>
-                    <li>Modular, include only the libraries you need</li>
-                    <li>Lightweight (5kb minified and gzipped)</li>
-                    <li>Near native performance on Android and IOS</li>
-                    <li>Simple codebase that easy to understand and extend</li>
-                    <li>Leverages best of breed components and libraries</li>
-                    <li>Get started quickly with Yeoman</li>
-                </ul>
-            </div>
+</div>
+
+<div class="main-container" id="container-fluid">
+    <div class="row">
+        <div class="col-sm-4 hidden-sm hidde-xs">
+            <img src="images/tt_screenshot_angle.png">
         </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div>Topcoat touch simple mobile framework that uses the <a href="http://topcoat.io">Topcoat</a> CSS framework to
-                    create mobile applications.   Inspired by <a href="http://jqtjs.com/">jQT</a>, it can be used either
-                    with a single html document with multiple pages, or a collection of controllers and templates.
-                    It uses the following optional libraries to provide most of the functionality for a mobile framework:</div>
-
-                <ul>
-                    <li>
-                        <a href="http://jquery.com">jQuery</a> or <a href="http://zeptojs.com">Zepto</a> to provide DOM
-                        manipulation.
-                    </li>
-                    <li>
-                        <a href="https://github.com/ftlabs/fastclick">fastclick</a> is an optional plugin to remove the
-                        300ms click delay in <a href="http://updates.html5rocks.com/2013/12/300ms-tap-delay-gone-away">most</a>
-                        mobile browsers
-                    </li>
-                    <li>
-                        <a href="https://github.com/cubiq/iscroll">iScroll</a> is an optional plugin that can be used to
-                        provide smooth scrolling automatically.
-                    </li>
-                    <li>
-                        <a href="http://eightmedia.github.io/hammer.js">hammer.js</a> is an optional plugin to allow
-                        TopcoatTouch to provide event brokering for mobile touch options (swipe, tap, hold, doubletap,
-                        drag, roate, pinch, etc).
-                    </li>
-                    <li>
-                        <a href="http://lodash.com/">lodash</a> is a plugin that is only required when using <a
-                            href="/kriserickson/topcoat-touch/blob/master/example/mvc">templating strategy</a>, of
-                        course you could also use <a href="http://underscorejs.org/">underscore</a>.
-                    </li>
-                    <li>Currently the default templating engine for the MVC style is underscore, but you can easily use
-                        <a href="http://handlebarsjs.com/">Handlebars</a> or <a
-                                href="https://github.com/janl/mustache.js">Mustache</a>. See <a
-                                href="//github.com/kriserickson/topcoat-touch/wiki/Tips-Tricks">tips and tricks</a> for
-                        a simple example using <a
-                                href="https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-handlebars-as-the-templating-engine">Handlebars</a>
-                        or
-                        <a href="//github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine">Mustache</a>.
-                        There is also an <a
-                                href="//github.com/kriserickson/topcoat-touch/tree/master/examples/handlebars">example</a>
-                        using handlerbars. Or you can also easily add your own templating engines following these
-                        examples.
-                    </li>
-                </ul>
-                <div>It has a <a href="https://github.com/kriserickson/generator-topcoat-touch">generator</a> for <a
-                        href="http://yeoman.io">Yeoman</a> that allows for rapid initial creation of your project, as
-                    well as integration with <a href="http://phonegap.com">phonegap/cordova</a> and <a
-                            href="http://gruntjs.com">grunt</a>.</div>
-
-                <ul>
-                    <li>
-                        <a href="//github.com/kriserickson/topcoat-touch/wiki/Getting-Started">Getting Started</a> --
-                        Getting started with topcoat touch.
-                    </li>
-                    <li>
-                        <a href="//github.com/kriserickson/topcoat-touch/wiki">Wiki</a> - Browse the Wiki for more
-                        detailed documentation.
-                    </li>
-                    <li>
-                        <a href="//github.com/kriserickson/topcoat-touch/wiki/FAQ">Faq</a> - Small Faq for now, but will
-                        expand over time.
-                    </li>
-                    <li>
-                        <a href="https://github.com/kriserickson/topcoat-touch/tree/master/examples/mvc">MVC Example
-                            App</a> - Check out the MVC example app in the source code to see how to create an MVC
-                        Topcoat Touch App
-                    </li>
-                    <li>
-                        <a href="https://github.com/kriserickson/topcoat-touch/tree/master/examples/one-document">Single
-                            Document Example App</a> - Examine the Single Document App if you are going to create a
-                        small app and want to keep things as simple as possible.
-                    </li>
-                </ul>
-                </article>
-            </div>
-
+        <div class="col-sm-8">
+            <h2>The Lean Mobile Framework</h2>
+            <ul>
+                <li>Designed from the ground up to build mobile apps on Phonegap</li>
+                <li>Modular, include only the libraries you need</li>
+                <li>Lightweight (5kb minified and gzipped)</li>
+                <li>Near native performance on Android and IOS</li>
+                <li>Simple codebase that easy to understand and extend</li>
+                <li>Leverages best of breed components and libraries</li>
+                <li>Get started quickly with Yeoman</li>
+            </ul>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div>Topcoat touch simple mobile framework that uses the <a href="http://topcoat.io">Topcoat</a> CSS framework to
+                create mobile applications.   Inspired by <a href="http://jqtjs.com/">jQT</a>, it can be used either
+                with a single html document with multiple pages, or a collection of controllers and templates.
+                It uses the following optional libraries to provide most of the functionality for a mobile framework:</div>
+
+            <ul>
+                <li>
+                    <a href="http://jquery.com">jQuery</a> or <a href="http://zeptojs.com">Zepto</a> to provide DOM
+                    manipulation.
+                </li>
+                <li>
+                    <a href="https://github.com/ftlabs/fastclick">fastclick</a> is an optional plugin to remove the
+                    300ms click delay in <a href="http://updates.html5rocks.com/2013/12/300ms-tap-delay-gone-away">most</a>
+                    mobile browsers
+                </li>
+                <li>
+                    <a href="https://github.com/cubiq/iscroll">iScroll</a> is an optional plugin that can be used to
+                    provide smooth scrolling automatically.
+                </li>
+                <li>
+                    <a href="http://eightmedia.github.io/hammer.js">hammer.js</a> is an optional plugin to allow
+                    TopcoatTouch to provide event brokering for mobile touch options (swipe, tap, hold, doubletap,
+                    drag, roate, pinch, etc).
+                </li>
+                <li>
+                    <a href="http://lodash.com/">lodash</a> is a plugin that is only required when using <a
+                        href="/kriserickson/topcoat-touch/blob/master/example/mvc">templating strategy</a>, of
+                    course you could also use <a href="http://underscorejs.org/">underscore</a>.
+                </li>
+                <li>Currently the default templating engine for the MVC style is underscore, but you can easily use
+                    <a href="http://handlebarsjs.com/">Handlebars</a> or <a
+                            href="https://github.com/janl/mustache.js">Mustache</a>. See <a
+                            href="//github.com/kriserickson/topcoat-touch/wiki/Tips-Tricks">tips and tricks</a> for
+                    a simple example using <a
+                            href="https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-handlebars-as-the-templating-engine">Handlebars</a>
+                    or
+                    <a href="//github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine">Mustache</a>.
+                    There is also an <a
+                            href="//github.com/kriserickson/topcoat-touch/tree/master/examples/handlebars">example</a>
+                    using handlerbars. Or you can also easily add your own templating engines following these
+                    examples.
+                </li>
+            </ul>
+            <div>It has a <a href="https://github.com/kriserickson/generator-topcoat-touch">generator</a> for <a
+                    href="http://yeoman.io">Yeoman</a> that allows for rapid initial creation of your project, as
+                well as integration with <a href="http://phonegap.com">phonegap/cordova</a> and <a
+                        href="http://gruntjs.com">grunt</a>.</div>
+
+            <ul>
+                <li>
+                    <a href="//github.com/kriserickson/topcoat-touch/wiki/Getting-Started">Getting Started</a> --
+                    Getting started with topcoat touch.
+                </li>
+                <li>
+                    <a href="//github.com/kriserickson/topcoat-touch/wiki">Wiki</a> - Browse the Wiki for more
+                    detailed documentation.
+                </li>
+                <li>
+                    <a href="//github.com/kriserickson/topcoat-touch/wiki/FAQ">Faq</a> - Small Faq for now, but will
+                    expand over time.
+                </li>
+                <li>
+                    <a href="https://github.com/kriserickson/topcoat-touch/tree/master/examples/mvc">MVC Example
+                        App</a> - Check out the MVC example app in the source code to see how to create an MVC
+                    Topcoat Touch App
+                </li>
+                <li>
+                    <a href="https://github.com/kriserickson/topcoat-touch/tree/master/examples/one-document">Single
+                        Document Example App</a> - Examine the Single Document App if you are going to create a
+                    small app and want to keep things as simple as possible.
+                </li>
+            </ul>
+        </div>
+
+    </div>
 </div>
+
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://code.jquery.com/jquery.js"></script>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <title>Topcoat-Touch</title>
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><strong>Topcoat-Touch</strong>
+                <small> - Mobile Microframework</small>
+            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-right">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li class="active"><a href="#">Getting Started</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="examples.html">Examples</a></li>
+                <li><a href="tutorials.html">Tutorials</a></li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+
+
+<div class="main-container" id="container-fluid">
+    <div class="row">
+         <h1 class="instapaper_title">Getting Started</h1>
+
+         <p>You have two options to get started with your Topcoat Touch project, either you can use <a href="http://yeoman.io/">Yeoman</a>,
+             or you can add all the files manually:</p>
+
+         <h4>Use Yeoman</h4>
+
+        <code>
+$npm install -g yo
+$npm install -g generator-topcoat-touch
+$yo topcoat-touch
+
+     _-----_
+    |       |
+    |--(o)--|   .--------------------------.
+   `---------'  |    Welcome to Yeoman,    |
+    ( _'U`_ )   |   ladies and gentlemen!  |
+    /___A___\   '__________________________'
+     |  ~  |
+   __'.___.'__
+ '   `  |° ' Y `
+
+[?] Topcoat Touch Project Name? Example
+[?] Would you like to enable Cordova for this project? Yes
+[?] Cordova platforms: (Press  to select)
+&gt;[X] ios
+ [X] android
+ [ ] wp8
+ [ ] windows8
+ [ ] amazon-fireos
+ [ ] firefoxos
+ [ ] blackberry10
+[?] Light or dark theme? (Use arrow keys)
+&gt; light
+  dark
+[?] Light or dark theme? (Use arrow keys)
+&gt; light
+  dark
+[?] Include Hammer.js for gesture support? (Y/n)
+[?] Include fastclick.js to remove click delays? (Y/n)
+[?] Include IScroll.js for scrolling (required for KitchenSink demo)? (Y/n)
+[?] MVC or Single Document? (Use arrow keys)
+&gt; mvc
+  single document
+[?] Include the KitchenSink demo? (y/N)
+   create app\index.html
+   create app\js\app.js
+   create app\css\app.css
+   create bower.json
+   create .bowerrc
+   create Gruntfile.js
+   create package.json
+   create app\cordova.js
+   create app\templates\home.ejs
+
+I'm all done. Running bower install &amp; npm install for you to install the required dependencies.
+If this fails, try running the command yourself.
+            </code>
+
+            <h4>Manually</h4>
+
+        <ol>
+            <li><a href="https://github.com/kriserickson/topcoat-touch/zipball/master">Download topcoat-touch.</a></li>
+            <li>Create an index.html in the root directory.</li>
+            <li>Set the viewport for mobile (&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;)</li>
+            <li>Include stylesheets (You can choose topcoat-mobile-light.css or topcoat-mobile-dark.css depending upon your colour preference) and topcoat-touch.css</li>
+            <li>Include the scripts you need to use: <a href="http://jquery.com/">jquery</a> or <a href="http://zeptojs.com/">zepto</a> depending on your preference,
+                topcoat-touch, <a href="http://iscrolljs.com/">iscroll</a> (if you want scrolling),
+                <a href="http://eightmedia.github.io/hammer.js/">hammerjs</a> (if you need touch events),
+                <a href="https://github.com/ftlabs/fastclick">fastclick</a> (to remove click delays), and any
+                javascript you need.</li>
+        </ol>
+
+
+
+            <p></p>
+
+<code>
+&lt;head&gt;
+    &lt;title&gt;Topcoat Touch&lt;/title&gt;
+    &lt;meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;
+    &lt;link href="css/topcoat-mobile-light.css" rel="stylesheet"&gt;
+    &lt;link href="css/topcoat-touch.css" rel="stylesheet"&gt;
+    &lt;link href="css/app.css" rel="stylesheet"&gt;
+    &lt;script src="js/jquery-2.0.3.js"&gt;&lt;/script&gt;
+    &lt;script src="js/topcoat-touch.js"&gt;&lt;/script&gt;
+    &lt;script src="js/iscroll.js"&gt;&lt;/script&gt;
+    &lt;script src="js/hammer.js"&gt;&lt;/script&gt;
+    &lt;script src="js/fastclick.js"&gt;&lt;/script&gt;
+    &lt;script src="js/app.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+</code>
+
+
+    </div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+</body>
+</html>
+

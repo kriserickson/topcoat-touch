@@ -27,3 +27,22 @@ body {
 #downloads {
     text-align: right;
 }
+
+.main-container {
+    margin: 10px 50px 50px;
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    display: block;
+    white-space: pre;
+    margin: 1em 0px;
+    background-color: #F8F8F8;
+    border: 1px solid #DDD;
+    font-size: 13px;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+    color: #333;
+}
