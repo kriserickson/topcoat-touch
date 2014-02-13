@@ -1,9 +1,15 @@
 body {
   padding-top: 50px;
+  font-size: 18px;
 }
+
 .starter-template {
   padding: 40px 15px;
   text-align: center;
+}
+
+ul {
+  list-style: square;
 }
 
 .btn-git {
@@ -37,12 +43,17 @@ code {
     display: block;
     white-space: pre;
     margin: 1em 0px;
-    background-color: #F8F8F8;
+    background-color: #444;
     border: 1px solid #DDD;
     font-size: 13px;
     line-height: 19px;
     overflow: auto;
     padding: 6px 10px;
     border-radius: 3px;
-    color: #333;
+    color: #eee;
+}
+
+#topcoatPhone {
+    float: left;
+    margin: 0 50px 20px 20px;
 }

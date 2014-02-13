@@ -21,7 +21,7 @@
 <body>
 
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
+
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -29,9 +29,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#"><strong>Topcoat-Touch</strong>
-                <small> - Mobile Microframework</small>
-            </a>
+            <a class="navbar-brand" href="index.html"><strong>Topcoat-Touch</strong></a>
         </div>
         <div class="collapse navbar-collapse navbar-right">
             <ul class="nav navbar-nav">
@@ -42,8 +40,7 @@
                 <li><a href="tutorials.html">Tutorials</a></li>
             </ul>
         </div>
-        <!--/.nav-collapse -->
-    </div>
+
 </div>
 
 
@@ -55,11 +52,37 @@
          <p>You have two options to get started with your Topcoat Touch project, either you can use <a href="http://yeoman.io/">Yeoman</a>,
              or you can add all the files manually:</p>
 
-         <h4>Use Yeoman</h4>
+         <h3>Use Yeoman</h3>
 
-        <code>
-$npm install -g yo
-$npm install -g generator-topcoat-touch
+<p>We will assume that you have already installed <a href="http://nodejs.org/download/">nodejs</a>, and npm  but if you haven't do
+so now.</p>
+
+<p>Next install <a href="http://yeoman.io">Yeoman</a>, if you haven't already.  This can be done with the following simple command:
+
+<code>
+    $npm install -g yo
+</code>
+
+<p>Next install the topcoat-touch genreator for yeoman</p>
+
+<code>
+    $npm install -g generator-topcoat-touch
+</code>
+
+<p>Next run yeoman and answer a few simple questions
+    <ol>
+        <li>do you want to enable Cordova (Phonegap).  Selecting this creates a grunt script that allows for quick creation of
+            a Phonegap app with little messing around, if you don't create this now you will have to do it manually by
+            yourself if you change your mind later.</li>
+        <li>The light or dark theme selection is easy to change later, so don't be too concerned</li>
+        <li>Hammer.js is used to react to swipes, pinches, zooms, other mobile touch events.  You can easily add it later</li>
+        <li>Fastclick.js is used to get around the 300ms click delay (may be obsolete in a year or so).  You can easily add it later</li>
+        <li>iScroll.js is used to allow for smooth scrolling of pages.  You can easily add it later</li>
+        <li>mvc or single document is an important decision, however if you are used to jQuery Mobile and jQT you
+        should probably pick single document for your first application.  It is the simplest way to quickly create a mobile site.</li>
+    </ol>
+</p>
+<code>
 $yo topcoat-touch
 
      _-----_
@@ -82,9 +105,6 @@ $yo topcoat-touch
  [ ] amazon-fireos
  [ ] firefoxos
  [ ] blackberry10
-[?] Light or dark theme? (Use arrow keys)
-&gt; light
-  dark
 [?] Light or dark theme? (Use arrow keys)
 &gt; light
   dark

@@ -21,29 +21,26 @@
 <body>
 
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#"><strong>Topcoat-Touch</strong>
-                <small> - Mobile Microframework</small>
-            </a>
-        </div>
-        <div class="collapse navbar-collapse navbar-right">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="started.html">Getting Started</a></li>
-                <li><a href="docs.html">Docs</a></li>
-                <li><a href="examples.html">Examples</a></li>
-                <li><a href="tutorials.html">Tutorials</a></li>
-            </ul>
-        </div>
-        <!--/.nav-collapse -->
+
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#"><strong>Topcoat-Touch</strong></a>
     </div>
+    <div class="collapse navbar-collapse navbar-right">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="started.html">Getting Started</a></li>
+            <li><a href="docs.html">Docs</a></li>
+            <li><a href="examples.html">Examples</a></li>
+            <li><a href="tutorials.html">Tutorials</a></li>
+        </ul>
+    </div>
+
 </div>
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
@@ -53,7 +50,7 @@
             <a href="https://github.com/kriserickson/topcoat-touch/zipball/master" id="download-zip" class="btn btn-git"
                role="button"><span>Download .zip</span></a>
             <a href="https://github.com/kriserickson/topcoat-touch/tarball/master" id="download-tar-gz"
-               class="btn btn-git" role="button"><span>Download .tar.gz</span></a>
+               class="btn btn-git hidden-xs" role="button"><span>Download .tar.gz</span></a>
             <a href="https://github.com/kriserickson/topcoat-touch" id="view-on-github" class="btn btn-git "
                role="button"><span>View on GitHub</span></a>
         </section>
@@ -62,29 +59,28 @@
 
 <div class="main-container" id="container-fluid">
     <div class="row">
-        <div class="col-sm-4 hidden-sm hidde-xs">
-            <img src="images/tt_screenshot_angle.png">
-        </div>
-        <div class="col-sm-8">
-            <h2>The Lean Mobile Framework</h2>
-            <ul>
-                <li>Designed from the ground up to build mobile apps on Phonegap</li>
-                <li>Modular, include only the libraries you need</li>
-                <li>Lightweight (5kb minified and gzipped)</li>
-                <li>Near native performance on Android and IOS</li>
-                <li>Simple codebase that easy to understand and extend</li>
-                <li>Leverages best of breed components and libraries</li>
-                <li>Get started quickly with Yeoman</li>
-            </ul>
-        </div>
-    </div>
-    <div class="row">
         <div class="col-sm-12">
-            <div>Topcoat touch simple mobile framework that uses the <a href="http://topcoat.io">Topcoat</a> CSS framework to
-                create mobile applications.   Inspired by <a href="http://jqtjs.com/">jQT</a>, it can be used either
-                with a single html document with multiple pages, or a collection of controllers and templates.
-                It uses the following optional libraries to provide most of the functionality for a mobile framework:</div>
+            <img class="hidden-xs" id="topcoatPhone" src="images/tt_screenshot_angle.png">
 
+            <h1>The Lean Mobile Framework</h1>
+            <ul>
+                <li>Designed from the ground up to build mobile apps on <a href="http://phonegap.com/">Phonegap</a>, of course
+                    you can build online app's as well</li>
+                <li>Open Source under the MIT License, fork it on <a href="https://github.com/kriserickson/topcoat-touch">Github</a> </li>
+                <li>Modular, include only the libraries you need</li>
+                <li>Lightweight (an entire application including CSS and html can be as little as 125K minified)</li>
+                <li>Near native performance on Android and IOS</li>
+                <li>Simple codebase that easy to understand to use and simple to extend.</li>
+                <li>Leverages best of breed components and libraries</li>
+                <li>Get started quickly with Yeoman generators</li>
+            </ul>
+
+            <h3>Built on proven Technologies</h3>
+
+            <div>Topcoat touch uses the <a href="http://topcoat.io">Topcoat</a> CSS framework for creating mobile widgets in CSS
+                without any need for slow Javascript enhancement.   Then it optionally allows addition of a collection of best of
+                breed libraries to allow for almost all of the functionality of heavier libraries:</div>
+            <p></p>
             <ul>
                 <li>
                     <a href="http://jquery.com">jQuery</a> or <a href="http://zeptojs.com">Zepto</a> to provide DOM
@@ -96,7 +92,7 @@
                     mobile browsers
                 </li>
                 <li>
-                    <a href="https://github.com/cubiq/iscroll">iScroll</a> is an optional plugin that can be used to
+                    <a href="http://iscrolljs.com/">iScroll</a> is an optional plugin that can be used to
                     provide smooth scrolling automatically.
                 </li>
                 <li>
@@ -106,39 +102,44 @@
                 </li>
                 <li>
                     <a href="http://lodash.com/">lodash</a> is a plugin that is only required when using <a
-                        href="/kriserickson/topcoat-touch/blob/master/example/mvc">templating strategy</a>, of
+                        href="https://github.com/kriserickson/topcoat-touch/blob/master/example/mvc">templating strategy</a>, of
                     course you could also use <a href="http://underscorejs.org/">underscore</a>.
                 </li>
                 <li>Currently the default templating engine for the MVC style is underscore, but you can easily use
                     <a href="http://handlebarsjs.com/">Handlebars</a> or <a
                             href="https://github.com/janl/mustache.js">Mustache</a>. See <a
-                            href="//github.com/kriserickson/topcoat-touch/wiki/Tips-Tricks">tips and tricks</a> for
+                            href="https://github.com/kriserickson/topcoat-touch/wiki/Tips-Tricks">tips and tricks</a> for
                     a simple example using <a
                             href="https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-handlebars-as-the-templating-engine">Handlebars</a>
                     or
-                    <a href="//github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine">Mustache</a>.
+                    <a href="https://github.com/kriserickson/topcoat-touch/wiki/Tips-and-Tricks#wiki-using-mustache-as-the-templating-engine">Mustache</a>.
                     There is also an <a
-                            href="//github.com/kriserickson/topcoat-touch/tree/master/examples/handlebars">example</a>
+                            href="https://github.com/kriserickson/topcoat-touch/tree/master/examples/handlebars">example</a>
                     using handlerbars. Or you can also easily add your own templating engines following these
                     examples.
                 </li>
             </ul>
-            <div>It has a <a href="https://github.com/kriserickson/generator-topcoat-touch">generator</a> for <a
-                    href="http://yeoman.io">Yeoman</a> that allows for rapid initial creation of your project, as
-                well as integration with <a href="http://phonegap.com">phonegap/cordova</a> and <a
-                        href="http://gruntjs.com">grunt</a>.</div>
 
+            <h3>Rapid Development</h3>
+
+            <div>Quickly generate a working app with our
+                <a href="https://github.com/kriserickson/generator-topcoat-touch">generator</a> for
+                <a href="http://yeoman.io">Yeoman</a>.  It allows for rapid initial creation of your project,
+                selection of which libraries you wish to use, as well as integration with <a href="http://phonegap.com">phonegap/cordova</a> and <a
+                href="http://gruntjs.com">grunt</a>.</div>
+
+            <h3>How to get Started</h3>
             <ul>
                 <li>
-                    <a href="//github.com/kriserickson/topcoat-touch/wiki/Getting-Started">Getting Started</a> --
-                    Getting started with topcoat touch.
+                    <a href="https://github.com/kriserickson/topcoat-touch/wiki/Getting-Started">Getting Started</a> --
+                    Read our guide to getting started with topcoat touch.
                 </li>
                 <li>
-                    <a href="//github.com/kriserickson/topcoat-touch/wiki">Wiki</a> - Browse the Wiki for more
+                    <a href="https://github.com/kriserickson/topcoat-touch/wiki">Wiki</a> - Browse the Wiki for more
                     detailed documentation.
                 </li>
                 <li>
-                    <a href="//github.com/kriserickson/topcoat-touch/wiki/FAQ">Faq</a> - Small Faq for now, but will
+                    <a href="https://github.com/kriserickson/topcoat-touch/wiki/FAQ">Faq</a> - Small Faq for now, but will
                     expand over time.
                 </li>
                 <li>
