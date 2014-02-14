@@ -7,6 +7,7 @@
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/prism.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -59,14 +60,12 @@ so now.</p>
 
 <p>Next install <a href="http://yeoman.io">Yeoman</a>, if you haven't already.  This can be done with the following simple command:
 
-<code>
-    $npm install -g yo
+<code>$npm install -g yo
 </code>
 
 <p>Next install the topcoat-touch genreator for yeoman</p>
 
-<code>
-    $npm install -g generator-topcoat-touch
+<code>$npm install -g generator-topcoat-touch
 </code>
 
 <p>Next run yeoman and answer a few simple questions
@@ -82,8 +81,7 @@ so now.</p>
         should probably pick single document for your first application.  It is the simplest way to quickly create a mobile site.</li>
     </ol>
 </p>
-<code>
-$yo topcoat-touch
+<code>$yo topcoat-touch
 
      _-----_
     |       |
@@ -126,10 +124,11 @@ $yo topcoat-touch
    create app\templates\home.ejs
 
 I'm all done. Running bower install &amp; npm install for you to install the required dependencies.
-If this fails, try running the command yourself.
-            </code>
+If this fails, try running the command yourself.</code>
 
-            <h4>Manually</h4>
+        <hr>
+
+            <h3>Manually</h3>
 
         <ol>
             <li><a href="https://github.com/kriserickson/topcoat-touch/zipball/master">Download topcoat-touch.</a></li>
@@ -147,31 +146,29 @@ If this fails, try running the command yourself.
 
             <p></p>
 
-<code>
-&lt;head&gt;
-    &lt;title&gt;Topcoat Touch&lt;/title&gt;
-    &lt;meta name="viewport"
-          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;
-    &lt;link href="css/topcoat-mobile-light.css" rel="stylesheet"&gt;
-    &lt;link href="css/topcoat-touch.css" rel="stylesheet"&gt;
-    &lt;link href="css/app.css" rel="stylesheet"&gt;
-    &lt;script src="js/jquery-2.0.3.js"&gt;&lt;/script&gt;
-    &lt;script src="js/topcoat-touch.js"&gt;&lt;/script&gt;
-    &lt;script src="js/iscroll.js"&gt;&lt;/script&gt;
-    &lt;script src="js/hammer.js"&gt;&lt;/script&gt;
-    &lt;script src="js/fastclick.js"&gt;&lt;/script&gt;
-    &lt;script src="js/app.js"&gt;&lt;/script&gt;
-&lt;/head&gt;
+<code class="language-markup">
+    &lt;head&gt;
+        &lt;title&gt;Topcoat Touch&lt;/title&gt;
+        &lt;meta name="viewport"
+              content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;
+        &lt;link href="css/topcoat-mobile-light.css" rel="stylesheet"&gt;
+        &lt;link href="css/topcoat-touch.css" rel="stylesheet"&gt;
+        &lt;link href="css/app.css" rel="stylesheet"&gt;
+        &lt;script src="js/jquery-2.0.3.js"&gt;&lt;/script&gt;
+        &lt;script src="js/topcoat-touch.js"&gt;&lt;/script&gt;
+        &lt;script src="js/iscroll.js"&gt;&lt;/script&gt;
+        &lt;script src="js/hammer.js"&gt;&lt;/script&gt;
+        &lt;script src="js/fastclick.js"&gt;&lt;/script&gt;
+        &lt;script src="js/app.js"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+
 </code>
 
 
     </div>
 </div>
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
+<script src="js/prism.js"></script>
 </body>
 </html>
 
