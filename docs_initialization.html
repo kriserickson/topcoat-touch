@@ -1,0 +1,53 @@
+<div class="row">
+    <div class="col-sm-12">
+        The TopcoatTouch is instantiated with the TopcoatTouch function.
+
+
+        <code class="language-javascript">
+    var tt = new TopcoatTouch([container], [options]);
+        </code>
+
+
+        Where <strong>container</strong> is query object (we will use the generic term query object for jQuery or
+        Zepto query results) that
+        is the base container where you wish the TopcoatTouch environment to be initialized. Almost always this is
+        the $('body'),
+        which is the default if no container is passed, but it can be any container (for testing, for example).
+
+        <h2>Configurable options</h2>
+
+        <dl>
+
+            <dt>exceptionOnError</dt>
+            <dd><div class="defaultValue">default false</div>
+                Whether or not an exception is thrown if an error occurs. By default only a console error is emitted
+            </dd>
+
+            <dt>initializeFunction</dt>
+            <dd><div class="defaultValue">default none</div>
+                Override the default template initialization function
+            </dd>
+
+            <dt>menu - default false</dt>
+            <dd></dd>
+
+            <dt>menuFadeIn - default 100</dt>
+            <dd></dd>
+
+            <dt>menuFadeOut - default 50</dt>
+            <dd></dd>
+
+            <dt>menuHasIcons - default false</dt>
+            <dd></dd>
+
+            <dt>renderFunction - default none</dt>
+            <dd></dd>
+
+
+            <dt>templateDirectory - default 'templates'</dt>
+            <dd></dd>
+
+        </dl>
+
+    </div>
+</div>

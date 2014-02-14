@@ -1,0 +1,234 @@
+<div class="row">
+    <div class="col-sm-12">
+        <h3>on (event, [selector], [page], function)</h3>
+
+        <div class="docDescription">Subscribe to event.</div>
+
+        <div>The <a href="#events">events</a> can be subscribed to globally (if you omit the page) or per page. There can
+be multiple subscriptions to the same event, so if you don't want to fire multiple events remember to remove the
+subscription with off. Note the page can be the page name ('home'), the page identifier ('#home'). As well as the
+<a href="#events">events</a>, you can also use on to delegate standard Javascript events (as a replacement for jQuery's
+on except that it limits the events to the current page) and also
+<a href="https://github.com/EightMedia/hammer.js/wiki/Getting-Started#gesture-events">Hammerjs events</a> if
+you have included the Hammer library (it implements the
+<a href="https://github.com/EightMedia/hammer.js/wiki/Tips-&amp;-Tricks#one-hammer-to-rule-them-all">one Hammer to rule them all</a>
+pattern.</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+    console.log("I'm on the home page!");
+    });
+
+    tt.on('click', 'button', 'home', function() {
+    console.log('All buttons on the home screen will log this, but not on any other screen');
+    }
+
+    tt.on('swipe', 'li', 'home', function() {
+    console.log('If hammer.js is included in the html this will react to swipes, no other initialization is required');
+    }
+        </code>
+
+        <h3>off (event, [selector], [page], [function])</h3>
+
+        <div class="docDescription">Unsubscribe to an event.</div>
+
+        <div>If the page is omitted, all subscriptions to the event are removed, not just global subscriptions. If the function is
+            omitted, all subscriptions for the page are removed. If the function is included just that functions subscription to
+            the page is removed.</div>
+
+        <code class="language-javascript">
+    tt.off(tt.EVENTS.PAGE_START, 'home');
+        </code>
+
+        <h3>currentPage</h3>
+
+        <div class="docDescription">Returns the current page name.</div>
+
+        <code class="language-javascript">
+    console.log('The current page is: ' + tt.currentPage());
+        </code>
+
+        <h3>currentPageFind</h3>
+
+        <div class="docDescription">Shortcut to access the current page's selector find.</div>
+
+        <code class="language-javascript">
+    var $helloButton = tt.currentPageFind('#helloButton');
+
+    // Basically the same as
+    var $helloButton = $('#' + tt.currentPage()).find('#helloButton');
+    // but a little less ugh...
+        </code>
+
+        <h3>previousPage</h3>
+
+        <div class="docDescription">Returns the previous page name.</div>
+
+        <code class="language-javascript">
+            console.log('The previous page is: ' + tt.previousPage());
+        </code>
+
+        <h3>hasBack</h3>
+
+        <div class="docDescription">Whether or not their are pages in the backstack.</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    if (!tt.hasBack()) {
+        $('backButton').hide();
+    }
+        </code>
+
+        <h3>goBack([numberOfPages])</h3>
+
+        <div class="docDescription">Goes back</div>
+
+        <div>Goes back one page back in the history. If numberOfPages is set it goes back that number if possible...</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    if (!loggedIn) {
+        tt.goBack();
+    }
+        </code>
+
+
+        <h3>goTo(page, [isGoingBack], [transition], [isDialog])</h3>
+
+        <div class="docDescription">Goes to a page</div>
+
+        <div>If isGoingBack is set the animation is from left-to-right rather than the standard right-to-left as well as not
+            adding the page to the backstack. Note the page can be the page name ('home'), the page identifier ('#home'), or the
+            page in a jQuery object $('#home'). Transition and isDialog are not yet implimented.</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.goTo('home');
+        </code>
+
+        <h3>removePageFromHistory</h3>
+
+        <div class="docDescription">Removes the current page from the history</div>
+
+        <div>The current page is removed from the backstack history. Useful for dialogs or logins so the user can't get back to
+            the page hitting the back button.</div>
+
+        <code class="language-javascript">
+    tt.removePageFromHistory();
+        </code>
+
+        <h3>refreshScroll</h3>
+
+        <div class="docDescription">Refreshes the scroll.</div>
+
+        <div>If a 'scroller' has been captured, it refreshes the boundaries of that 'scroller'.</div>
+
+        <code class="language-javascript">
+    tt.refreshScroll()
+        </code>
+
+        <h3>scrollTo(x, y,
+            [duration], [easing])</h3>
+
+        <div class="docDescription">Scrolls to a position</div>
+
+        <div>If a 'scroller' has been captured, scrolls to that position in viewwindow. Duration and easing are optional. Easing
+            is one of: quadratic, circular, back, bounce, elastic.</div>
+
+        <code class="language-javascript">
+    tt.scrollTo(0,0);
+        </code>
+
+        <h3>scrollToElement(el, [duration], [offsetX], [offsetY], [easing])</h3>
+
+        <div class="docDescription">Scrolls to an element</div>
+
+        <div>If a 'scroller' has been captured, scrolls to that element Duration, offset and easing are optional. Easing is one
+            of: quadratic, circular, back, bounce, elastic.</div>
+
+        <code class="language-javascript">
+    $('li').click(function() {
+        tt.scrollToElement($(this));
+    });
+        </code>
+
+        <h3>showLoading(msg)</h3>
+
+        <div class="docDescription">Shows a loading message</div>
+
+        <div>Msg can text or html.</div>
+
+        <code class="language-javascript">
+    tt.showLoading('Please Wait');
+        </code>
+
+        <h3>loadMessage(msg)</h3>
+
+        <div class="docDescription">Changes the loading message..</div>
+
+        <code class="language-javascript">
+            tt.loadMessage('Wait longer...');
+        </code>
+
+        <h3>hideLoading()</h3>
+
+        <div class="docDescription">Hides the loading message</div>
+
+        <code class="language-javascript">
+    tt.hideLoading();
+        </code>
+
+        <h3>showDialog(msg, [buttons])
+        </h3>
+
+        <div class="docDescription">Shows a dialog with optional buttons.</div>
+
+        <div>If no buttons are present an Ok button is shown. Buttons are passed as an object where the button caption is the key
+            and value is a function that is executed when the button is pressed. The dialog is always closed by clicking on any
+            of the buttons.</div>
+
+        <code class="language-javascript">
+    tt.showDialog('Example Dialog', 'This is a dialog', {
+        OK: function() { console.log('OK Pressed') },
+        Cancel: function() { console.log('Cancel Pressed')}
+    });
+        </code>
+
+        <h3>dialogShowing()</h3>
+
+        <div class="docDescription">Returns whether or not a dialog is showing.</div>
+
+        <code class="language-javascript">
+    console.log('Dialog is' + (tt.dialogShowing() ? '' : ' not') + ' showing');
+        </code>
+
+        <h3>hideDialog</h3>
+
+        <div class="docDescription">Hides the dialog</div>
+
+        <code class="language-javascript">
+    tt.hideDialog();
+        </code>
+
+        <h3>createController(pageName, [fns], [data])</h3>
+
+        <div class="docDescription">Creates a controller for a page.</div>
+
+        <div>See <a href="https://github.com/kriserickson/topcoat-touch/blob/master/examples/mvc/js/app.js">the mvc example</a> to
+            see how it used. See <a href="#mvc">Controller</a> for controller functions and properties.</div>
+
+        <code class="language-javascript">
+    var homeController = tt.createController('home', {
+        pagestart: function() { console.log('Page started'); },
+        pageend: function() { console.log('Page ended'); }},
+        {title: 'Home Page'}
+    });
+        </code>
+
+    </div>
+</div>
