@@ -1,0 +1,96 @@
+<div class="row">
+    <div class="col-sm-12">
+
+            <h3>PAGE_START</h3>
+        <div class="docDescription">Fired when a page is loaded (or started).</div>
+
+        <div>Event is fired when the user arrives at the page. The page will be fully loaded (I.e. you will know the dimensions of the page) when the event is fired..</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+        console.log("I'm on the home page!");
+    });
+        </code>
+
+        <h3>PAGE_END</h3>
+
+        <div class="docDescription">Fired when a page is loaded (or started).</div>
+
+        <div>The event is fired just before leaving the page. There is no way to cancel a page leave through this event, though that might be coming.</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.PAGE_END, 'home', function() {
+        console.log("I've left the home page!");
+    });
+        </code>
+
+        <h3>SCROLL_START</h3>
+
+        <div class="docDescription">The event is fired when the user starts scrolling a "scrollable" container.</div>
+
+        <div></div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.SCROLL_START, function() {
+        _lockScrollingUpdates = true;
+    });
+        </code>
+
+        <h3>SCROLL_END</h3>
+
+        <div class="docDescription">The event is fired when the user completes scrolling a "scrollable" container.</div>
+
+        <div></div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.SCROLL_START, function() {
+        _lockScrollingUpdates = true;
+    });
+        </code>
+
+        <h3>SHOW_MENU</h3>
+
+        <div class="docDescription">The event is fired when the user clicks on .menu-button class.</div>
+
+        <div>The event is fired when the .menu-button class is clicked (this gets added automatically if menu option is set to
+            true or a collection of menu items on TopcoatTouch initialization). The current page and the current state of the
+            menu collection is sent to the callback. The callback should return the state of the menu desired.
+            Note: Show menu can be fired in multiple controllers and you are responsible for the order of the items in the menuItems array.</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.SHOW_MENU, function(currentPage, menuItems) {
+        if (currentPage != 'about')) {
+            menuItems.push({name: 'About', 'id': 'about'});
+        }
+    });
+        </code>
+
+        <h3>SCROLL_START</h3>
+
+        <div class="docDescription">Event that is fired when a menu item is clicked.</div>
+
+        <div>Here is where you can react to menu click events.</div>
+
+        <div>Example:</div>
+
+        <code class="language-javascript">
+    tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(currentPage, menuId) {
+        if (menuId == 'about') {
+            tt.goTo('about');
+        }
+    });
+        </code>
+
+
+    </div>
+</div>
