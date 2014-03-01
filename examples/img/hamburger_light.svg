@@ -1,0 +1,29 @@
+<svg width="42" height="42" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_1" opacity="0.7">
+   <g id="svg_2" opacity="0.75">
+    <path id="svg_3" d="m40,11l0,-1c0,-1.47 -0.48,-2 -2,-2l-34,0c-1.53,0 -2,0.52 -2,2l0,1c0,1.55 0.52,2 2,2l34,0c1.5,0 2,-0.48 2,-2z" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+   <g id="svg_4">
+    <path id="svg_5" d="m40,10l0,-1c0,-1.47 -0.48,-2 -2,-2l-34,0c-1.53,0 -2,0.52 -2,2l0,1c0,1.55 0.52,2 2,2l34,0c1.5,0 2,-0.48 2,-2z" fill="#FFFFFF" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+  </g>
+  <g id="svg_6" opacity="0.7">
+   <g id="svg_7" opacity="0.75">
+    <path id="svg_8" d="m40,22l0,-1c0,-1.47 -0.48,-2 -2,-2l-34,0c-1.53,0 -2,0.52 -2,2l0,1c0,1.55 0.52,2 2,2l34,0c1.5,0 2,-0.48 2,-2z" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+   <g id="svg_9">
+    <path id="svg_10" d="m40,21l0,-1c0,-1.47 -0.48,-2 -2,-2l-34,0c-1.53,0 -2,0.52 -2,2l0,1c0,1.55 0.52,2 2,2l34,0c1.5,0 2,-0.48 2,-2z" fill="#FFFFFF" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+  </g>
+  <g id="svg_11" opacity="0.7">
+   <g id="svg_12" opacity="0.75">
+    <path id="svg_13" d="m40,33l0,-1c0,-1.471 -0.48,-2 -2,-2l-34,0c-1.53,0 -2,0.52 -2,2l0,1c0,1.55 0.52,2 2,2l34,0c1.5,0 2,-0.48 2,-2z" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+   <g id="svg_14">
+    <path id="svg_15" d="m40,32l0,-1c0,-1.471 -0.48,-2 -2,-2l-34,0c-1.53,0 -2,0.52 -2,2l0,1c0,1.55 0.52,2 2,2l34,0c1.5,0 2,-0.48 2,-2z" fill="#FFFFFF" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+  </g>
+ </g>
+</svg>

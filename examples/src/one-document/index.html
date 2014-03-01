@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Topcoat Touch</title>
+    <!-- Set the viewport for a mobile device -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- link to the topcoat stylesheet, feel free to change this with topcoat-mobile-dark.css to get a dark theme -->
+    <link href="../../css/topcoat-mobile-dark.css" rel="stylesheet">
+    <!-- Additions to the topcoat stylesheet for page swapping and a couple of other widgets
+        see https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions for more information -->
+    <link href="../../css/topcoat-touch.css" rel="stylesheet">
+    <!-- This apps stylesheet -->
+    <link href="css/app.css" rel="stylesheet">
+    <!-- jQuery is currently required -->
+    <script src="../../js/jquery-2.0.3.js"></script>
+    <!--  The topcoat touch library -->
+    <script src="../../js/topcoat-touch.js"></script>
+    <!-- iScroll is not required, feel to remove it you aren't scrolling anything, also you could replace it IScroll lite -->
+    <script src="../../js/iscroll.js"></script>
+    <!-- fastclick also isn't required but dialogs, dropdowns, back-button and data-rel links won't work without some mobile click polyfill -->
+    <script src="../../js/fastclick.js"></script>
+    <!-- hammerjs isn't required, but can be used for swipe, drag, hold, dbltap and other gestures -->
+    <script src="../../js/hammer.js"></script>
+    <!-- your app's script -->
+    <script src="js/app.js"></script>
+</head>
+<body>
+<div id="home">
+    <div class="topcoat-navigation-bar"> <!-- Navigation bar -->
+        <div class="topcoat-navigation-bar__item left quarter">
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Topcoat Touch</h1>
+        </div>
+        <div class="topcoat-navigation-bar__item right quarter">
+            <a class="topcoat-icon-button--quiet menu-button" href="#">
+                <span class="topcoat-icon topcoat-icon--menu-stack"></span>
+            </a>
+        </div>
+    </div>
+    <div class="content scrollable"> <!-- containers with the class scrollable are automatically hooked into iscroll -->
+        <div class="topcoat-list__container">
+            <ul id="demoList" class="topcoat-list list">
+                <!-- setting the data-rel means that when that element is clicked it goes to the page in the data-rel -->
+                <li class="topcoat-list__item" data-rel="buttonExample">
+                    <span class="formItem">Buttons</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="checkRadioExample">
+                    <span class="formItem">Check/Radio Example</span><span class="chevron"></span><span
+                        class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="formExample">
+                    <span class="formItem">Form Example</span><span class="chevron"></span><span class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="waitingDialogExample">
+                    <span class="formItem">Waiting/Dialog Example</span><span class="chevron"></span><span
+                        class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="galleryExample">
+                    <span class="formItem">Gallery Example</span><span class="chevron"></span><span
+                        class="count"></span>
+                </li>
+                <li class="topcoat-list__item" data-rel="carouselExample">
+                    <span class="formItem">Carousel Example</span><span class="chevron"></span><span
+                        class="count"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div id="buttonExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <!-- elements with the class back-button automatically go back on click -->
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Buttons</h1>
+        </div>
+    </div>
+    <div class="content scrollable">
+        <form class="testForm" method="post" action="#">
+
+            <h3>Button Bar</h3>
+
+            <div class="topcoat-button-bar">
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button">One</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button">Two</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button">Three</button>
+                </div>
+            </div>
+
+            <h3>Large Button Bar</h3>
+
+            <div class="topcoat-button-bar">
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button--large">One</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button--large">Two</button>
+                </div>
+                <div class="topcoat-button-bar__item">
+                    <button class="topcoat-button-bar__button--large">Three</button>
+                </div>
+            </div>
+
+            <h3>Tab bar</h3>
+
+            <div class="topcoat-tab-bar">
+                <label class="topcoat-tab-bar__item">
+                    <input type="radio" name="tab-bar">
+                    <button class="topcoat-tab-bar__button">One</button>
+                </label>
+                <label class="topcoat-tab-bar__item">
+                    <input type="radio" name="tab-bar">
+                    <button class="topcoat-tab-bar__button">Two</button>
+                </label>
+                <label class="topcoat-tab-bar__item">
+                    <input type="radio" name="tab-bar">
+                    <button class="topcoat-tab-bar__button">Three</button>
+                </label>
+            </div>
+
+            <h3>Button</h3>
+            <button class="topcoat-button">Button</button>
+            <button class="topcoat-button" disabled>Button</button>
+
+            <h3>Quiet Button</h3>
+            <button class="topcoat-button--quiet">Button</button>
+            <button class="topcoat-button--quiet" disabled>Button</button>
+
+
+            <h3>Large Button</h3>
+            <button class="topcoat-button--large">Button</button>
+            <button class="topcoat-button--large" disabled>Button</button>
+
+            <h3>Large Quiet Button</h3>
+            <button class="topcoat-button--large--quiet">Button</button>
+            <button class="topcoat-button--large--quiet" disabled>Button</button>
+
+            <h3>Large Call To Action Button</h3>
+            <button class="topcoat-button--large--cta">Button</button>
+            <button class="topcoat-button--large--cta" disabled>Button</button>
+
+
+            <h3>Small Button</h3>
+            <button class="topcoat-button button-small">Button</button>
+            <button class="topcoat-button button-small" disabled>Button</button>
+
+            <h3>Small Quiet Button</h3>
+            <button class="topcoat-button--quiet button-small">Button</button>
+            <button class="topcoat-button--quiet button-small" disabled>Button</button>
+
+            <h3>Small Call To Action Button</h3>
+            <button class="topcoat-button--cta button-small">Button</button>
+                <button class="topcoat-button--cta button-small" disabled>Button</button>
+        </form>
+    </div>
+</div>
+<div id="checkRadioExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Check/Radio</h1>
+        </div>
+    </div>
+    <div class="content scrollable">
+        <form class="testForm" method="post" action="#">
+            <h3>Checkbox</h3>
+            <label class="topcoat-checkbox">
+                <input type="checkbox">
+
+                <div class="topcoat-checkbox__checkmark"></div>
+                Default
+            </label>
+            <br>
+            <br>
+            <label class="topcoat-checkbox">
+                <input type="checkbox" disabled>
+
+                <div class="topcoat-checkbox__checkmark"></div>
+                Disabled
+            </label>
+
+            <h3>Icon Button</h3>
+            <button class="topcoat-icon-button">
+                <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+            </button>
+            <button class="topcoat-icon-button" disabled>
+                <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+            </button>
+
+            <h3>Quiet Icon Button</h3>
+            <button class="topcoat-icon-button--quiet">
+                <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+            </button>
+            <button class="topcoat-icon-button--quiet" disabled>
+                <span class="topcoat-icon" style="background-color:#A5A7A7;"></span>
+            </button>
+
+            <h3>Large Icon Button</h3>
+            <button class="topcoat-icon-button--large">
+                <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+            </button>
+            <button class="topcoat-icon-button--large" disabled>
+                <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+            </button>
+
+            <h3>Large Quiet Icon Button</h3>
+            <button class="topcoat-icon-button--large--quiet">
+                <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+            </button>
+            <button class="topcoat-icon-button--large--quiet" disabled>
+                <span class="topcoat-icon--large" style="background-color:#A5A7A7;"></span>
+            </button>
+
+            <h3>Radio Button</h3>
+            <!-- NO LABEL -->
+            <label class="topcoat-radio-button">
+                <input type="radio" name="topcoat">
+
+                <div class="topcoat-radio-button__checkmark"></div>
+            </label>
+            <br>
+            <br>
+            <!-- LEFT LABEL -->
+            <label class="topcoat-radio-button">
+                Left label
+                <input type="radio" name="topcoat">
+
+                <div class="topcoat-radio-button__checkmark"></div>
+            </label>
+            <br>
+            <br>
+            <!-- RIGHT LABEL -->
+            <label class="topcoat-radio-button">
+                <input type="radio" name="topcoat">
+
+                <div class="topcoat-radio-button__checkmark"></div>
+                Right label
+            </label>
+            <br>
+            <br>
+            <!-- DISABLED -->
+            <label class="topcoat-radio-button">
+                <input type="radio" name="topcoat" Disabled>
+
+                <div class="topcoat-radio-button__checkmark"></div>
+                Disabled
+            </label>
+
+            <h3>Switch</h3>
+            <label class="topcoat-switch">
+                <input type="checkbox" class="topcoat-switch__input">
+
+                <div class="topcoat-switch__toggle"></div>
+            </label>
+            <br>
+            <br>
+            <label class="topcoat-switch">
+                <input type="checkbox" class="topcoat-switch__input" checked>
+
+                <div class="topcoat-switch__toggle"></div>
+            </label>
+            <br>
+            <br>
+            <label class="topcoat-switch">
+                <input type="checkbox" class="topcoat-switch__input" disabled>
+
+                <div class="topcoat-switch__toggle"></div>
+            </label>
+
+        </form>
+    </div>
+</div>
+<div id="formExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Form Elements</h1>
+        </div>
+    </div>
+    <div class="content scrollable">
+        <form class="testForm" method="post" action="#">
+
+            <h3>Notification</h3>
+            <span class="topcoat-notification">1</span>
+
+            <h3>Range Slider</h3>
+
+            <p><input type="range" class="topcoat-range"> &nbsp; <input type="range" class="topcoat-range" disabled></p>
+
+            <h3>Search Input</h3>
+
+            <p><input type="search" value="" placeholder="search" class="topcoat-search-input"></p>
+
+            <p><input type="search" value="" placeholder="search disabled" class="topcoat-search-input" disabled></p>
+
+            <h3>Large Search</h3>
+
+            <p><input type="search" value="" placeholder="search" class="topcoat-search-input--large"></p>
+
+            <p><input type="search" value="" placeholder="search disabled" class="topcoat-search-input--large" disabled>
+            </p>
+
+
+            <h3>Text Input</h3>
+
+            <p><input type="text" class="topcoat-text-input" placeholder="text" value=""></p>
+
+            <p><input type="text" class="topcoat-text-input" placeholder="text" value="" disabled></p>
+
+            <p><input type="text" class="topcoat-text-input" placeholder="text" value="fail" pattern="not-fail"></p>
+
+            <h3>Large Text Input</h3>
+
+            <p><input type="text" class="topcoat-text-input--large" placeholder="text" value=""></p>
+
+            <p><input type="text" class="topcoat-text-input--large" placeholder="text" value="" disabled></p>
+
+            <p><input type="text" class="topcoat-text-input--large" placeholder="text" value="fail" pattern="not-fail">
+            </p>
+
+            <h3>Textarea</h3>
+
+            <p><textarea class="topcoat-textarea" rows="6" cols="36" placeholder="Textarea"></textarea></p>
+
+            <p><textarea class="topcoat-textarea" rows="6" cols="36" placeholder="Textarea" disabled></textarea></p>
+
+            <h3>Large Textarea</h3>
+
+            <p><textarea class="topcoat-textarea--large" rows="6" cols="36" placeholder="Textarea"></textarea></p>
+
+            <p><textarea class="topcoat-textarea--large" rows="6" cols="36" placeholder="Textarea" disabled></textarea>
+            </p>
+
+        </form>
+    </div>
+</div>
+<div id="waitingDialogExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Waiting/Dialog Example</h1>
+        </div>
+    </div>
+    <div class="content">
+        <div class="loadingDialogDiv">
+            <button id="showLoading" class="topcoat-button--cta">Show Loading</button>
+            <!-- See app.js to see how these work -->
+            <button id="showDialog" class="topcoat-button--cta">Show Dialog</button>
+        </div>
+    </div>
+</div>
+<div id="galleryExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Photos</h1>
+        </div>
+    </div>
+    <div class="content scrollable">
+        <div id="gallery-div">
+            <ul class="photo-gallery">
+
+            </ul>
+        </div>
+    </div>
+    <div class="topcoat-bottom-bar dark"> <!-- A bottom bar, note this screen is resized automatically
+                                    and bottom-bar is absolute positioned at the bottom of the page -->
+        <div class="topcoat-bottom-bar-item" style="width: 70%">
+            <!-- To see how dropdowns are created go to https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions#drop-down -->
+            <div class="form-dropdown" id="gallery-picker">
+                <a href="#" class="toggle-dropdown">Gallery Type</a>
+                <ul id="gallery-type" class="dropdown">
+                    <li class="dropdown-item" data-id="kittens">
+                        <div class="menu-item">Kittens</div>
+                    </li>
+                    <li class="dropdown-item" data-id="bears">
+                        <div class="menu-item">Bears</div>
+                    </li>
+                    <li class="dropdown-item" data-id="lorem">
+                        <div class="menu-item">Lorem Pixel</div>
+                    </li>
+                    <li class="dropdown-item" data-id="bacon">
+                        <div class="menu-item">Bacon</div>
+                    </li>
+                    <li class="dropdown-item" data-id="murray">
+                        <div class="menu-item">Bill Murray</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="topcoat-bottom-bar-item quarter">
+            <button class="topcoat-button--cta button-small" id="changeButton">Change</button>
+        </div>
+    </div>
+</div>
+<div id="carouselExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Photos</h1>
+        </div>
+    </div>
+    <!-- Carousel Example taken from: http://lab.cubiq.org/iscroll5/demos/carousel/, see app.js for how to do this... -->
+    <div id="carouselViewport">
+        <div id="carouselWrapper">
+            <div class="scroller">
+                <div class="slide">
+                    <div class="painting kitten1"></div>
+                </div>
+                <div class="slide">
+                    <div class="painting kitten2"></div>
+                </div>
+                <div class="slide">
+                    <div class="painting kitten3"></div>
+                </div>
+                <div class="slide">
+                    <div class="painting kitten4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="carouselIndicator">
+        <div id="carouselDotty"></div>
+    </div>
+</div>
+<div data-role="dialog" id="help">
+    <div class="topcoat-touch-dialog">
+        <div class="topcoat-touch-header">
+            <h1>Help</h1>
+        </div>
+
+        <div class="topcoat-touch-dialog-content">
+            <div>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </div>
+
+            <div class="topcoat-touch-grid  buttons">
+                <div class="half">
+                    <button class="topcoat-button">Cancel</button>
+                </div>
+                <div class="half">
+                    <button class="topcoat-button--cta">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div data-role="dialog" id="info">
+    <div class="topcoat-touch-dialog">
+        <div class="topcoat-touch-header">
+            <h1>Info</h1>
+        </div>
+
+        <div class="topcoat-touch-dialog-content">
+            <div class="scrollable" style="height:300px"> 
+                <div>
+Bacon ipsum dolor sit amet cow tenderloin fatback bacon, ham tail boudin jerky tri-tip pork ball tip chuck. Leberkas swine tri-tip jowl bacon. Brisket bresaola chuck beef ribs chicken leberkas tenderloin jerky tail ball tip biltong. Ham hock jowl frankfurter kevin pastrami strip steak. Pork chop hamburger pancetta, pork chicken tail ball tip venison.
+
+Ground round landjaeger drumstick turducken, meatloaf kielbasa biltong pig t-bone ribeye fatback corned beef. Bacon corned beef chicken pastrami swine t-bone meatball hamburger short ribs pig spare ribs tenderloin ball tip kevin boudin. Sirloin rump boudin, bacon chicken kielbasa andouille. Salami chicken pork loin, pancetta t-bone beef brisket rump fatback drumstick porchetta ribeye cow. Pig short loin prosciutto porchetta, frankfurter pork chop rump t-bone ham kielbasa meatball pork loin meatloaf leberkas.
+
+Salami prosciutto bacon kevin. Prosciutto kielbasa chicken ribeye biltong pork ground round shoulder cow. Beef ribs tri-tip t-bone porchetta tongue chicken ribeye frankfurter hamburger shankle brisket jowl short ribs. Pork chop short ribs pork loin, beef ribs hamburger salami strip steak sausage ball tip tenderloin. Shoulder filet mignon leberkas landjaeger shankle salami pork loin.
+
+Chicken beef ribs pancetta short loin salami kielbasa kevin short ribs strip steak brisket meatball turducken ground round filet mignon spare ribs. Shankle meatloaf doner shank andouille pork loin biltong, sirloin spare ribs beef ribs beef. Flank venison t-bone, fatback bresaola short ribs chicken pancetta hamburger rump ball tip sirloin. Fatback corned beef leberkas short ribs, flank filet mignon tenderloin pig cow meatball kevin pancetta landjaeger ham hock pork chop.
+
+Strip steak hamburger capicola, pork chop chicken short ribs pork belly turducken shoulder fatback pastrami pancetta chuck drumstick. Tenderloin pastrami kevin rump spare ribs. Boudin swine rump cow turducken pork chop. Pastrami rump pork loin, brisket landjaeger tenderloin boudin ham hock shankle shank pork belly. Fatback ham hock capicola brisket.
+                </div>
+            </div>
+
+            <div class="topcoat-touch-grid  buttons">
+                <div class="half">
+                    <button class="topcoat-button">Cancel</button>
+                </div>
+                <div class="half">
+                    <button class="topcoat-button--cta">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div data-role="dialog" id="about">
+    <div class="topcoat-touch-dialog">
+        <div class="topcoat-touch-header">
+            <h1>About</h1>
+        </div>
+
+        <div class="topcoat-touch-dialog-content">
+            <div>
+                <h2>Topcoat Touch</h2>
+
+                <p>A very simple mobile framework based on the Topcoat Framework. Inspired by the jQT framework. Can be
+                    used either with a single html document with multiple pages, or using a collection of controllers and templates.</p>
+
+                <p>Topcoat Touch uses jQuery (or Zepto), fastclick, iscroll, hammerjs, and lodash</p>
+
+            </div>
+
+            <div class="topcoat-touch-grid  buttons">
+                <div class="half">
+                    <button class="topcoat-button">Cancel</button>
+                </div>
+                <div class="half">
+                    <button class="topcoat-button--cta">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+
+

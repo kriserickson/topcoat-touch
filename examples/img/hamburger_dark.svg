@@ -1,0 +1,28 @@
+<svg width="42" height="42" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <g opacity="0.7">
+   <g opacity="0.75">
+    <path d="m40,11v-1c0,-1.47 -0.48,-2 -2,-2h-34c-1.53,0 -2,0.52 -2,2v1c0,1.55 0.52,2 2,2h34c1.5,0 2,-0.48 2,-2z" fill="#FFFFFF" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+   <g>
+    <path d="m40,10v-1c0,-1.47 -0.48,-2 -2,-2h-34c-1.53,0 -2,0.52 -2,2v1c0,1.55 0.52,2 2,2h34c1.5,0 2,-0.48 2,-2z" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+  </g>
+  <g opacity="0.7">
+   <g opacity="0.75">
+    <path d="m40,22v-1c0,-1.47 -0.48,-2 -2,-2h-34c-1.53,0 -2,0.52 -2,2v1c0,1.55 0.52,2 2,2h34c1.5,0 2,-0.48 2,-2z" fill="#FFFFFF" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+   <g>
+    <path d="m40,21v-1c0,-1.47 -0.48,-2 -2,-2h-34c-1.53,0 -2,0.52 -2,2v1c0,1.55 0.52,2 2,2h34c1.5,0 2,-0.48 2,-2z" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+  </g>
+  <g opacity="0.7">
+   <g opacity="0.75">
+    <path d="m40,33v-1c0,-1.471 -0.48,-2 -2,-2h-34c-1.53,0 -2,0.52 -2,2v1c0,1.55 0.52,2 2,2h34c1.5,0 2,-0.48 2,-2z" fill="#FFFFFF" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+   <g>
+    <path d="m40,32v-1c0,-1.471 -0.48,-2 -2,-2h-34c-1.53,0 -2,0.52 -2,2v1c0,1.55 0.52,2 2,2h34c1.5,0 2,-0.48 2,-2z" clip-rule="evenodd" fill-rule="evenodd"/>
+   </g>
+  </g>
+ </g>
+</svg>

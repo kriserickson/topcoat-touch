@@ -1,0 +1,48 @@
+<div id="galleryExample">
+    <div class="topcoat-navigation-bar">
+        <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet back-button" href="#">
+                <span class="topcoat-icon topcoat-icon--back"></span>
+            </a>
+        </div>
+        <div class="topcoat-navigation-bar__item center half">
+            <h1 class="topcoat-navigation-bar__title">Photos</h1>
+        </div>
+    </div>
+    <div class="content scrollable">
+        <div id="gallery-div">
+            <ul class="photo-gallery">
+
+            </ul>
+        </div>
+    </div>
+    <div class="topcoat-bottom-bar"> <!-- A bottom bar, note this screen is resized automatically
+                                    and bottom-bar is absolute positioned at the bottom of the page -->
+        <div class="topcoat-bottom-bar-item" style="width: 70%">
+            <!-- To see how dropdowns are created go to https://github.com/kriserickson/topcoat-touch/wiki/Topcoat-additions#drop-down -->
+            <div class="form-dropdown" id="gallery-picker">
+                <a href="#" class="toggle-dropdown">Gallery Type</a>
+                <ul id="gallery-type" class="dropdown">
+                    <li class="dropdown-item" data-id="kittens">
+                        <div class="menu-item">Kittens</div>
+                    </li>
+                    <li class="dropdown-item" data-id="bears">
+                        <div class="menu-item">Bears</div>
+                    </li>
+                    <li class="dropdown-item" data-id="lorem">
+                        <div class="menu-item">Lorem Pixel</div>
+                    </li>
+                    <li class="dropdown-item" data-id="bacon">
+                        <div class="menu-item">Bacon</div>
+                    </li>
+                    <li class="dropdown-item" data-id="murray">
+                        <div class="menu-item">Bill Murray</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="topcoat-bottom-bar-item quarter">
+            <button class="topcoat-button--cta button-small" id="changeButton">Change</button>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,7 @@
 <div class="row">
     <div class="col-sm-12">
+        <h2>Methods</h2>
+
         <h3>on (event, [selector], [page], function)</h3>
 
         <div class="docDescription">Subscribe to event.</div>
@@ -30,6 +32,11 @@ pattern.</div>
     }
         </code>
 
+
+
+
+
+
         <h3>off (event, [selector], [page], [function])</h3>
 
         <div class="docDescription">Unsubscribe to an event.</div>
@@ -42,6 +49,9 @@ pattern.</div>
     tt.off(tt.EVENTS.PAGE_START, 'home');
         </code>
 
+
+
+
         <h3>currentPage</h3>
 
         <div class="docDescription">Returns the current page name.</div>
@@ -49,6 +59,10 @@ pattern.</div>
         <code class="language-javascript">
     console.log('The current page is: ' + tt.currentPage());
         </code>
+
+
+
+
 
         <h3>currentPageFind</h3>
 
@@ -61,6 +75,9 @@ pattern.</div>
     var $helloButton = $('#' + tt.currentPage()).find('#helloButton');
     // but a little less ugh...
         </code>
+
+
+
 
         <h3>previousPage</h3>
 
@@ -82,6 +99,9 @@ pattern.</div>
     }
         </code>
 
+
+
+
         <h3>goBack([numberOfPages])</h3>
 
         <div class="docDescription">Goes back</div>
@@ -95,6 +115,10 @@ pattern.</div>
         tt.goBack();
     }
         </code>
+
+
+
+
 
 
         <h3>goTo(page, [isGoingBack], [transition], [isDialog])</h3>
@@ -121,6 +145,10 @@ pattern.</div>
         <code class="language-javascript">
     tt.removePageFromHistory();
         </code>
+
+
+
+
 
         <h3>refreshScroll</h3>
 
@@ -157,6 +185,9 @@ pattern.</div>
     });
         </code>
 
+
+
+
         <h3>showLoading(msg)</h3>
 
         <div class="docDescription">Shows a loading message</div>
@@ -167,6 +198,10 @@ pattern.</div>
     tt.showLoading('Please Wait');
         </code>
 
+
+
+
+
         <h3>loadMessage(msg)</h3>
 
         <div class="docDescription">Changes the loading message..</div>
@@ -174,6 +209,10 @@ pattern.</div>
         <code class="language-javascript">
     tt.loadMessage('Wait longer...');
         </code>
+
+
+
+
 
         <h3>hideLoading()</h3>
 
@@ -183,8 +222,11 @@ pattern.</div>
     tt.hideLoading();
         </code>
 
-        <h3>showDialog(msg, [buttons])
-        </h3>
+
+
+
+
+        <h3>showDialog(msg, [buttons])</h3>
 
         <div class="docDescription">Shows a dialog with optional buttons.</div>
 
@@ -199,6 +241,10 @@ pattern.</div>
     });
         </code>
 
+
+
+
+
         <h3>dialogShowing()</h3>
 
         <div class="docDescription">Returns whether or not a dialog is showing.</div>
@@ -206,6 +252,10 @@ pattern.</div>
         <code class="language-javascript">
     console.log('Dialog is' + (tt.dialogShowing() ? '' : ' not') + ' showing');
         </code>
+
+
+
+
 
         <h3>hideDialog</h3>
 

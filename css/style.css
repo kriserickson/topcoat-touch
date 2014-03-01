@@ -1,49 +1,48 @@
 body {
-  padding-top: 50px;
-  font-size: 18px;
+    padding-top: 50px;
+    font-size: 18px;
 }
 
 .starter-template {
-  padding: 40px 15px;
-  text-align: center;
+    padding: 40px 15px;
+    text-align: center;
 }
 
 ul {
-  list-style: square;
+    list-style: square;
 }
 
 .docsCode {
-  font-family:   
-  Consolas, "Liberation Mono", Courier, monospace;
-  display: block;
-  white-space: pre;
-  margin: 5px 0 10px;
-  padding: 0 10px 0;
-  border: 0;
-  background: #333;
-  color: #18bc9c
-;
-  /* -webkit-margin-before: 0; */
-  /* line-height: 1; */
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    display: block;
+    white-space: pre;
+    margin: 5px 0 10px;
+    padding: 0 10px 0;
+    border: 0;
+    background: #333;
+    color: #18bc9c;
+    /* -webkit-margin-before: 0; */
+    /* line-height: 1; */
 }
-
 
 .btn-git {
     color: #FFF;
-    padding: 10px 15px 10px 50px ;
+    padding: 10px 15px 10px 50px;
     margin: 5px 20px 0 0;
-    background-color: #18BC9C;  
+    background-color: #18BC9C;
     border-color: #128F76;
 }
 
 #download-zip {
-  background: #18BC9C url(../images/zip-icon.png) 12px 50% no-repeat;
+    background: #18BC9C url(../images/zip-icon.png) 12px 50% no-repeat;
 }
+
 #download-tar-gz {
-  background: #18BC9C url(../images/tar-gz-icon.png) 12px 50% no-repeat;
+    background: #18BC9C url(../images/tar-gz-icon.png) 12px 50% no-repeat;
 }
+
 #view-on-github {
-  background: #18BC9C url(../images/octocat-icon.png) 12px 50% no-repeat;
+    background: #18BC9C url(../images/octocat-icon.png) 12px 50% no-repeat;
 }
 
 #downloads {
@@ -55,8 +54,8 @@ ul {
 }
 
 code.prism {
-  border: 0;
-  /* padding-left: 20px; */
+    border: 0;
+    /* padding-left: 20px; */
 }
 
 code {
@@ -84,9 +83,76 @@ code {
 }
 
 #tab-content dd {
-  margin: 0 0 10px 20px;
+    margin: 0 0 10px 20px;
 }
 
 .defaultValue {
-  font-style: italic;
+    font-style: italic;
+}
+
+/** Example page **/
+.tab-content {
+    margin: 50px auto;
+}
+
+.nexus5-container {
+    width: 450px;
+    height: 862px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.nexus5 {
+    background-image: url(../images/nexus5.png);
+    background-size: cover;
+    width: 450px;
+    height: 862px;
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+}
+
+.nexus5-container iframe {
+    border: none;
+    position: absolute;
+    top: 75px;
+    left: 37px;
+    width: 378px;
+    height: 674px;
+}
+
+.iphone-container {
+    width: 450px;
+    height: 862px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.iphone {
+    width: 450px;
+    height: 862px;
+    background-image: url(../images/iphone5s.png);
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    pointer-events: none;
+}
+
+.iphone-container iframe {
+    border: none;
+    position: absolute;
+    top: 139px;
+    left: 60px;
+    width: 330px;
+    height: 578px;
+}
+
+.examples > div {
+    position: absolute;
+    width: 100%;
+    left: -99999px;
+}
+
+.examples > div.active {
+    left: 0;
 }
