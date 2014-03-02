@@ -52,7 +52,7 @@
             <li><a href="#methods" data-target="docs_methods.html" data-toggle="tab">Methods</a></li>
             <li><a href="#events" data-target="docs_events.html" data-toggle="tab">Events</a></li>
             <li><a href="#additions" data-target="docs_additions.html" data-toggle="tab">Additions</a></li>
-<!--            <li><a href="#single" data-target="docs_single_document.html" data-toggle="tab">Single Document</a></li>-->
+<!--            <li><a href="#single" data-target="docs_single.html" data-toggle="tab">Single Document</a></li>-->
 <!--            <li><a href="#mvc" data-target="docs_mvc.html" data-toggle="tab">MVC</a></li>-->
         </ul>
 
@@ -63,21 +63,9 @@
 </div>
 
 
-<script src="https://code.jquery.com/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src="js/prism.js"></script>
-<script>
-    $(document).ready(function () {
-        $('a[data-toggle]').click(function () {
-            $('#docsTag li').removeClass('active');
-            $(this).parent().addClass('active');
-            $('#tab-content').load($(this).data('target'), function () {
-                Prism.highlightAll();
-            });
-
-        });
-        $('#docsTag').find('li.active a').first().trigger('click');
-    });
-</script>
+<script src="js/tab-with-code.js"></script>
 <script>
     (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;

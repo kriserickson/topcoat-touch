@@ -50,7 +50,7 @@ ul {
 }
 
 .main-container {
-    margin: 10px 50px 50px;
+    margin: 30px 50px 50px;
 }
 
 code.prism {
@@ -155,4 +155,40 @@ code {
 
 .examples > div.active {
     left: 0;
+}
+
+span.yeoman-red {
+    color: #800000;
+}
+
+span.yeoman-brown {
+    color: #808000;
+}
+
+span.yeoman-yellow {
+    color: #ffff00;
+}
+
+span.yeoman-green {
+    color: #008000;
+}
+
+span.yeoman-blue {
+    color: #008080;
+}
+
+li {
+    margin: 15px 0;
+}
+
+code.noblock {
+    display: inline;
+    border: none;
+    margin: 0 5px;
+    padding: 3px;
+}
+
+.imageHolder {
+    text-align: center;
+    margin: 20px
 }

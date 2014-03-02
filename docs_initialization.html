@@ -4,9 +4,7 @@
 
         The TopcoatTouch is instantiated by calling the TopcoatTouch function.
 
-        <code class="language-javascript">
-    var tt = new TopcoatTouch([container], [options]);
-        </code>
+        <code class="language-javascript">var tt = new TopcoatTouch([container], [options]);</code>
 
 
         Where <strong>container</strong> is query object (we will use the generic term query object for jQuery or
@@ -26,7 +24,37 @@
 
             <dt>initializeFunction</dt>
             <dd><div class="defaultValue">default none</div>
-                Override the default template initialization function.  See
+                Override the default template initialization function in the MVC version of TopcoatTouch.  Both the initializeFunction
+                and the renderFunction all called within the context of a PageController.  For example, you can choose to use Handlebars as a
+                templating engine by overriding the initialization function: Both initializeFunction and renderFunction all
+                called within the
+
+                <code class="language-javascript">var tt = new TopcoatTouch({initializeFunction: function() {
+      // Need access to the pageController inside of the jquery callback
+      var self = this;
+
+      // this.tt is available in the initializeFunction and the renderFunction
+      $.get(this.tt.options.templateDirectory + '/' + this.pageName + '.handlebars', function (source) {
+        self.template = Handlebars.compile(source);
+    });
+}});</code>
+
+            </dd>
+
+            <dt>renderFunction</dt>
+            <dd><div class="defaultValue">default none</div>The render function can also be overriden from the default
+            lodash templating.  For example to use Mustache as a templating engine:
+
+            <code class="language-javascript">var tt = new TopcoatTouch({initializeFunction: function() {
+     var self = this;
+     $.get(this.tt.options.templateDirectory + '/' + this.pageName + '.mustache', function (source) {
+        self.template = source;
+     });
+  }, renderFunction: function() {
+     return Mustache.render(this.template, this.data);
+  }
+});</code>
+
             </dd>
 
             <dt>menu</dt>
@@ -41,10 +69,19 @@
             <dd><div class="defaultValue">default 50</div>Speed to fade out the menu.</dd>
 
             <dt>menuHasIcons</dt>
-            <dd><div class="defaultValue">default false</div></dd>
+            <dd><div class="defaultValue">default false</div>Whether or not the menu has icons, if set to true a span with
+                an menuItemIcon class is added to each menu item.
+                in the CSS you should change the icon with #menuItemId .menuItemIcon selector.  e.g:
 
-            <dt>renderFunction</dt>
-            <dd><div class="defaultValue">default none</div></dd>
+            <code class="language-css">#menuAbout .menuItemIcon {
+    background-image: url(images/menuAbout.png);
+}</code>
+
+            </dd>
+
+
+
+
 
             <dt>templateDirectory</dt>
             <dd><div class="defaultValue">default 'templates'</div></dd>

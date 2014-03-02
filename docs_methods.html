@@ -18,19 +18,17 @@ pattern.</div>
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.PAGE_START, 'home', function() {
-    console.log("I'm on the home page!");
-    });
+        <code class="language-javascript">tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+console.log("I'm on the home page!");
+});
 
-    tt.on('click', 'button', 'home', function() {
-    console.log('All buttons on the home screen will log this, but not on any other screen');
-    }
+tt.on('click', 'button', 'home', function() {
+console.log('All buttons on the home screen will log this, but not on any other screen');
+}
 
-    tt.on('swipe', 'li', 'home', function() {
-    console.log('If hammer.js is included in the html this will react to swipes, no other initialization is required');
-    }
-        </code>
+tt.on('swipe', 'li', 'home', function() {
+console.log('If hammer.js is included in the html this will react to swipes, no other initialization is required');
+}</code>
 
 
 
@@ -45,9 +43,7 @@ pattern.</div>
             omitted, all subscriptions for the page are removed. If the function is included just that functions subscription to
             the page is removed.</div>
 
-        <code class="language-javascript">
-    tt.off(tt.EVENTS.PAGE_START, 'home');
-        </code>
+        <code class="language-javascript">tt.off(tt.EVENTS.PAGE_START, 'home');</code>
 
 
 
@@ -56,9 +52,7 @@ pattern.</div>
 
         <div class="docDescription">Returns the current page name.</div>
 
-        <code class="language-javascript">
-    console.log('The current page is: ' + tt.currentPage());
-        </code>
+        <code class="language-javascript">console.log('The current page is: ' + tt.currentPage());</code>
 
 
 
@@ -68,13 +62,11 @@ pattern.</div>
 
         <div class="docDescription">Shortcut to access the current page's selector find.</div>
 
-        <code class="language-javascript">
-    var $helloButton = tt.currentPageFind('#helloButton');
+        <code class="language-javascript">var $helloButton = tt.currentPageFind('#helloButton');
 
-    // Basically the same as
-    var $helloButton = $('#' + tt.currentPage()).find('#helloButton');
-    // but a little less ugh...
-        </code>
+// Basically the same as
+var $helloButton = $('#' + tt.currentPage()).find('#helloButton');
+// but a little less ugh...</code>
 
 
 
@@ -83,9 +75,7 @@ pattern.</div>
 
         <div class="docDescription">Returns the previous page name.</div>
 
-        <code class="language-javascript">
-    console.log('The previous page is: ' + tt.previousPage());
-        </code>
+        <code class="language-javascript">console.log('The previous page is: ' + tt.previousPage());</code>
 
         <h3>hasBack</h3>
 
@@ -93,11 +83,9 @@ pattern.</div>
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    if (!tt.hasBack()) {
-        $('backButton').hide();
-    }
-        </code>
+        <code class="language-javascript">if (!tt.hasBack()) {
+    $('backButton').hide();
+}</code>
 
 
 
@@ -110,11 +98,9 @@ pattern.</div>
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    if (!loggedIn) {
-        tt.goBack();
-    }
-        </code>
+        <code class="language-javascript">if (!loggedIn) {
+    tt.goBack();
+}</code>
 
 
 
@@ -131,9 +117,7 @@ pattern.</div>
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.goTo('home');
-        </code>
+        <code class="language-javascript">tt.goTo('home');</code>
 
         <h3>removePageFromHistory</h3>
 
@@ -142,12 +126,7 @@ pattern.</div>
         <div>The current page is removed from the backstack history. Useful for dialogs or logins so the user can't get back to
             the page hitting the back button.</div>
 
-        <code class="language-javascript">
-    tt.removePageFromHistory();
-        </code>
-
-
-
+        <code class="language-javascript">tt.removePageFromHistory();</code>
 
 
         <h3>refreshScroll</h3>
@@ -156,9 +135,7 @@ pattern.</div>
 
         <div>If a 'scroller' has been captured, it refreshes the boundaries of that 'scroller'.</div>
 
-        <code class="language-javascript">
-    tt.refreshScroll()
-        </code>
+        <code class="language-javascript">tt.refreshScroll();</code>
 
         <h3>scrollTo(x, y,
             [duration], [easing])</h3>
@@ -168,9 +145,7 @@ pattern.</div>
         <div>If a 'scroller' has been captured, scrolls to that position in viewwindow. Duration and easing are optional. Easing
             is one of: quadratic, circular, back, bounce, elastic.</div>
 
-        <code class="language-javascript">
-    tt.scrollTo(0,0);
-        </code>
+        <code class="language-javascript">tt.scrollTo(0,0);</code>
 
         <h3>scrollToElement(el, [duration], [offsetX], [offsetY], [easing])</h3>
 
@@ -179,11 +154,9 @@ pattern.</div>
         <div>If a 'scroller' has been captured, scrolls to that element Duration, offset and easing are optional. Easing is one
             of: quadratic, circular, back, bounce, elastic.</div>
 
-        <code class="language-javascript">
-    $('li').click(function() {
-        tt.scrollToElement($(this));
-    });
-        </code>
+        <code class="language-javascript">$('li').click(function() {
+    tt.scrollToElement($(this));
+});</code>
 
 
 
@@ -194,9 +167,7 @@ pattern.</div>
 
         <div>Msg can text or html.</div>
 
-        <code class="language-javascript">
-    tt.showLoading('Please Wait');
-        </code>
+        <code class="language-javascript">tt.showLoading('Please Wait');</code>
 
 
 
@@ -206,9 +177,7 @@ pattern.</div>
 
         <div class="docDescription">Changes the loading message..</div>
 
-        <code class="language-javascript">
-    tt.loadMessage('Wait longer...');
-        </code>
+        <code class="language-javascript">tt.loadMessage('Wait longer...');</code>
 
 
 
@@ -218,9 +187,7 @@ pattern.</div>
 
         <div class="docDescription">Hides the loading message</div>
 
-        <code class="language-javascript">
-    tt.hideLoading();
-        </code>
+        <code class="language-javascript">tt.hideLoading();</code>
 
 
 
@@ -234,12 +201,10 @@ pattern.</div>
             and value is a function that is executed when the button is pressed. The dialog is always closed by clicking on any
             of the buttons.</div>
 
-        <code class="language-javascript">
-    tt.showDialog('Example Dialog', 'This is a dialog', {
-        OK: function() { console.log('OK Pressed') },
-        Cancel: function() { console.log('Cancel Pressed')}
-    });
-        </code>
+        <code class="language-javascript">tt.showDialog('Example Dialog', 'This is a dialog', {
+    OK: function() { console.log('OK Pressed') },
+    Cancel: function() { console.log('Cancel Pressed')}
+});</code>
 
 
 
@@ -249,9 +214,7 @@ pattern.</div>
 
         <div class="docDescription">Returns whether or not a dialog is showing.</div>
 
-        <code class="language-javascript">
-    console.log('Dialog is' + (tt.dialogShowing() ? '' : ' not') + ' showing');
-        </code>
+        <code class="language-javascript">console.log('Dialog is' + (tt.dialogShowing() ? '' : ' not') + ' showing');</code>
 
 
 
@@ -261,9 +224,7 @@ pattern.</div>
 
         <div class="docDescription">Hides the dialog</div>
 
-        <code class="language-javascript">
-    tt.hideDialog();
-        </code>
+        <code class="language-javascript">tt.hideDialog();</code>
 
         <h3>createController(pageName, [fns], [data])</h3>
 
@@ -272,13 +233,11 @@ pattern.</div>
         <div>See <a href="https://github.com/kriserickson/topcoat-touch/blob/master/examples/mvc/js/app.js">the mvc example</a> to
             see how it used. See <a href="#mvc">Controller</a> for controller functions and properties.</div>
 
-        <code class="language-javascript">
-    var homeController = tt.createController('home', {
-        pagestart: function() { console.log('Page started'); },
-        pageend: function() { console.log('Page ended'); }},
-        {title: 'Home Page'}
-    });
-        </code>
+        <code class="language-javascript">var homeController = tt.createController('home', {
+    pagestart: function() { console.log('Page started'); },
+    pageend: function() { console.log('Page ended'); }},
+    {title: 'Home Page'}
+});</code>
 
     </div>
 </div>

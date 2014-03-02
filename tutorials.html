@@ -7,6 +7,7 @@
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/prism.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -46,23 +47,32 @@
 
 <div class="main-container" id="container-fluid">
     <div class="row">
-        <h2>Coming Soon..</h2>
+        <h1>Documentation</h1>
+        <ul id="docsTag" class="nav nav-pills">
+            <li class="active"><a href="#single" data-target="tutorial_single_1.html" data-toggle="pill">Single Document TODO App - Part 1</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div id="tab-content">
+        </div>
     </div>
 
 </div>
 
 
-<script src="https://code.jquery.com/jquery.min.js"></script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/prism.js"></script>
+<script src="js/tab-with-code.js"></script>
+<!--<script>-->
+  <!--(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){-->
+  <!--(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),-->
+  <!--m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)-->
+  <!--})(window,document,'script','//www.google-analytics.com/analytics.js','ga');-->
 
-  ga('create', 'UA-48507677-1', 'topcoattouch.com');
-  ga('send', 'pageview');
+  <!--ga('create', 'UA-48507677-1', 'topcoattouch.com');-->
+  <!--ga('send', 'pageview');-->
 
-</script>
+<!--</script>-->
 </body>
 </html>
 

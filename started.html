@@ -60,12 +60,12 @@ so now.</p>
 
 <p>Next install <a href="http://yeoman.io">Yeoman</a>, if you haven't already.  This can be done with the following simple command:
 
-<code>$npm install -g yo
+<code class="language-bash">$npm install -g yo
 </code>
 
 <p>Next install the topcoat-touch genreator for yeoman</p>
 
-<code>$npm install -g generator-topcoat-touch
+<code class="language-bash">$npm install -g generator-topcoat-touch
 </code>
 
 <p>Next run yeoman and answer a few simple questions
@@ -81,49 +81,52 @@ so now.</p>
         should probably pick single document for your first application.  It is the simplest way to quickly create a mobile site.</li>
     </ol>
 </p>
-<code>$yo topcoat-touch
+<code class="language-yeoman"><span class="token property">$yo</span> topcoat-touch
 
      _-----_
     |       |
-    |--(o)--|   .--------------------------.
-   `---------'  |    Welcome to Yeoman,    |
-    ( _'U`_ )   |   ladies and gentlemen!  |
+    |<span class="yeoman-red">--(o)--</span>|   .--------------------------.
+   `---------'  |    <span class="yeoman-yellow">Welcome to Yeoman,</span>    |
+    <span class="yeoman-brown">(</span> _<span class="yeoman-brown">'U`</span>_ <span class="yeoman-brown">)</span>   |   <span class="yeoman-brown">ladies and gentlemen!</span>  |
     /___A___\   '__________________________'
-     |  ~  |
-   __'.___.'__
- '   `  |° ' Y `
+     <span class="yeoman-brown">|  ~  |</span>
+   __<span class="yeoman-brown">'.___.'</span>__
+ '   <span class="yeoman-red">`  |</span>° <span class="yeoman-red">' Y</span> `
 
-[?] Topcoat Touch Project Name? Example
-[?] Would you like to enable Cordova for this project? Yes
-[?] Cordova platforms: (Press  to select)
-&gt;[X] ios
- [X] android
+[<span class="yeoman-green">?</span>] Topcoat Touch Project Name? <span class="yeoman-blue">Example</span>
+[<span class="yeoman-green">?</span>] Would you like to enable Cordova for this project? <span class="yeoman-blue">Yes</span>
+[<span class="yeoman-green">?</span>] Cordova platforms: (Press &lt;space&gt; to select)
+&gt;[<span class="yeoman-green">X</span>] ios
+ [<span class="yeoman-green">X</span>] android
  [ ] wp8
  [ ] windows8
  [ ] amazon-fireos
  [ ] firefoxos
  [ ] blackberry10
-[?] Light or dark theme? (Use arrow keys)
-&gt; light
+[<span class="yeoman-green">?</span>] Light or dark theme? (Use arrow keys)
+<span class="yeoman-blue">&gt; light</span>
   dark
-[?] Include Hammer.js for gesture support? (Y/n)
-[?] Include fastclick.js to remove click delays? (Y/n)
-[?] Include IScroll.js for scrolling (required for KitchenSink demo)? (Y/n)
-[?] MVC or Single Document? (Use arrow keys)
-&gt; mvc
+[<span class="yeoman-green">?</span>] Use jQuery or Zepto as Dom manipulation library? (Use arrow keys)
+<span class="yeoman-blue">&gt; jquery</span>
+  zepto
+[<span class="yeoman-green">?</span>] Include Hammer.js for gesture support? (Y/n)
+[<span class="yeoman-green">?</span>] Include fastclick.js to remove click delays? (Y/n)
+[<span class="yeoman-green">?</span>] Include IScroll.js for scrolling (required for KitchenSink demo)? (Y/n)
+[<span class="yeoman-green">?</span>] MVC or Single Document? (Use arrow keys)
+<span class="yeoman-blue">&gt; mvc</span>
   single document
-[?] Include the KitchenSink demo? (y/N)
-   create app\index.html
-   create app\js\app.js
-   create app\css\app.css
-   create bower.json
-   create .bowerrc
-   create Gruntfile.js
-   create package.json
-   create app\cordova.js
-   create app\templates\home.ejs
+[<span class="yeoman-green">?</span>] Include the KitchenSink demo? (y/N)
+   <span class="yeoman-green">create</span> app\index.html
+   <span class="yeoman-green">create</span> app\js\app.js
+   <span class="yeoman-green">create</span> app\css\app.css
+   <span class="yeoman-green">create</span> bower.json
+   <span class="yeoman-green">create</span> .bowerrc
+   <span class="yeoman-green">create</span> Gruntfile.js
+   <span class="yeoman-green">create</span> package.json
+   <span class="yeoman-green">create</span> app\cordova.js
+   <span class="yeoman-green">create</span> app\templates\home.ejs
 
-I'm all done. Running bower install &amp; npm install for you to install the required dependencies.
+I'm all done. Running <span class="yeoman-yellow">bower install &amp; npm install</span> for you to install the required dependencies.
 If this fails, try running the command yourself.</code>
 
         <hr>
@@ -146,23 +149,20 @@ If this fails, try running the command yourself.</code>
 
             <p></p>
 
-<code class="language-markup">
-    &lt;head&gt;
-        &lt;title&gt;Topcoat Touch&lt;/title&gt;
-        &lt;meta name="viewport"
-              content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;
-        &lt;link href="css/topcoat-mobile-light.css" rel="stylesheet"&gt;
-        &lt;link href="css/topcoat-touch.css" rel="stylesheet"&gt;
-        &lt;link href="css/app.css" rel="stylesheet"&gt;
-        &lt;script src="js/jquery-2.0.3.js"&gt;&lt;/script&gt;
-        &lt;script src="js/topcoat-touch.js"&gt;&lt;/script&gt;
-        &lt;script src="js/iscroll.js"&gt;&lt;/script&gt;
-        &lt;script src="js/hammer.js"&gt;&lt;/script&gt;
-        &lt;script src="js/fastclick.js"&gt;&lt;/script&gt;
-        &lt;script src="js/app.js"&gt;&lt;/script&gt;
-    &lt;/head&gt;
-
-</code>
+<code class="language-markup">&lt;head&gt;
+    &lt;title&gt;Topcoat Touch&lt;/title&gt;
+    &lt;meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;
+    &lt;link href="css/topcoat-mobile-light.css" rel="stylesheet"&gt;
+    &lt;link href="css/topcoat-touch.css" rel="stylesheet"&gt;
+    &lt;link href="css/app.css" rel="stylesheet"&gt;
+    &lt;script src="js/jquery-2.0.3.js"&gt;&lt;/script&gt;
+    &lt;script src="js/topcoat-touch.js"&gt;&lt;/script&gt;
+    &lt;script src="js/iscroll.js"&gt;&lt;/script&gt;
+    &lt;script src="js/hammer.js"&gt;&lt;/script&gt;
+    &lt;script src="js/fastclick.js"&gt;&lt;/script&gt;
+    &lt;script src="js/app.js"&gt;&lt;/script&gt;
+&lt;/head&gt;</code>
 
 
     </div>

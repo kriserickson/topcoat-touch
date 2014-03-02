@@ -10,11 +10,9 @@
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.PAGE_START, 'home', function() {
-        console.log("I'm on the home page!");
-    });
-        </code>
+        <code class="language-javascript">tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+    console.log("I'm on the home page!");
+});</code>
 
 
 
@@ -27,11 +25,9 @@
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.PAGE_END, 'home', function() {
-        console.log("I've left the home page!");
-    });
-        </code>
+        <code class="language-javascript">tt.on(tt.EVENTS.PAGE_END, 'home', function() {
+    console.log("I've left the home page!");
+});</code>
 
 
 
@@ -44,11 +40,9 @@
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.SCROLL_START, function() {
-        _lockScrollingUpdates = true;
-    });
-        </code>
+        <code class="language-javascript">tt.on(tt.EVENTS.SCROLL_START, function() {
+    _lockScrollingUpdates = true;
+});</code>
 
 
 
@@ -61,11 +55,9 @@
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.SCROLL_START, function() {
-        _lockScrollingUpdates = true;
-    });
-        </code>
+        <code class="language-javascript">tt.on(tt.EVENTS.SCROLL_START, function() {
+    _lockScrollingUpdates = true;
+});</code>
 
 
 
@@ -81,13 +73,11 @@
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.SHOW_MENU, function(currentPage, menuItems) {
-        if (currentPage != 'about')) {
-            menuItems.push({name: 'About', 'id': 'about'});
-        }
-    });
-        </code>
+        <code class="language-javascript">tt.on(tt.EVENTS.SHOW_MENU, function(currentPage, menuItems) {
+    if (currentPage != 'about')) {
+        menuItems.push({name: 'About', 'id': 'about'});
+    }
+});</code>
 
 
 
@@ -100,13 +90,11 @@
 
         <div>Example:</div>
 
-        <code class="language-javascript">
-    tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(currentPage, menuId) {
-        if (menuId == 'about') {
-            tt.goTo('about');
-        }
-    });
-        </code>
+        <code class="language-javascript">tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(currentPage, menuId) {
+    if (menuId == 'about') {
+        tt.goTo('about');
+    }
+});</code>
 
 
     </div>
