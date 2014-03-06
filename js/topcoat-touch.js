@@ -18,6 +18,7 @@ function TopcoatTouch($container, options) {
         _isDialog,
         _skipUserEvents,
         _stashedScroll,
+        _backCallback,
         self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -40,9 +41,9 @@ function TopcoatTouch($container, options) {
         MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', BACK: 'back'};
 
     this.isScrolling = false;
-    this.clickEvent = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
-    this.touchStartEvent = 'ontouchend' in window ? 'touchend touchcancel touchleave' : 'mouseup';
-    this.touchEndEvent = 'ontouchend' in window ? 'touchend' : 'click';
+    this.clickEvent = 'ontouchend' in window ? 'touchend' : 'click';
+    this.touchStartEvent = 'ontouchstart' in window ? 'touchstart' : 'mousedown';
+    this.touchEndEvent = 'ontouchend' in window ? 'touchend touchcancel touchleave' : 'mouseup';
 
     // Setup the defaults
     var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50, menuHasIcons: false,
@@ -91,10 +92,10 @@ function TopcoatTouch($container, options) {
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
             if (_controller) {
-				if (!_skipUserEvents) {
+                if (!_skipUserEvents) {
                     _controller.pagestart.call(_controller);
                 }                
-				_controller._pagestart.call(_controller);
+                _controller._pagestart.call(_controller);
                 var $page = $container.find('.page-remove');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
@@ -108,11 +109,14 @@ function TopcoatTouch($container, options) {
                     prevController._pageend.call(prevController);
                 }
                 
-				if (!_isDialog) {                    
+                if (!_isDialog) {                    
                     $page.remove();
                 }
                 if (_skipUserEvents) {
                     removeOverlay();
+                    if (_backCallback) {
+                        _backCallback();
+                    }
                 }
                 if (prevController && !_isDialog) {
                     prevController.postremove.call(prevController, $page);
@@ -127,6 +131,9 @@ function TopcoatTouch($container, options) {
                 }
                 if (_skipUserEvents) {
                     removeOverlay();
+                    if (_backCallback) {
+                        _backCallback();
+                    }
                 }
             }
             _startedAnimation = false;
@@ -709,7 +716,13 @@ function TopcoatTouch($container, options) {
      * Goes back one page
      * @param [numberOfPages] {Number}
      */
-    this.goBack = function (numberOfPages) {
+    this.goBack = function (numberOfPages, callback) {
+        if (typeof callback != 'function') {
+            numberOfPages = callback;
+            _backCallback = undefined;
+        } else {
+            _backCallback = callback;
+        }
         if (numberOfPages) {
             if (_pages.length > numberOfPages) {
                 // Remove all but the last page...
@@ -726,7 +739,12 @@ function TopcoatTouch($container, options) {
         if (self.hasBack()) {
             this.goTo(_pages[_pages.length - 2], 'slideright', false, true);
         } else {
-            this._error('Cannot go back, there are no pages on the backstack');
+            if (callback) {
+                _pages = [];
+                callback();
+            } else {
+                this._error('Cannot go back, there are no pages on the backstack');
+            }
         }
     };
 
@@ -739,6 +757,12 @@ function TopcoatTouch($container, options) {
      * @param [back] {Boolean}
      */
     this.goTo = function (page, transition, dialog, back) {
+
+        if (page == _currentPage) {
+            return;
+        }
+        
+        console.log('tt.goTo ' + page);
 
         if (_isDialog && !back) {
             throw 'Cannot goTo a page when a dialog is showing, can only go back..';
@@ -804,8 +828,12 @@ function TopcoatTouch($container, options) {
         _pages.splice(_pages.length - 2, 1);
     };
 
-    this.clearHistory = function () {
-        _pages = [];
+    this.clearHistory = function (removeAllPages) {
+        if (removeAllPages || _pages.length == 0) {
+            _pages = [];
+        } else {
+            _pages = [_pages[_pages.length - 1]];
+        }
     };
 
     /**
@@ -1062,11 +1090,14 @@ function TopcoatTouch($container, options) {
         $container.append($menuDiv);
 
         // Hide the menu one mousedown
-        $container.on(self.touchStartEvent, function () {
-            if (!_showingMenu) {
-                $menuDiv.fadeOut(50);
-            } else {
-                _showingMenu = false;
+        $container.on(self.touchStartEvent, function (e) {
+            var $target = $(e.target);
+            if (!$target.is(',menu-button') && $target.closest('.menu-button')) {
+                if (!_showingMenu) {
+                    $menuDiv.fadeOut(50);
+                } else {
+                    _showingMenu = false;
+                }
             }
         });
 
