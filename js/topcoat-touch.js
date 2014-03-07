@@ -1092,7 +1092,7 @@ function TopcoatTouch($container, options) {
         // Hide the menu one mousedown
         $container.on(self.touchStartEvent, function (e) {
             var $target = $(e.target);
-            if (!$target.is(',menu-button') && $target.closest('.menu-button')) {
+            if (!$target.is('.menu-button') && $target.closest('.menu-button')) {
                 if (!_showingMenu) {
                     $menuDiv.fadeOut(50);
                 } else {
