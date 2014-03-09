@@ -38,3 +38,6 @@ Version 0.2.9
 
 Version 0.3.0
 - Improve menu handling, allow for callbacks when going back.
+
+Version 0.3.1
+- Fix some issues with menus, going back, and navigation bars.
