@@ -138,8 +138,10 @@ function TopcoatTouch($container, options) {
             }
             _startedAnimation = false;
 
-            // We disable tracking of fastclicks during a page switch...  TODO: disable on events during a page switch...
-            _fastClick.trackingDisabled = false;
+            if (_fastClick) {
+                // We disable tracking of fastclicks during a page switch...
+                _fastClick.trackingDisabled = false;
+            }
         }
     });
 
@@ -373,7 +375,9 @@ function TopcoatTouch($container, options) {
             }
         } else {
             setTimeout(function () {
-                renderPage(page, callback);
+                if (_controller) {
+                    renderPage(page, callback);
+                }
             }, 50);
         }
     }
@@ -423,7 +427,9 @@ function TopcoatTouch($container, options) {
 
         _startedAnimation = true;
 
-        _fastClick.trackingDisabled = true;
+        if (_fastClick) {
+            _fastClick.trackingDisabled = true;
+        }
 
         if (!_$currentPage) {
             $page.attr('class', 'page page-center');
@@ -713,10 +719,11 @@ function TopcoatTouch($container, options) {
         this.goBack();
     };
     /**
-     * Goes back one page
+     * Goes back one page, note: numberOfPages can come first...
+     * @param {callback} [Function}
      * @param [numberOfPages] {Number}
      */
-    this.goBack = function (numberOfPages, callback) {
+    this.goBack = function (callback, numberOfPages) {
         if (typeof callback != 'function') {
             numberOfPages = callback;
             _backCallback = undefined;
@@ -1044,7 +1051,7 @@ function TopcoatTouch($container, options) {
      * @returns {Boolean}
      */
     this.dialogShowing = function () {
-        return _dialogShowing;
+        return _dialogShowing || _isDialog;
     };
 
     /**
@@ -1092,7 +1099,7 @@ function TopcoatTouch($container, options) {
         // Hide the menu one mousedown
         $container.on(self.touchStartEvent, function (e) {
             var $target = $(e.target);
-            if (!$target.is('.menu-button') && $target.closest('.menu-button')) {
+            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
                 if (!_showingMenu) {
                     $menuDiv.fadeOut(50);
                 } else {
