@@ -73,7 +73,7 @@
                 <code class="language-bash"># For npm versions < 1.2.10.
 $ npm install -g grunt-cli bower</code>
 
-                Next install the topcoat-touch genreator for yeoman
+                Next install the topcoat-touch generator for yeoman
 
                 <code class="language-bash">$ npm install -g generator-topcoat-touch</code>
                 </li>
@@ -84,7 +84,7 @@ $ npm install -g grunt-cli bower</code>
         <h3>Scaffolding.</h3>
 
         <div class="tutorialItem">Hopefully your computer is now setup, if you had any problems installing the dependencies remember Google
-            and <a href="http://stackoverflow.com">stackoverflow</a> are your friends.  Next we create the scaffolding (and here we will
+            and <a href="http://stackoverflow.com">Stackoverflow</a> are your friends.  Next we create the scaffolding (and here we will
             be thankful for the goodness that is Yeoman.  Go to your projects directory, and create a directory called "topcoattouch-todo" and
             open a console in that directory.  Next type <code class="noblock">yo topcoat-touch</code>:
 
@@ -228,7 +228,8 @@ Hit CTRL-C to stop the server</code>
             <a href="https://github.com/kriserickson/topcoat-touch-todo/tree/stage-0">stage-0</a>.
 
 
-            So after all of our preparation and scaffolding, what do we have?</div>
+            So after all of our preparation and scaffolding, what do we have?
+        </div>
 
         <div class="imageHolder">
             <img src="images/tutorial/simple-step-0.png"/>
@@ -267,7 +268,7 @@ Hit CTRL-C to stop the server</code>
         </div>
 
         <div class="imageHolder">
-            <img src="images/tutorial/simple-step-1.png"/>
+            <img src="images/tutorial/simple-step-1-a.png"/>
         </div>
 
         <div class="tutorialItem">Now lets quickly add some javascript to show some simulated TODO's. Add the following between
@@ -304,7 +305,7 @@ $('#todoList').html(todoList);</code>
         <div class="tutorialItem">Now we are getting somewhere, this is actually starting to look a bit like an app: </div>
 
         <div class="imageHolder">
-            <img src="images/tutorial/simple-step-2.png"/>
+            <img src="images/tutorial/simple-step-1-b.png"/>
         </div>
 
         <div class="tutorialItem">Before we break for today, lets look over what we have added.  First the html:</div>
@@ -364,13 +365,13 @@ $('#todoList').html(todoList);</code>
     new ToDo('Test TODO App', '', new Date(2014,4,2)),
     new ToDo('Profit!!!', '', new Date(2014,4,5))
 ];
-    </code>
+        </code>
     
         <div class="tutorialItem">Next we create a small, and very simple array of ToDo's.  Obviously in the future we are
         going to have a way of storing them locally, and adding ToDo's.  For now it is good enough to generate a few sample items. 
         </div>
     
-    <code class="language-javascript">var todoList = '';
+        <code class="language-javascript">var todoList = '';
 
 $.each(todos, function(key, todo) {
     todoList += '&lt;li class="topcoat-list__item" data-rel="todoView"&gt;' +
@@ -391,10 +392,10 @@ $('#todoList').html(todoList);</code>
             on how these tutorials could be improved in any way.
         </div>
 
-    <h3>Coming Up</h3>
+        <h3>Coming Up</h3>
 
-    <div class="tutorialItem">In the next part we will add the ability to Add ToDo's, view them, and get the applicaiton
-    up and running on a moblie device in PhoneGap.</div>
+        <div class="tutorialItem">In the next part we will add the ability to view ToDo's, add them, move the management of
+        todos to a simple service and get the application up and running in PhoneGap.</div>
 
 
 

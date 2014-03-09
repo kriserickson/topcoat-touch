@@ -173,12 +173,20 @@ span.yeoman-green {
     color: #008000;
 }
 
+span.yeoman-grey {
+    color: #d0d0d0;
+}
+
 span.yeoman-blue {
     color: #008080;
 }
 
 li {
     margin: 15px 0;
+}
+
+code.language-javascript {
+
 }
 
 code.noblock {
@@ -191,4 +199,8 @@ code.noblock {
 .imageHolder {
     text-align: center;
     margin: 20px
+}
+
+.tutorialItem {
+    margin: 10px 0;
 }
