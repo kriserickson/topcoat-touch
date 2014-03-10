@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/prism.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <title>Topcoat-Touch</title>
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html"><strong>Topcoat-Touch</strong></a>
+        </div>
+        <div class="collapse navbar-collapse navbar-right">
+            <ul class="nav navbar-nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#started.html">Getting Started</a></li>
+                <li><a href="docs.html">Docs</a></li>
+                <li><a href="examples.html">Examples</a></li>
+                <li><a href="tutorials.html">Tutorials</a></li>
+                <li class="active"><a href="#">Faq</a></li>
+            </ul>
+        </div>
+
+</div>
+
+
+
+<div class="main-container" id="container-fluid">
+    <div class="row">
+        <h3>Faq</h3>
+
+        <ul>
+            <li><a href="#faq1">The MVC example appears to be broken, how do I run it.</a></li>
+            <li><a href="#faq2">How do I run the tests?</a></li>
+            <li><a href="#faq3">How do I run the tests in a web-browser?</a></li>
+        </ul>
+        
+        <h4><a name="faq1">The MVC example appears to be broken, how do I run it.</a></h4>
+
+        <em>When I open the file I get a blank screen with a bunch of "Failed to load resource: No 'Access-Control-Allow-Origin' header is present on the requested resource" and "XMLHttpRequest cannot load" errors.</em>
+
+        <p>While the one-document example can be opened in the browser directly, the mvc example must be run from a webserver. The easiest way is to install nodes http server, and start it up from the root</p>
+
+        <code class="language-yeoman"><span class="yeoman-green">~/topcoat-touch$</span> <span class="yeoman-yellow">npm install http-server -g</span>
+<span class="yeoman-green">~/topcoat-touch$</span> <span class="yeoman-yellow">http-server</span>
+<span class="yeoman-grey">Starting up http-server, serving ./ on port: 8080
+Hit CTRL-C to stop the server
+then open a browser to http://localhost:8080/examples/mvc/</span></code>
+
+        <h4><a name="faq2">How do I run the tests?</a></h4>
+
+        <p>The tests are run from the command line through NPM.  You can also see the test results on <a href="https://travis-ci.org/kriserickson/topcoat-touch">Travis-CI</a></p>
+
+        <code class="language-yeoman"><span class="yeoman-green">~/topcoat-touch$</span> <span class="yeoman-yellow">npm test</span></code>
+
+        <h4><a name="faq3">How do I run the tests in a web-browser?</a></h4>
+
+        <p>Install http-server (see first question), and switch to the root directory and open http://localhost:8080/TestRunner.html in a web browser.</p>
+
+        <code class="language-yeoman"><span class="yeoman-green">~/topcoat-touch$</span> <span class="yeoman-yellow">http-server</span>
+<span class="yeoman-grey">Starting up http-server, serving ./ on port: 8080
+Hit CTRL-C to stop the server</span></code>
+    </div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-48507677-1', 'topcoattouch.com');
+  ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
+
