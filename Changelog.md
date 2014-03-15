@@ -41,3 +41,6 @@ Version 0.3.0
 
 Version 0.3.1
 - Fix some issues with menus, going back, and navigation bars.
+
+Version 0.3.3
+- Don't go to a page if you have already been there.

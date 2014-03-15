@@ -490,6 +490,14 @@ function TopcoatTouch($container, options) {
 
         
     }
+
+    function getPageName(page) {
+        if (typeof(page) == 'string') {
+            return fixPage(page);
+        } else {
+            return $(page).attr('id');
+        }
+    }
     
     function showOverlay() {
         $container.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');        
@@ -769,7 +777,7 @@ function TopcoatTouch($container, options) {
             return;
         }
 
-        if (_currentPage == fixPage(page)) {
+        if (_currentPage == getPageName(page)) {
             return self;
         }
 
