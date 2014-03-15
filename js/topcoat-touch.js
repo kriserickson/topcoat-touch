@@ -768,13 +768,14 @@ function TopcoatTouch($container, options) {
         if (page == _currentPage) {
             return;
         }
-        
-        console.log('tt.goTo ' + page);
+
+        if (_currentPage == fixPage(page)) {
+            return self;
+        }
 
         if (_isDialog && !back) {
             throw 'Cannot goTo a page when a dialog is showing, can only go back..';
         }
-
 
         _previousPage = _currentPage;
 
