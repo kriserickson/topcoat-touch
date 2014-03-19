@@ -247,8 +247,10 @@ function TopcoatTouch($container, options) {
      * @returns {String}
      */
     function fixPage(page) {
-        if (page && page.substr(0, 1) == '#') {
+        if (typeof page == 'string' && page.substr(0, 1) == '#') {
             page = page.substr(1);
+        } else if (typeof page == 'object') {
+            page = $(page).attr('id');
         }
         return page;
     }
