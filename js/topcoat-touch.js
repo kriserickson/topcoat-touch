@@ -1,24 +1,25 @@
 function TopcoatTouch($container, options) {
 
-    var _$currentPage,
-        _$loadingDiv,
-        _currentPage,
-        _previousPage,
-        _startedAnimation,
-        _dialogShowing,
-        _loadingShowing,
-        _iScroll = null,
-        _events = {},
-        _hammer,
-        _pages = [],
-        _controllers = {},
-        _controller,
-        _fastClick,
-        _showingMenu,
-        _isDialog,
-        _skipUserEvents,
-        _stashedScroll,
-        self = this;
+    var _$currentPage;
+    var _$loadingDiv;
+    var _currentPage;
+    var _previousPage;
+    var _startedAnimation;
+    var _dialogShowing;
+    var _loadingShowing;
+    var _iScroll = null;
+    var _events = {};
+    var _hammer;
+    var _pages = [];
+    var _controllers = {};
+    var _controller;
+    var _fastClick;
+    var _showingMenu;
+    var _isDialog;
+    var _skipUserEvents;
+    var _stashedScroll;
+    var _showingOverlay;
+    var self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
         'dragright', 'swipe', 'swipeup', 'swipedown', 'swipeleft', 'swiperight', 'transform', 'transformstart',
@@ -377,11 +378,11 @@ function TopcoatTouch($container, options) {
      *
      * @param page {String}
      * @param $page {jQuery}
-     * @param back {Boolean}
      * @param transition {String}
      * @param dialog {Boolean}
+     * @param back {Boolean} (also used as skipOverlay when dialog is true)
      */
-    function goToPage(page, $page, back, transition, dialog) {
+    function goToPage(page, $page, transition, dialog, back) {
         var pagesLength = _pages.length;
 
         // If this is the first page...
@@ -390,17 +391,17 @@ function TopcoatTouch($container, options) {
             // this hack for loading the first page...
             setTimeout(function () {
                 _pages.push(page);
-                goDirectly($page, transition, false);
+                goDirectly($page, transition, false, false);
                 _startedAnimation = true;
                 $page.trigger('transitionend');
             }, 20);
         } else {
-            if (back) {
+            if (back && !dialog) {
                 _pages.pop();
             } else {
                 _pages.push(page);
             }
-            goDirectly($page, transition, dialog);
+            goDirectly($page, transition, dialog, back);
         }
     }
 
@@ -408,9 +409,10 @@ function TopcoatTouch($container, options) {
      *
      * @param $page {jQuery}
      * @param transition {String}
-     * @param [dialog] {Boolean}
+     * @param dialog {Boolean}
+     * @param skipOverlay {Boolean}
      */
-    function goDirectly($page, transition, dialog) {
+    function goDirectly($page, transition, dialog, skipOverlay) {
 
         // Transition type one of page-left, page-right, page-down, pop and flip...
 
@@ -438,6 +440,7 @@ function TopcoatTouch($container, options) {
         } else {
             _skipUserEvents = false;
             _isDialog = dialog ? pageClass.next : false;
+            _stashedScroll = dialog && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
         }
 
         // Position the page at the starting position of the animation
@@ -450,25 +453,26 @@ function TopcoatTouch($container, options) {
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
         
-        _stashedScroll = _isDialog && _iScroll ? {x: iScroll.x, y: _iScroll.y} : false;
         
-
+        
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
 
        if (_skipUserEvents) {
              $prevPage.css('z-index', 30);
-             $('#topcoat-loading-overlay-div').css('z-index', 25);
+			 if (_showingOverlay) {
+             	 $('#topcoat-loading-overlay-div').css('z-index', 25);
+			 }
         }
         
         if (_isDialog) {
-            
-            showOverlay();
+            if (!skipOverlay) {
+                showOverlay();
+            }
             $prevPage.attr('class', 'page page-remove');
         } else {
             $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
         }
-        
  
 
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
@@ -479,11 +483,14 @@ function TopcoatTouch($container, options) {
     }
     
     function showOverlay() {
+        _showingOverlay = true;
         $container.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');        
     }
     
     function removeOverlay() {
+        if (_showingOverlay) {
         $('#topcoat-loading-overlay-div').remove();
+        }
     }
 
 
@@ -737,6 +744,7 @@ function TopcoatTouch($container, options) {
      * @param [transition] {String}
      * @param [dialog] {Boolean}
      * @param [back] {Boolean}
+     *
      */
     this.goTo = function (page, transition, dialog, back) {
 
@@ -754,7 +762,7 @@ function TopcoatTouch($container, options) {
                 renderPage(_currentPage, function ($page) {
                     // We call postAdd here since reloadPage should not call postAdd.
                     _controller.postadd.call(_controller);
-                    goToPage(_currentPage, $page, back, transition, dialog);
+                    goToPage(_currentPage, $page, transition, dialog, back);
                 });
             } else {
                 if (_controllers[_currentPage] && _isDialog) {
@@ -764,12 +772,12 @@ function TopcoatTouch($container, options) {
                     page = '#' + page;
                 }
                 var $page = $(page);
-                goToPage(page, $page, back, transition, dialog);
+                goToPage(page, $page, transition, dialog, back);
             }
         } else {
             $page = page;
             _currentPage = $page.attr('id');
-            goToPage(_currentPage, $page, back, transition, dialog);
+            goToPage(_currentPage, $page, transition, dialog, back);
         }
 
         return self;

@@ -115,24 +115,19 @@ body > div {
 }
 
 .page.page-scale {
-    -webkit-transform: translate3d(0, -25%, 0) scale(0.1);
-    transform: translate3d(0, -25%, 0) scale(0.1);
+    -webkit-transform: translate3d(0, 0, 0) scale(0.1);
+    transform: translate3d(0, 0, 0) scale(0.1);
+	z-index: 20;
 }
 
 .page.transition {
-    -webkit-transition-duration: .25s;
-    transition-duration: .25s;
+    -webkit-transition: .25s ease;
+    transition: .25s ease;
 }
 
 .page.transition-slow {
-    -webkit-transition-duration: .5s;
-    transition-duration: .5s;
-}
-
-
-.button-small {
-    line-height: 1.5rem;	
-    border-radius: 3px;
+    -webkit-transition: .5s ease;
+    transition: .5s ease;
 }
 
 /** Dropdown **/
@@ -315,7 +310,7 @@ body > div {
 .topcoat-overlay {
   position: absolute;  
   cursor: default;
-  z-index: 10;  
+  z-index: 30;  
   width: 70%;
   height: 30%;
   margin: auto;
@@ -338,7 +333,7 @@ body > div {
   left:0;
   background-color: rgba(88,90,92,0.7);
   box-shadow: inset 0 0 115px 0 #000;
-  z-index: 5;
+  z-index: 25;
 }
 
 /** end Overlay **/
