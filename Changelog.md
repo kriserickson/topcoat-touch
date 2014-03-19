@@ -44,3 +44,6 @@ Version 0.3.1
 
 Version 0.3.3
 - Don't go to a page if you have already been there.
+
+Version 0.3.4
+- Small bugfixes...
