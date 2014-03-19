@@ -458,6 +458,7 @@ body > div {
 
 .topcoat-navigation-bar {
     height: 3rem;
+    padding: 0;
 }
 
 .topcoat-navigation-bar__item {

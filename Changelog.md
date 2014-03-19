@@ -35,3 +35,12 @@ Version 0.2.8
 Version 0.2.9
 - Fix iScroll regression on mobile devices (broken in 0.2.8), improve 
   modal dialogs so that pages before do not need to be reloaded.
+
+Version 0.3.0
+- Improve menu handling, allow for callbacks when going back.
+
+Version 0.3.1
+- Fix some issues with menus, going back, and navigation bars.
+
+Version 0.3.3
+- Don't go to a page if you have already been there.

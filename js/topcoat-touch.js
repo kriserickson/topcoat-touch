@@ -92,10 +92,10 @@ function TopcoatTouch($container, options) {
             // If _controller is set, we are running from a controller not a single page app.  Remove the
             // page rather than hide it.
             if (_controller) {
-				if (!_skipUserEvents) {
+                if (!_skipUserEvents) {
                     _controller.pagestart.call(_controller);
                 }                
-				_controller._pagestart.call(_controller);
+                _controller._pagestart.call(_controller);
                 var $page = $container.find('.page-remove');
                 if ($page.length > 0) {
                     var prevController = _controllers[$page.attr('id')];
@@ -109,11 +109,14 @@ function TopcoatTouch($container, options) {
                     prevController._pageend.call(prevController);
                 }
                 
-				if (!_isDialog) {                    
+                if (!_isDialog) {                    
                     $page.remove();
                 }
                 if (_skipUserEvents) {
                     removeOverlay();
+                    if (_backCallback) {
+                        _backCallback();
+                    }
                 }
                 if (prevController && !_isDialog) {
                     prevController.postremove.call(prevController, $page);
@@ -128,12 +131,17 @@ function TopcoatTouch($container, options) {
                 }
                 if (_skipUserEvents) {
                     removeOverlay();
+                    if (_backCallback) {
+                        _backCallback();
+                    }
                 }
             }
             _startedAnimation = false;
 
-            // We disable tracking of fastclicks during a page switch...  TODO: disable on events during a page switch...
-            _fastClick.trackingDisabled = false;
+            if (_fastClick) {
+                // We disable tracking of fastclicks during a page switch...
+                _fastClick.trackingDisabled = false;
+            }
         }
     });
 
@@ -367,7 +375,9 @@ function TopcoatTouch($container, options) {
             }
         } else {
             setTimeout(function () {
-                renderPage(page, callback);
+                if (_controller) {
+                    renderPage(page, callback);
+                }
             }, 50);
         }
     }
@@ -418,7 +428,9 @@ function TopcoatTouch($container, options) {
 
         _startedAnimation = true;
 
-        _fastClick.trackingDisabled = true;
+        if (_fastClick) {
+            _fastClick.trackingDisabled = true;
+        }
 
         if (!_$currentPage) {
             $page.attr('class', 'page page-center');
@@ -453,12 +465,13 @@ function TopcoatTouch($container, options) {
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
         
+        _stashedScroll = _isDialog && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
         
-        
+       
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
 
-       if (_skipUserEvents) {
+        if (_skipUserEvents) {
              $prevPage.css('z-index', 30);
 			 if (_showingOverlay) {
              	 $('#topcoat-loading-overlay-div').css('z-index', 25);
@@ -480,6 +493,14 @@ function TopcoatTouch($container, options) {
         });
 
         
+    }
+
+    function getPageName(page) {
+        if (typeof(page) == 'string') {
+            return fixPage(page);
+        } else {
+            return $(page).attr('id');
+        }
     }
     
     function showOverlay() {
@@ -713,10 +734,17 @@ function TopcoatTouch($container, options) {
         this.goBack();
     };
     /**
-     * Goes back one page
+     * Goes back x pages, note: numberOfPages can come first...
+     * @param {callback} [Function}
      * @param [numberOfPages] {Number}
      */
-    this.goBack = function (numberOfPages) {
+    this.goBack = function (callback, numberOfPages) {
+        if (typeof callback != 'function') {
+            numberOfPages = callback;
+            _backCallback = undefined;
+        } else {
+            _backCallback = callback;
+        }
         if (numberOfPages) {
             if (_pages.length > numberOfPages) {
                 // Remove all but the last page...
@@ -733,7 +761,12 @@ function TopcoatTouch($container, options) {
         if (self.hasBack()) {
             this.goTo(_pages[_pages.length - 2], 'slideright', false, true);
         } else {
-            this._error('Cannot go back, there are no pages on the backstack');
+            if (callback) {
+                _pages = [];
+                callback();
+            } else {
+                this._error('Cannot go back, there are no pages on the backstack');
+            }
         }
     };
 
@@ -748,10 +781,17 @@ function TopcoatTouch($container, options) {
      */
     this.goTo = function (page, transition, dialog, back) {
 
+        if (page == _currentPage) {
+            return;
+        }
+
+        if (_currentPage == getPageName(page)) {
+            return self;
+        }
+
         if (_isDialog && !back) {
             throw 'Cannot goTo a page when a dialog is showing, can only go back..';
         }
-
 
         _previousPage = _currentPage;
 
@@ -812,8 +852,12 @@ function TopcoatTouch($container, options) {
         _pages.splice(_pages.length - 2, 1);
     };
 
-    this.clearHistory = function () {
-        _pages = [];
+    this.clearHistory = function (removeAllPages) {
+        if (removeAllPages || _pages.length == 0) {
+            _pages = [];
+        } else {
+            _pages = [_pages[_pages.length - 1]];
+        }
     };
 
     /**
@@ -1024,7 +1068,7 @@ function TopcoatTouch($container, options) {
      * @returns {Boolean}
      */
     this.dialogShowing = function () {
-        return _dialogShowing;
+        return _dialogShowing || _isDialog;
     };
 
     /**
@@ -1070,11 +1114,14 @@ function TopcoatTouch($container, options) {
         $container.append($menuDiv);
 
         // Hide the menu one mousedown
-        $container.on(self.touchStartEvent, function () {
-            if (!_showingMenu) {
-                $menuDiv.fadeOut(50);
-            } else {
-                _showingMenu = false;
+        $container.on(self.touchStartEvent, function (e) {
+            var $target = $(e.target);
+            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
+                if (!_showingMenu) {
+                    $menuDiv.fadeOut(50);
+                } else {
+                    _showingMenu = false;
+                }
             }
         });
 
@@ -1258,6 +1305,14 @@ function PageController(pageName, fns, data, tt) {
         }
         this.events.push({event: event, selector: selector, callback: callback});
         return this;
+    };
+
+    /**
+     * Helper funciton to go to a page.
+     * @param [transition] {String}
+     */
+    this.goTo = function(transition) {
+        self.tt.goTo(self.pageName, transition);
     };
 
     this.initialize();

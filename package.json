@@ -1,6 +1,6 @@
 {
     "name": "topcoat-touch",
-    "version": "0.2.9",
+    "version": "0.3.2",
     "devDependencies": {
         "mocha": "1.16.1",
         "chai": "1.8.1",
