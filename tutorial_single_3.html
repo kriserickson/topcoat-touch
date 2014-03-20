@@ -11,9 +11,68 @@
         </div>
 
 
-        <div class="tutorialItem">In the next part </div>
+        <h3>Grunt</h3>
+
+        <div class="tutorialItem">
+            When we used Yeoman to create our project, it helpfully created a Gruntfile for us.  What that gruntfile does
+            depends on whether or not we have included Phonegap in the project.  If we haven't included phonegap it
+            is basically just a skeleton of a gruntfile that provides an HTTP server (which is the default action even if Phonegap is included).
+            <br/><br/>
+            While this isn't a tutorial on <a href="http://gruntjs.com">Grunt</a>, let's quickly look at what we have included:
+
+            <code class="language-javascript">'http-server': {
+    dev : {
+        port: 3000,
+        root: './app/'
+    }
+}</code>
+
+            Is the clip of code that creates the HTTP server, feel free to change it's port if 3000 conflicts with another
+            application.<br/><br/>
+
+            There are two more grunt commands that are created for you that you should know about how they work: 'debug', 'debug-cordova'.<br/><br/>
+
+            <dl>
+                <dt>debug-cordova</dt><dd>This places a debug version (non-minimized) of all of the files into the ./cordova/www directory.  Once
+            this is done, you can run <code class="noblock">$ cordova prepare</code> in the cordova directory to build application. </dd>
+                <dt>cordova</dt><dd>This places a production version (minimized css, and javascript) into the ./cordova/www directory.</dd>
+            </dl>
+
+            There are a few of things to note about these commands:
+
+            <ol>
+                <li>The dist directory is used as a scratchpad directory when building the production output, check there to see if anything went wrong</li>
+                <li>Javascript files are included from the libs directory and the js directory, but in random order so you should wrap any javascript that
+                requires functionality to be loaded in a document.ready OR rewrite the grunt file to join the files in the order you require</li>
+                <li>Development html is included between the <code class="noblock">&lt;!-- @@DEVELOPMENT@@ --&gt;</code> comments and production
+                html is included between the <code class="noblock">&lt;!-- @@PRODUCTION@@ --&gt;</code> comments.  This little hack is performed
+                by the <a href="https://github.com/kriserickson/grunt-transform-html">transform_html</a> grunt task</li>
+            </ol>
+
+            As the Yeoman generator becomes more robust, more commands will be added but for now that is what you need to know.
 
 
+        </div>
+
+        <h3>Editing ToDo's</h3>
+
+        <div class="tutorialItem">
+        Now let's get back to our application.  We are now on <a href="https://github.com/kriserickson/topcoat-touch-todo/tree/stage-3">stage-3</a> but when we
+        are done editing we will be at <a href="https://github.com/kriserickson/topcoat-touch-todo/tree/stage-4">stage-4</a>.  
+        </div>
+        
+        <div class="tutorialItem">
+
+        The first thing we need to do is add an edit button.  Since eventually we are going to need to delete toDo's lets
+        add that at the same time.  Place the following html in the index.html at the end of the #toDoView div.
+
+<code class="language-markup">&lt;div class="topcoat-bottom-bar"&gt;
+    &lt;div class="topcoat-bottom-bar-item full center"&gt;
+        &lt;button class="topcoat-button--cta" id="editButton"&gt;Edit Todo&lt;/button&gt;
+        &lt;button class="topcoat-button--cta" id="deleteButton"&gt;Delete Todo&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code>
+            
         </div>
     </div>
 </div>
