@@ -72,7 +72,529 @@
         &lt;button class="topcoat-button--cta" id="deleteButton"&gt;Delete Todo&lt;/button&gt;
     &lt;/div&gt;
 &lt;/div&gt;</code>
-            
+
+        Next we need to update our javascript a little.  Underneath the creation of hte TopcoatTouch object add two more variables,
+        a toDo which will be our current toDo, and a state (whether we are editing or creating a new ToDo).
+
+<code class="language-javascript">var toDo;
+var state;</code>
+
+        Now in the todo click handler, remove that var reference so that ToDo is global to the scope of the entire document.ready function
+
+        <code class="language-javascript">$('#todoList').on('click', 'li[data-id]', function() {
+var toDo = toDoService.getToDo($(this).data('id'));</code>
+
+        becomes
+
+        <code class="language-javascript">$('#todoList').on('click', 'li[data-id]', function() {
+toDo = toDoService.getToDo($(this).data('id'));</code>
+
         </div>
+
+        In the addButton click handler add a line setting the state to 'new';
+
+        <code class="language-javascript">state = 'new';</code>
+
+        Add a handler for the edit button:
+
+        <code class="language-javascript">$('#editButton').click(function() {
+    state = 'save';
+    $todoEdit.find('.header').text('Edit ' + toDo.name);
+    $todoEdit.find('#nameInput').val(toDo.name);
+    $todoEdit.find('#dueDateInput').val(toDo.dateDueString());
+    $todoEdit.find('#detailsTextarea').val(toDo.details);
+    tt.goTo($todoEdit);
+});</code>
+
+        Also make some small changes to the save button, remove the toService.add line:
+
+        <code class="language-javascript">toDoService.addToDo($('#nameInput').val(), $('#detailsTextarea').val(), $('#dueDateInput').val());</code>
+
+        And add some lines that handle either adding or editing a todo:
+
+        <code class="language-javascript">var name = $('#nameInput').val();
+var details = $('#detailsTextarea').val();
+var dueDate = $('#dueDateInput').val();
+if (state == 'new') {
+    toDoService.addToDo(name, details, dueDate);
+} else {
+    toDo.name = name;
+    toDo.details = details;
+    toDo.dueDate = dueDate;
+}</code>
+
+        And we should now be able to test editing a ToDO.  Fire up the http service (through grunt) if it's not already
+        running and make sure everything works the way it should.
+        </div>
+
+        <h3>Deleting ToDo's.</h3>
+
+        <div class="tutorialItem">
+        Now that we can add and edit toDo's, the last step of <a href="http://en.wikipedia.org/wiki/Create,_read,_update_and_delete">CRUD</a> is to be able to delete them.
+        Let us separate out the deleting into its own function (we are going to reuse it later, so lets seperate it now):
+
+    <code class="language-javascript">function deleteToDo(delToDo) {
+    toDoService.removeToDo(delToDo);
+    toDoService.save();
+    createToDoList();
+    tt.goTo('#home');
+}</code>
+
+        Now we need a delete button click handler:
+
+    <code class="language-javascript">$('#deleteButton').click(function() {
+    deleteToDo(toDo);
+});</code>
+
+        Test again, and be sure to reload the page every now and then to make sure our changes are actually stored from
+        session and not completely ephemeral.
+
+        <h3>Finishing the Application</h3>
+
+        <div class="tutorialItem">While no app is really ever finished, we are going to put some finishing touches
+        on this ToDo app and then put a fork in it.  First we are going to duplicate the functionality that many
+        mobile users expect when swiping from left to right on a list item, showing a delete button and a way
+        to delete the ToDo.  This uses the functionality it Hammer.js to get the swipe so it becomes a very
+        few short lines of code:
+
+        <code class="language-javascript">function showDeleteButton() {
+
+    // reference the just swiped list item
+    var $li = $(this);
+    var toDoId = $li.data('id');
+
+    // create buttons and div container
+    var $deleteBtn = $('&lt;button class="deleteButton topcoat-button"&gt;Delete&lt;/button&gt;');
+
+    $deleteBtn.css({opacity: 0})
+        .bind('click', function () {
+            $deleteBtn.remove();
+            deleteToDo(toDoStorage.getToDo(toDoId))
+        });
+
+    // insert swipe div into list item
+    $li.prepend($deleteBtn);
+    $deleteBtn.animate({opacity: 1}, 150);
+
+    return false;
+}
+
+tt.on('swiperight', 'li', 'home', showDeleteButton);
+
+tt.on(tt.EVENTS.PAGE_END, 'home', function() {
+    $('.deleteButton').remove();
+});</code>
+
+        Let's quickly go over what this code is doing.  The showDeleteButton function acts in response to swipe event
+        to dynamically create a button, bind it to a click event that calls the deleteToDo function we wrote earlier,
+        and appends it to the current list item.  It then fades itself in using jQuery animate.  Underneath the showDeleteButton function
+        we use the event delegation features of TopcoatTouch to bind to the swiperight event and the pageEnd event.  Note
+        that TopcoatTouch event delegation takes up to four parameters, the first being the event.  TopcoatTouch supports
+        all jQuery events (click, mousedown, mouseup, touchstart, touchend, change, etc) as well as all Hammer.js
+        <a href="https://github.com/EightMedia/hammer.js/wiki/Getting-Started">events</a> (swiperight, swipeleft, drag, tap, doubletap, hold, roate, pinch, etc),
+        as well as several TopcoatTouch only <a href="http://www.agingcoder.com/topcoat-touch/docs.html#events">events</a> (PAGE_START, PAGE_END,
+        SCROLL_START, SCROLL_END, SHOW_MENU, MENU_ITEM_CLICKED).  The second argument being an optional element to react to (for
+        example we are only reacting to li that are swiped).  The third argument is also optional and is the page to react to,
+        so in the above code we are only reacting to events on the home page.  The last argument is the function to execute (note:
+        that TopcoatTouch event delegation returns the target elment as this, exactly as jquery does.
+
+        To have our button look reasonable, and be in the right place, we need to sprinkle some CSS magic into our style.css (feel
+        free to place it at the bottom.)
+
+         <code class="language-css">.deleteButton {
+    position: absolute;
+    right: 41px;
+    width: 100px;
+    height: 28px;
+    line-height: 28px;
+    background: #A00;
+    color: #FFF;
+    text-shadow: none;
+    box-shadow: none;
+    top: 19px;
+}
+
+.deleteButton:hover {
+    background: #933;
+}</code>
+
+        Now is a good time to test our swipe to delete functionality.   Note: You will either need a mobile device or use the
+        emulation mode of Chrome or Opera to get swiping to work, as swipe is not a standard action for desktop browsers.
+
+        The last thing we are going to do is quickly add a menu, and an about dialog.
+
+        Go back to the index.html and add an about page at the bottom before the final closing body tag.
+
+<code class="language-markup">&lt;div data-role="dialog" id="about"&gt;
+    &lt;div class="topcoat-touch-dialog"&gt;
+        &lt;div class="topcoat-touch-header"&gt;
+            &lt;h1&gt;About&lt;/h1&gt;
+        &lt;/div&gt;
+
+        &lt;div class="topcoat-touch-dialog-content"&gt;
+            &lt;div&gt;
+                &lt;h2&gt;Topcoat Touch Todo&lt;/h2&gt;
+
+                &lt;p&gt;Simple ToDo App Demo&lt;/p&gt;
+
+            &lt;/div&gt;
+
+            &lt;div class="topcoat-touch-grid  buttons"&gt;
+                &lt;div class="full center"&gt;
+                    &lt;button class="topcoat-button--cta back-button"&gt;OK&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;            
+</code>
+
+        Next we have to add some options to our TopcoatTouch constructor to tell it about our menu:
+
+        <code class="language-javascript">var tt = new TopcoatTouch({menu: [{id: 'about', name: 'About'}]});</code>
+
+        There are other options you can set in the TopcoatTouch constructor, see the <a href="docs.html">docs</a> for
+        more information.<br/><br/>
+
+        Next we need to handle the menu item clicked event for the about menu item:
+
+        <code class="language-javascript">tt.on(tt.EVENTS.MENU_ITEM_CLICKED, function(page, id) {
+    if (id == 'about') {
+        tt.goTo('about', 'pop', true);
+    }
+});</code>
+
+        Next a tiny bit of css gets tucked at the bottom of our style.css:
+
+        <code class="language-css">#about {
+    color: #fff;
+}</code>
+
+        Hit reload on our little mobile app, and see that the Menu that was there all long, is finally functional:
+
+        <div class="imageHolder">
+            <img src="images/tutorial/simple-step-4-a.png"/>
+        </div>
+
+        And clicking on it, gives us a nice little pop-up:
+
+        <div class="imageHolder">
+            <img src="images/tutorial/simple-step-4-b.png"/>
+        </div>
+
+
+        </div>
+
+        <h3>Doing Things the TopcoatTouch Way</h3>
+
+        If you have looked at the latest version of the TopcoatTouchTodo app you will notice a few more small changes,
+        all of the event handlers are done with TopcoatTouch event delegation rather than jQuery click handlers.  For
+        example the addButton click handler has changed from:
+
+        <code class="language-javascript">$('#addButton').click(function() {</code>
+
+        to
+
+        <code class="language-javascript">tt.on(tt.clickEvent, '#addButton', 'home', function() {</code>
+
+        While not necessary in any way, if you do all of your event handling through the topcoatTouch interface
+        you may find it produces a more unified experience.  Also not the tt.clickEvent, which is not necessary if
+        you have included fastclick, it is necessary if you have not and you wish your application to work in a non
+        touch enabled as well as a touch enabled environment.
+
+        <h3>Getting ready for testing</h3>
+
+        You've probably noticed that our application is not very well structured, it only uses 2 modules (and
+        the toDoService is jammed into the global window, a terrible practice) and isn't very well organized in
+        general.   I will argue that a lot of the reason for that is:
+
+            <ol class="alpha">
+                <li>It was written as a tutorial to slowly build on simple ideas.</li>
+                <li>It is a very simple application.</li>
+                <li>TopcoatTouch is not designed for very large applications (especially the single
+                    document for of TopcoatTouch)</li>
+            </ol>
+
+         All of which are kind of feeble augments, but for the single document tutorial we are not going to spend
+         any time fixing any of the architectural problems with our ToDo app, but we are going to remove our
+         ToDo service from the global window and make it slightly testable.  Since we are not going to introduce
+         a real <a href="http://en.wikipedia.org/wiki/Inversion_of_control">IOC container</a> or any kind of
+         dependency injection into this simple app, we are going to rely on the programmers best friend,
+         <a href="http://www.joelonsoftware.com/items/2009/09/23.html">Duct Tape</a>.  First lets take the
+         ToDoService off of the global object and at least make it instantiable class.<br/><br/>
+
+        Change this:
+
+        <code class="language-javascript">window.toDoService = new (function ToDoService() {</code>
+
+        to this:
+
+        <code class="language-javascript">window.ToDoService = function ToDoService(localStorage) {</code>
+
+        What we are doing is a little subtle, we are change the toDoService from an immediately instantiated
+        object to a constructor (class).  We are also accepting a single argument which is our localStorage
+        object which we can then mock out for easy testing.<br/><br/>
+
+        next we have to change our localStorage accessor (this is unfortunate since if we had thought this
+        through at the beginning the change wouldn't have been necessary), but this:
+
+        <code class="language-javascript">if (window.localStorage.getItem('todos')) {
+    var toDoPojos = JSON.parse(window.localStorage.getItem('todos'));</code>
+
+        becomes:
+
+        <code class="language-javascript">if (localStorage['todos']) {
+    var toDoPojos = JSON.parse(localStorage['todos']);</code>
+
+        This is a really minor change that allows us to simplify our Mock of the localStorage object and just
+        pass in a plain object rather than have to somehow create a pseudo array that does setting and also
+        has a getItem function.  The last change is also minor, making sure that function isn't immediately executed.  Change
+
+        <code class="language-javascript">})();</code>
+
+        to
+
+        <code class="language-javascript">};</code>
+
+        Once again, if all of this is confusing, check out that whole <a href="https://github.com/kriserickson/topcoat-touch-todo/blob/master/app/js/todo-service.js">file on Github</a>.<br/><br/>
+
+        Now we have to change our app.js file, underneath the creation of our tt TopcoatTouch object add the following:
+
+        <code class="language-javascript">var toDoStorage = new window.ToDoService(window.injectedStorage ?  window.injectedStorage : window.localStorage);</code>
+
+        The reference to window.injectedStorage will be for our End2End testing and mocking the localStorage.  I personally
+        don't like having to variables that only differ in capitalization, so I renamed toDoService toDoStorage.  If you follow
+        my lead here you will have to rename every toDoService reference to toDoStorage.  If you aren't using a fancy IDE
+        with refactoring, or don't trust Search and Replace you can simple change the name of toDoStorage to toDoService and
+        you are done.
+
+        <h3>Testing The ToDo Service</h3>
+
+        I've chosen to use Mocha and Phantomjs (in fact a package called mocha-phantomjs) to do my end to end testing,
+        and using Mocha to do the unit testing.  There are a few reasons for this:
+
+        <ol>
+            <li>You can do Unit Testing and End2End Testing with the same framework</li>
+            <li>It works from a browser and the command line</li>
+            <li>It integrates nicely with npm and CI servers like <a href="https://travis-ci.org/">TravisCI</a></li>
+            <li>It is relatively fast compared with solutions like <a href="http://docs.seleniumhq.org/">Selenium</a></li>
+        </ol>
+
+        You don't have to use this MochaPhantom combination, however the Yeoman Generator will probably start including
+        it as a default option in the near future.  For now you are going to have to do a little work.  First, crack
+        open your package.json and add the following under devDependencies:
+
+        <code class="language-javascript">"mocha": "1.18.2",
+    "chai": "1.9.1",
+    "mocha-phantomjs": "3.3.2"</code>
+
+        (Note: these modules change pretty fast, feel free to keep up to date with the latest versions, however I know that
+        there particular versions work).  Also add a new node call scripts, in the package.json
+
+        <code class="language-javascript">"scripts": {
+    "test": "mocha-phantomjs TestRunner.html"
+  }</code>
+
+        In your root diretory, run <code class="noblock">npm install</code>, to get the new pacakges.  Next you have to
+        create a file in the root of project (the same level as the package.json) called TestRunner.html:
+        
+        <code class="language-markup">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt; Topcoat Touch Tests &lt;/title&gt;
+    &lt;link rel="stylesheet" href="./node_modules/mocha/mocha.css"/&gt;
+    &lt;script src="./node_modules/mocha/mocha.js"&gt;&lt;/script&gt;
+    &lt;script src="./node_modules/chai/chai.js"&gt;&lt;/script&gt;
+    &lt;script src="app/libs/topcoat-touch/js/jquery-2.0.3.js"&gt;&lt;/script&gt;
+    &lt;script src="app/js/todo-service.js"&gt;&lt;/script&gt;
+
+   &lt;style&gt;
+        /** Quick hack to make the site visible within the test container... **/
+        #testContainer {
+            width: 320px;
+            height: 480px;
+            border: 1px solid #000;
+            position: fixed;
+            right: 50px;
+            top: calc(50% - 240px);
+        }
+
+        #testContainer &gt; div {
+            position: absolute;
+            top: 9999px;
+        }
+        body &gt; div {
+            position: static;
+            top: 0;
+        }        
+        body {
+            overflow: visible;
+        }
+        #mocha {
+            width: calc(100% - 450px);
+        }
+    
+    &lt;/style&gt;
+
+    &lt;script&gt;
+        mocha.ui('bdd');
+        mocha.reporter('html');
+        var expect = chai.expect;
+    &lt;/script&gt;
+    &lt;script src="test/testToDoService.js"&gt;&lt;/script&gt;
+    &lt;!-- &lt;script src="test/testApp.js"&gt;&lt;/script&gt; --&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="mocha"&gt;
+
+    &lt;/div&gt;
+    &lt;iframe id="testContainer" src="app/index.html#testing"&gt;
+    &lt;/iframe&gt;
+&lt;script&gt;
+    $('#testContainer').on('load', function() {
+        window.$iframeContents = $('#testContainer').contents();
+        var $body = window.$iframeContents.find('body');
+        (function startMocha() {
+            if ($body.data('startedapp')) {
+                if (window.mochaPhantomJS) {
+                    mochaPhantomJS.run();
+                } else {
+                    mocha.setup({globals: ['$']});
+                    mocha.run();
+                }
+            } else {
+                setTimeout(startMocha, 50);
+            }
+        })();
+    });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code>
+
+        This file will run all of our tests (both Unit and E2E).  For now we are only creating unit tests, so lets create the
+        tests for toDoService.  First create a directory called <code class="noblock">test</code>, and add a file called
+        <code class="noblock">testToDoService.js</code>, which contains some simple tests of our ToDo service:
+
+        <code class="language-javascript">describe("Test ToDoService", function () {
+    var toDoService;
+
+    before(function() {
+        toDoService = new ToDoService({todos: "{\"1\":{\"id\":1,\"name\":\"Test 1 Name\",\"details\":\"Test 1 Details.\",\"dateDue\":\"2014-01-01T00:00:00.000Z\",\"complete\":false}," +
+                    "\"2\":{\"id\":2,\"name\":\"Test 2 Name\",\"details\":\"Test 2 Details\",\"dateDue\":\"2014-05-02T00:00:00.000Z\",\"complete\":true}," +
+                    "\"3\":{\"id\":3,\"name\":\"Test 3 Name\",\"details\":\"Test 3 Details\",\"dateDue\":\"2014-05-05T00:00:00.000Z\",\"complete\":false}," +
+                    "\"4\":{\"id\":4,\"name\":\"Test 4 Name\",\"details\":\"Test 4 Details\",\"dateDue\":\"2014-06-01T00:00:00.000Z\",\"complete\":false}}"});
+    });
+
+    it('should have 4 toDos', function() {
+        expect(Object.keys(toDoService.getAllToDos()).length).to.equal(4);
+    });
+
+    it('toDo 1 should be named Test 1 Name', function() {
+        expect(toDoService.getToDo(1).name).to.equal("Test 1 Name");
+    });
+
+    it('toDo 4 should have a details called Test 4 Details', function() {
+        expect(toDoService.getToDo(4).details).to.equal("Test 4 Details");
+    });
+
+    it('removing toDo should cause 3 toDos to remain', function() {
+        var removeToDo = toDoService.getToDo(3);
+        toDoService.removeToDo(removeToDo);
+        expect(Object.keys(toDoService.getAllToDos()).length).to.equal(3);
+        expect(toDoService.getToDo(3)).to.equal(undefined);
+    });
+
+});</code>
+
+    We have written some very simple BDD style Mocha tests (if you want a good tutorial on <a href="http://visionmedia.github.io/mocha/">Mocha</a>, I recommend
+        the <a href="http://code.tutsplus.com/tutorials/testing-in-nodejs--net-35018">net-tuts tutorial</a> which is very thorough.
+    Ok, ready to fire up our tests.  You can run them in the browser, or simply by typing <code class="noblock">npm test</code>.
+
+    <code class="language-yeoman"><span class="yeoman-blue">$topcoat-touch-todo></span><span class="yeoman-yellow">npm test</span>
+
+> todo@0.0.1 test topcoat-touch-todo
+> mocha-phantomjs TestRunner.html
+
+  Test ToDoService
+    <span class="yeoman-green">âo"</span> should have 4 toDos
+    <span class="yeoman-green">âo"</span> toDo 1 should be named Test 1 Name
+    <span class="yeoman-green">âo"</span> toDo 4 should have a details called Test 4 Details
+    <span class="yeoman-green">âo"</span> removing toDo should cause 3 toDos to remain
+
+4 passing (4ms)</code>
+
+    Woot!  It works.  Now, let's get to work with end to end testing...    This is a lot more complicated, as we have
+    to deal with some peculiarities of PhantomJS, iframes, and a few hacks to allow us to test without actually touching
+    local storage.  First our local storage hack, which we are going to place into our index.html (right after the
+    @@DEVELOPMENT@@ comment:
+
+    <code class="language-markup">&lt;script&gt;
+    if (window.location.hash == '#testing') {
+        window.injectedStorage = {todos: "{\"1\":{\"id\":1,\"name\":\"Test 1 Name\",\"details\":\"Test 1 Details.\",\"dateDue\":\"2014-01-01T00:00:00.000Z\",\"complete\":false}," +
+                "\"2\":{\"id\":2,\"name\":\"Test 2 Name\",\"details\":\"Test 2 Details\",\"dateDue\":\"2014-05-02T00:00:00.000Z\",\"complete\":true}," +
+                "\"3\":{\"id\":3,\"name\":\"Test 3 Name\",\"details\":\"Test 3 Details\",\"dateDue\":\"2014-05-05T00:00:00.000Z\",\"complete\":false}," +
+                "\"4\":{\"id\":4,\"name\":\"Test 4 Name\",\"details\":\"Test 4 Details\",\"dateDue\":\"2014-06-01T00:00:00.000Z\",\"complete\":false}}"};
+    }
+&lt;/script&gt;</code>
+
+    This hack says that we will create our own <a href="http://en.wikipedia.org/wiki/Mock_object">mock</a> of localStorage
+    when '#testing' is appended to url (see the iframe in TestRunner.html).  Now for our next hack, we have to know when
+    the page is loaded and ready for testing, as testing to soon will cause unpredictable errors.  The hacky solution is
+    to tack a data attribute onto the body when we are loaded.  The other option is to create an event sync and broadcast
+    the event however this can lead to a race condition where if the event broadcasts before we are ready for it the tests
+    will never run.  Append the following to app.js just before the tt.goTo('home') command:
+
+    <code class="language-javascript">tt.on(tt.EVENTS.PAGE_START, 'home', function() {
+        $('body').attr('data-startedapp',1);
+    });</code>
+
+    Next we will have to uncomment the testApp.js script.  Remove the comment from around that in TestRunner.html.<br/><br/>
+
+    Now let's write some end to end tests.  Create another file in the test folder, called testApp.js.  First we will
+    test that the home page is loaded and it has some events.
+
+   <code class="language-javascript">describe("Test Home Page", function () {
+
+    it('should be on the home page', function() {
+        expect($iframeContents.find('#home').hasClass('page-center')).to.be.true;
+    });
+
+    it('toDo list should have 4 items', function() {
+        expect($iframeContents.find('#todoList li').length).to.equal(4);
+    });
+
+    it('toDo list item 1 should be called Test1Name', function() {
+        expect($($iframeContents.find('#todoList li')[0]).find('.toDoName').text()).to.equal('Test 1 Name');
+    });
+
+    it('toDo list item 3 should had id of 3', function() {
+        expect($($iframeContents.find('#todoList li')[2]).data('id')).to.equal(3);
+    });
+
+});</code>
+
+    Run our tests:
+
+    <code class="language-yeoman"><span class="yeoman-blue">$topcoat-touch-todo></span><span class="yeoman-yellow">npm test</span>
+
+> todo@0.0.1 test topcoat-touch-todo
+> mocha-phantomjs TestRunner.html
+
+  Test ToDoService
+    <span class="yeoman-green">âo"</span> should have 4 toDos
+    <span class="yeoman-green">âo"</span> toDo 1 should be named Test 1 Name
+    <span class="yeoman-green">âo"</span> toDo 4 should have a details called Test 4 Details
+    <span class="yeoman-green">âo"</span> removing toDo should cause 3 toDos to remain
+
+  Test Home Page
+    <span class="yeoman-green">âo"</span> should be on the home page
+    <span class="yeoman-green">âo"</span> toDo list should have 4 items
+    <span class="yeoman-green">âo"</span> toDo list item 1 should be called Test1Name
+    <span class="yeoman-green">âo"</span> toDo list item 3 should had id of 3
+
+8 passing (18ms)</code>
+
+
+
     </div>
 </div>

@@ -185,6 +185,15 @@ li {
     margin: 15px 0;
 }
 
+ol.alpha {
+    list-style: lower-alpha;    
+}
+
+ol.alpha li {
+    margin: 3px 0;
+}
+
+
 code.language-javascript {
 
 }
@@ -214,4 +223,13 @@ h4 a {
 h4 a:hover {
     color: #299680;
     text-decoration: none;
+}
+
+span.oldCode {
+    background: #454641;
+    opacity: 0.5;
+}
+
+span.strike {
+    text-decoration: line-through;
 }
