@@ -507,8 +507,9 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 });</code>
 
     We have written some very simple BDD style Mocha tests (if you want a good tutorial on <a href="http://visionmedia.github.io/mocha/">Mocha</a>, I recommend
-        the <a href="http://code.tutsplus.com/tutorials/testing-in-nodejs--net-35018">net-tuts tutorial</a> which is very thorough.
-    Ok, ready to fire up our tests.  You can run them in the browser, or simply by typing <code class="noblock">npm test</code>.
+    the <a href="http://code.tutsplus.com/tutorials/testing-in-nodejs--net-35018">net-tuts tutorial</a> which is very thorough.
+    Ok, ready to fire up our tests.  First lets run them in the browser, just by opening the TestRunner.html (you don't need an
+    http server in this particular instance).  Make sure that they all work.  Now try them from the commandline line by typing <code class="noblock">npm test</code>.
 
     <code class="language-yeoman"><span class="yeoman-blue">$topcoat-touch-todo></span><span class="yeoman-yellow">npm test</span>
 
@@ -538,17 +539,24 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 &lt;/script&gt;</code>
 
     This hack says that we will create our own <a href="http://en.wikipedia.org/wiki/Mock_object">mock</a> of localStorage
-    when '#testing' is appended to url (see the iframe in TestRunner.html).  Now for our next hack, we have to know when
-    the page is loaded and ready for testing, as testing to soon will cause unpredictable errors.  The hacky solution is
-    to tack a data attribute onto the body when we are loaded.  The other option is to create an event sync and broadcast
+    when '#testing' is appended to url (see the iframe in TestRunner.html).<br/><br/>
+
+    Now for our next hack, we have to know when the page is loaded and ready for testing, as testing too soon will cause
+    unpredictable errors.  Our solution is to tack a data attribute onto the body when we are loaded, and then to poll
+    for its presence after the iFrame's contents have loaded. The other option is to create an event sync and broadcast
     the event however this can lead to a race condition where if the event broadcasts before we are ready for it the tests
-    will never run.  Append the following to app.js just before the tt.goTo('home') command:
+    will never run.  The other thing we are doing once the iframe is done is getting a reference to the iFrames's contents
+    (which we are storing in the window variable $iframeContents).  The standard jQuery object will by default be accessing
+    TestRunning.html, and we want to be able to test things within the iFrame.  Append the following to app.js just before
+    the tt.goTo('home') command:
 
     <code class="language-javascript">tt.on(tt.EVENTS.PAGE_START, 'home', function() {
         $('body').attr('data-startedapp',1);
     });</code>
 
-    Next we will have to uncomment the testApp.js script.  Remove the comment from around that in TestRunner.html.<br/><br/>
+    Next we will have to uncomment the testApp.js script in TestRunner.html.  While you are uncommenting that make sure to
+    look at the <code class="noblock">$('#testContainer').on('load', function() {</code> code and make sure you understand
+    what is going on.  There is a little Mocha housekeeping to run one way in the browser and another in PhatomJS.<br/><br/>
 
     Now let's write some end to end tests.  Create another file in the test folder, called testApp.js.  First we will
     test that the home page is loaded and it has some events.
@@ -573,7 +581,9 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 
 });</code>
 
-    Run our tests:
+    What is going here?  Well, we are just checking some basic characteristics that we expect of the home page.  As we
+    explained above we are using the global $iframeContents jQuery object to reference our iframe, and then it is
+    basic jQuery selects to get our values.  Now lets run our tests:
 
     <code class="language-yeoman"><span class="yeoman-blue">$topcoat-touch-todo></span><span class="yeoman-yellow">npm test</span>
 
@@ -594,6 +604,151 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 
 8 passing (18ms)</code>
 
+    Now let's try testing some interaction.  One of the first things you will discover when testing with PhantomJS is
+    that jquery's trigger.  So we are going to create our own function to trigger mouse-click events ourselves.  At the top
+    of testApp.js add the following:
+
+    <code class="language-javascript">function clickElement(el){
+    var ev = document.createEvent("MouseEvent");
+    ev.initMouseEvent("click", true , true , window, null, 0, 0, 0, 0, false, false, false, false, 0 , null);
+    el.dispatchEvent(ev);
+}</code>
+
+    If you need to test other interactions, you can create similar event triggers, or check to see if the jQuery
+    trigger for that particular event works (there is also some rumbling in the phantomjs issues on github that this
+    <a href="https://github.com/ariya/phantomjs/issues/10522">issue</a> may be fixed in the near future.)  But for now
+    lets test viewing an issue:
+
+    <code class="language-javascript">describe("Test View ToDo", function () {
+
+    before(function(done) {
+        clickElement($iframeContents.find('#todoList li[data-id="2"]')[0]);
+        (function checkDone() {
+            if ($iframeContents.find('#todoView').hasClass('page-center')) {
+                done();
+            } else {
+                setTimeout(checkDone, 20);
+            }
+        })();
+    });
+
+    after(function(done) {
+        clickElement($iframeContents.find('#todoView .topcoat-icon--back')[0]);
+        (function checkDone() {
+            if ($iframeContents.find('#home').hasClass('page-center')) {
+                done();
+            } else {
+                setTimeout(checkDone, 20);
+            }
+        })();
+    });
+
+    it('View Should Have Test 2 Name', function() {
+        expect($iframeContents.find('#nameField').text()).to.equal('Test 2 Name');
+    });
+
+
+});</code>
+
+   What exactly is going on here?  First thing we are doing is before the test we are clicking
+   on the ToDo list element with data-id="2", and then waiting until we have reached the toDoView
+   page (we know that we are on this page when class page-center has been added to the page, NOTE:
+   this will be before the PAGE_START event is run, so if you have to react to the PAGE_START event
+   you will need to find a different event to react to).  This is done with a setTimeout as
+   we have no other way to react to events occurring in the iframe, if you really need to react to
+   actual events you will have to proxy them by firing an event on a page or the body of your app, which
+   has the unwelcome side effect that you are changing the behavior of your application to be able to
+   do testing.<br/><br/>
+
+   The after function returns us to the home page, which should be done in all tests, remember that the
+   order of the tests is not guaranteed to be in the order they are in the code so you should try to reset
+   the state of your app to the starting state after every test.<br/><br/>
+
+   Next we simply test to see if the 2nd list element is named 'Test 2 Name'.  Now lets do some more
+   complicated tests:
+
+   <code class="language-javascript">describe("Test Add ToDo", function () {
+
+
+    before(function(done) {
+        clickElement($iframeContents.find('#addButton')[0]);
+        (function checkDone() {
+            if ($iframeContents.find('#todoEdit').hasClass('page-center')) {
+                done();
+            } else {
+                setTimeout(checkDone, 20);
+            }
+        })();
+    });
+
+    it('It should Add ToDo', function(done) {
+        var nameText = 'Create ToDo Test';
+        $iframeContents.find('#nameInput').val(nameText);
+        $iframeContents.find('#dueDateInput').val('2014-06-06');
+        $iframeContents.find('#detailsTextarea').val('Testing Creating ToDo');
+        clickElement($iframeContents.find('#saveButton')[0]);
+        (function checkDone() {
+            if ($iframeContents.find('#home').hasClass('page-center')) {
+                expect($iframeContents.find('#todoList li').length).to.equal(5);
+                expect($($iframeContents.find('#todoList li')[4]).find('.toDoName').text()).to.equal(nameText);
+                done();
+            } else {
+                setTimeout(checkDone, 20);
+            }
+        })();
+    });
+
+
+});</code>
+
+    In this test we click the addButton and before we start the test.  Then we fill out the ToDo and click the
+    saveButton.  Then we make sure we have 5 toDo's and the 5th element has the name we have given it.
+    There are a couple of things to note in this test:
+
+        <ol>
+            <li>We have made a judgement call that going to the add page is part of the before, but filling out the
+            ToDo is part of the Test, it's up to you where you draw these lines.  Some people feel the tests should
+            only test data and perform no actions, others feel that the doing the action is part of the test.  Just
+            make sure your tests are small and modular and return the app to the state it was before the test</li>
+            <li>We haven't returned the app to the state it was before the test, for now this doesn't matter because
+            the tests can still be performed in any order, but in the future it will matter.  As an exercise to get
+            yourself used to this testing environment and an after than removes the 'Create ToDo Test' todo. </li>
+        </ol>
+
+    Let's run our tests again and make sure they all work:
+
+
+<code class="language-yeoman"><span class="yeoman-blue">$topcoat-touch-todo></span><span class="yeoman-yellow">npm test</span>
+
+> todo@0.0.1 test topcoat-touch-todo
+> mocha-phantomjs TestRunner.html
+
+  Test ToDoService
+    <span class="yeoman-green">âo"</span> should have 4 toDos
+    <span class="yeoman-green">âo"</span> toDo 1 should be named Test 1 Name
+    <span class="yeoman-green">âo"</span> toDo 4 should have a details called Test 4 Details
+    <span class="yeoman-green">âo"</span> removing toDo should cause 3 toDos to remain
+
+  Test Home Page
+    <span class="yeoman-green">âo"</span> should be on the home page
+    <span class="yeoman-green">âo"</span> toDo list should have 4 items
+    <span class="yeoman-green">âo"</span> toDo list item 1 should be called Test1Name
+    <span class="yeoman-green">âo"</span> toDo list item 3 should had id of 3
+
+  Test View ToDo
+    <span class="yeoman-green">âo"</span> View Should Have Test 2 Name
+
+  Test Add ToDo
+    <span class="yeoman-green">âo"</span> It should Add ToDo
+
+
+  <span class="yeoman-green">10 passing</span> (36ms)
+</code>
+
+   Hurrah!  Now you should add some more tests, add more functionality to app, and generally play around with the
+   framework.  Please post any issues you have with this tutorial on <a href="https://github.com/kriserickson/topcoat-touch-todo/issues">github</a>,
+   or send me a message on twitter <a href="https://twitter.com/ksoncan34/">ksoncan34</a>, or just send me an
+   email at ksoncan34@yahoo.ca.
 
 
     </div>
