@@ -876,7 +876,7 @@ function TopcoatTouch($container, options) {
         var scrollX = $scrollable.data('scroll-x');
 
         // Create the iScroll object...
-        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY});
+        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY, tap: true});
 
         _iScroll.on('scrollStart', function () {
             self.isScrolling = true;
