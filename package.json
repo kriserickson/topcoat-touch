@@ -1,16 +1,18 @@
 {
     "name": "topcoat-touch",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "devDependencies": {
-        "mocha": "1.16.1",
-        "chai": "1.8.1",
-        "mocha-phantomjs": "3.3.0"
+        "mocha": "1.18.2",
+        "chai": "1.9.1",
+        "mocha-phantomjs": "3.3.2",
+        "http-server": "0.6.1"
     },
     "repository": {
         "type": "git",
         "url": "https://github.com/kriserickson/topcoat-touch.git"
     },
     "scripts": {
-        "test": "mocha-phantomjs TestRunner.html"
+        "test": "mocha-phantomjs TestRunner.html",
+        "start": "http-server"
     }
 }

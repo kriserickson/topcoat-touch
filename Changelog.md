@@ -47,3 +47,8 @@ Version 0.3.3
 
 Version 0.3.4
 - Small bugfixes...
+
+Version 0.3.5
+- Let iScroll emit tap event when the scroll area is clicked/tapped but not scrolled.
+- Fix loading not properly showing overlay.
+- Updated components.

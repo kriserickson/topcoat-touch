@@ -101,7 +101,7 @@ function TopcoatTouch($container, options) {
                     var prevController = _controllers[$page.attr('id')];
                 }
 
-                
+
                 if (prevController) {
                     if (!_isDialog) {
                         prevController.pageend.call(prevController);
@@ -477,8 +477,7 @@ function TopcoatTouch($container, options) {
         }
         
         if (_isDialog) {
-            
-            showOverlay();
+            showOverlay(false);
             $prevPage.attr('class', 'page page-remove');
         } else {
             $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
@@ -501,8 +500,9 @@ function TopcoatTouch($container, options) {
         }
     }
     
-    function showOverlay() {
-        $container.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');        
+    function showOverlay(loadOnCurrentPage) {
+        var $overlayContainer = loadOnCurrentPage ? _$currentPage : $container;
+        $overlayContainer.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');
     }
     
     function removeOverlay() {
@@ -730,7 +730,7 @@ function TopcoatTouch($container, options) {
     };
     /**
      * Goes back one page, note: numberOfPages can come first...
-     * @param {callback} [Function}
+     * @param callback {Function}
      * @param [numberOfPages] {Number}
      */
     this.goBack = function (callback, numberOfPages) {
@@ -958,8 +958,8 @@ function TopcoatTouch($container, options) {
         _$loadingDiv = $(ui || '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
             '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
             '<span class="topcoat-spinner"></span></aside>');
-        showOverlay();
-        $container.append(_$loadingDiv);
+        showOverlay(true);
+        _$currentPage.append(_$loadingDiv);
     };
 
     /**
@@ -1025,7 +1025,7 @@ function TopcoatTouch($container, options) {
             '</div>');
 
 
-        $('.page-center').append($dialog);
+        _$currentPage.append($dialog);
         $dialog[1].style.top = "-1000px";
 
 
