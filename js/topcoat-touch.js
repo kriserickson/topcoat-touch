@@ -926,6 +926,14 @@ function TopcoatTouch($container, options) {
         }
     };
 
+    this.showSideDrawer = function() {
+        _$currentPage.addClass('with-side-drawer');
+    };
+
+    this.hideSideDrawer = function() {
+        _$currentPage.addClass('remove-side-drawer').removeClass('with-side-drawer');
+    };
+
     /**
      *
      * @param el {Element}
