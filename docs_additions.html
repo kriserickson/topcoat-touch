@@ -128,5 +128,57 @@
 });</code>
 
 
+        <h3>Side Drawer</h3>
+
+        <div>The side drawer is added to the bottom of the page and given the class "side-drawer".  It ias automatically
+            shown when the page is swiped to the right, and hidden when the page is swipped to the left (requires the
+            hammer.js library to be included in the project).  You can optionally add a button with the class
+            "side-drawer-toggle" that can be clicked to show or hide the side-drawer, or you can manually show and
+            hide the drawer by calling the method showSideDrawer() and hideSideDrawer() on the topcoat touch object.
+        </div>
+
+        <div>Step 1: A side drawer container.  </div>
+
+        <code class="language-markup">&lt;div class="side-drawer"&gt;
+    &lt;div class="topcoat-list__container"&gt;
+        &lt;ul class="topcoat-list"&gt;
+            &lt;li class="topcoat-list__item"&gt;
+                &lt;span class="formItem"&gt;List Item 1&lt;/span&gt;
+            &lt;/li&gt;
+            &lt;li class="topcoat-list__item"&gt;
+                &lt;span class="formItem"&gt;List Item 2&lt;/span&gt;
+            &lt;/li&gt;
+            &lt;li class="topcoat-list__item"&gt;
+                &lt;span class="formItem"&gt;List Item 3&lt;/span&gt;
+            &lt;/li&gt;
+            &lt;li class="topcoat-list__item"&gt;
+                &lt;span class="formItem"&gt;List Item 4&lt;/span&gt;
+            &lt;/li&gt;
+            &lt;li class="topcoat-list__item"&gt;
+                &lt;span class="formItem"&gt;List Item 5&lt;/span&gt;
+            &lt;/li&gt;
+            &lt;li class="topcoat-list__item"&gt;
+                &lt;span class="formItem"&gt;List Item 6&lt;/span&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt; </code>
+
+        <div>Step 2 (Optional): Add a button to show hide the side draw in the navigation header.</div>
+        
+        <code class="language-markup">&lt;div class="topcoat-navigation-bar__item left quarter"&gt;
+    &lt;a class="topcoat-icon-button--quiet side-drawer-toggle" href="#"&gt;
+        &lt;span class="topcoat-icon topcoat-icon--menu-stack"&gt;&lt;/span&gt;
+    &lt;/a&gt;
+&lt;/div&gt;</code>
+
+        <div>Step 2 b (Optional): show or hide the side-drawer.</div>
+
+        <code class="language-javascript">tt.showSideDrawer();
+... // Code Here
+tt.hideSideDrawer();</code>
+
+
+
     </div>
 </div>
