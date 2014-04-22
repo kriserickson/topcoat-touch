@@ -56,3 +56,6 @@ Version 0.3.5
 Version 0.4.0
 - Add side-drawer
 - Fix hammer.js events where multiple events where passed in the same string.
+
+Version 0.4.1
+- Fixes to get the new FastClick working with modern Android browsers.
