@@ -52,3 +52,7 @@ Version 0.3.5
 - Let iScroll emit tap event when the scroll area is clicked/tapped but not scrolled.
 - Fix loading not properly showing overlay.
 - Updated components.
+
+Version 0.4.0
+- Add side-drawer
+- Fix hammer.js events where multiple events where passed in the same string.

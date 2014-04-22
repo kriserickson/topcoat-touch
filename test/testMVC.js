@@ -53,7 +53,9 @@ describe('MVC Go home tests', function () {
 
     after(function () {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -114,7 +116,9 @@ describe('MVC Validate Topcoat Events fire...', function () {
 
     after(function () {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('should be on the home page', function () {
@@ -169,7 +173,9 @@ describe('MVC Dynamic Page', function () {
 
     after(function () {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 

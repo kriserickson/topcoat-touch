@@ -47,7 +47,7 @@ function TopcoatTouch($container, options) {
 
     // Setup the defaults
     var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50, menuHasIcons: false,
-        renderFunction: false, initializeFunction: false, exceptionOnError: false};
+        renderFunction: false, initializeFunction: false, exceptionOnError: false, hammerSwipeVelocity: 0.5};
     options = options || {};
     this.options = {};
     for (var defaultName in defaults) {
@@ -84,6 +84,21 @@ function TopcoatTouch($container, options) {
             arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
                 callback(_currentPage);
             });
+
+            if (_$currentPage.find('.side-drawer')) {
+                self.on('slideright dragright', function(ev) {
+                    self.showSideDrawer();
+                    ev.preventDefault();
+                    return false;
+                });
+                self.on('slideleft dragleft', function(ev) {
+                    if (_$currentPage.hasClass('with-side-drawer')) {
+                        self.hideSideDrawer();
+                        ev.preventDefault();
+                        return false;
+                    }
+                });
+            }
 
             // Remove the transition class, it isn't needed any more...
             $container.find('.page.transition').removeClass('transition');
@@ -142,6 +157,8 @@ function TopcoatTouch($container, options) {
                 // We disable tracking of fastclicks during a page switch...
                 _fastClick.trackingDisabled = false;
             }
+        } else if (_$currentPage.hasClass('remove-side-drawer')) {
+            _$currentPage.removeClass('remove-side-drawer');
         }
     });
 
@@ -194,6 +211,16 @@ function TopcoatTouch($container, options) {
     // setup the all the back buttons
     $container.on(self.clickEvent, '.back-button', function (e) {
         self.goBack();
+        e.preventDefault();
+        return false;
+    });
+
+    $container.on(self.clickEvent, '.side-drawer-toggle', function(e) {
+        if (_$currentPage.hasClass('with-side-drawer')) {
+            self.hideSideDrawer();
+        } else {
+            self.showSideDrawer();
+        }
         e.preventDefault();
         return false;
     });
@@ -466,11 +493,11 @@ function TopcoatTouch($container, options) {
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
         
         _stashedScroll = _isDialog && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
-        
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
 
+        // SkipUserEvents means we are going from a dialog, and we have to adjust the zIndex
         if (_skipUserEvents) {
              $prevPage.css('z-index', 30);
              $('#topcoat-loading-overlay-div').css('z-index', 25);
@@ -483,13 +510,9 @@ function TopcoatTouch($container, options) {
             $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
         }
         
- 
-
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
             callback(_previousPage);
         });
-
-        
     }
 
     function getPageName(page) {
@@ -549,13 +572,13 @@ function TopcoatTouch($container, options) {
     /**
      * Turn on delegated events
      *
-     * @param gesture {String}
+     * @param event {String}
      * @param selector {String}
      * @param [page] {String}
      * @param callback {Function}
      * @param type {String}
      */
-    function eventOn(gesture, selector, page, callback, type) {
+    function eventOn(event, selector, page, callback, type) {
         if (typeof selector == 'function') {
             callback = selector;
             selector = '';
@@ -566,37 +589,34 @@ function TopcoatTouch($container, options) {
         } else {
             page = fixPage(page);
         }
-        if (type == 'hammer' && !_hammer) {
-            _hammer = Hammer(document.body, {swipe_velocity: 0.5});
-        }
-        var gestures = gesture.split(' ');
-        for (var i = 0; i < gestures.length; i++) {
-            if (!_events[gestures[i]]) {
-                _events[gestures[i]] = [];
-                if (type == 'hammer') {
-                    _hammer.on(gestures[i], eventHandler);
-                } else if (type == 'jquery') {
-                    $container.on(gestures[i], eventHandler);
-                }
-            }
-            var pages = page ? page.split(' ') : [''];
-            for (var j = 0; j < pages.length; j++) {
-                _events[gestures[i]].push({selector: selector, callback: callback, page: pages[j].trim()});
+
+
+        if (!_events[event]) {
+            _events[event] = [];
+            if (type == 'hammer') {
+                _hammer.on(event, eventHandler);
+            } else if (type == 'jquery') {
+                $container.on(event, eventHandler);
             }
         }
+        var pages = page ? page.split(' ') : [''];
+        for (var j = 0; j < pages.length; j++) {
+            _events[event].push({selector: selector, callback: callback, page: pages[j].trim()});
+        }
+
     }
 
 
     /**
      * Turn off delegated events
      *
-     * @param gesture {String}
+     * @param event {String}
      * @param selector {String}
      * @param [page] {String}
      * @param callback {Function}
      * @param type {String}
      */
-    function eventOff(gesture, selector, page, callback, type) {
+    function eventOff(event, selector, page, callback, type) {
         if (typeof page == 'function') {
             callback = page;
             page = undefined;
@@ -604,23 +624,21 @@ function TopcoatTouch($container, options) {
             page = fixPage(page);
         }
 
-        var gestures = gesture.split(' ');
 
-        for (var i = 0; i < gestures.length; i++) {
-            var event = _events[gestures[i]];
-            if (event) {
-                for (var j = 0; j < event.length; j++) {
-                    if (event[j].selector == selector && (!page || event[j].page == page) && (!callback || event[j].callback == callback)) {
-                        event.splice(j, 1);
+        var storedEvent = _events[event];
+        if (storedEvent) {
+            for (var j = storedEvent.length - 1; j >=0; j--) {
+                if ((!selector || storedEvent[j].selector == selector) && (!page || storedEvent[j].page == page) &&
+                    (!callback || storedEvent[j].callback == callback)) {
+                    storedEvent.splice(j, 1);
+                }
+                if (storedEvent.length == 0) {
+                    if (type == 'hammer') {
+                        _hammer.off(event, eventHandler);
+                    } else if (type == 'jquery') {
+                        $container.off(event, eventHandler);
                     }
-                    if (event.length == 0) {
-                        if (type == 'hammer') {
-                            _hammer.off(gesture, eventHandler);
-                        } else if (type == 'jquery') {
-                            $container.off(gesture, eventHandler);
-                        }
-                        delete _events[gestures[i]];
-                    }
+                    delete _events[event];
                 }
             }
         }
@@ -643,6 +661,10 @@ function TopcoatTouch($container, options) {
         }
     };
 
+    this._getEvent = function(event) {
+        return _events[event];
+    };
+
     // Public functions
 
 
@@ -657,12 +679,19 @@ function TopcoatTouch($container, options) {
      */
     this.on = function (event, selector, page, callback) {
         event = event.toLocaleLowerCase();
-        if (checkForEvent(event)) {
-            eventOn(event, '', arguments[1], arguments[2], 'topcoat');
-        } else if (typeof Hammer === 'function' && HAMMER_EVENTS.indexOf(event) > -1) {
-            eventOn(event, selector, page, callback, 'hammer');
-        } else {
-            eventOn(event, selector, page, callback, 'jquery');
+
+        var events = event.split(' ');
+        for (var i = 0; i < events.length; i++) {
+            if (checkForEvent(events[i])) {
+                eventOn(events[i], '', arguments[1], arguments[2], 'topcoat');
+            } else if (typeof Hammer === 'function' && HAMMER_EVENTS.indexOf(events[i]) > -1) {
+                if (!_hammer) {
+                    _hammer = Hammer(document.body, {swipe_velocity: 0.5});
+                }
+                eventOn(events[i], selector, page, callback, 'hammer');
+            } else {
+                eventOn(events[i], selector, page, callback, 'jquery');
+            }
         }
         return self;
     };
@@ -678,12 +707,15 @@ function TopcoatTouch($container, options) {
      */
     this.off = function (event, selector, page, callback) {
         event = event.toLowerCase();
-        if (checkForEvent(event)) {
-            eventOff(event, '', arguments[1], arguments[2], 'topcoat');
-        } else if (typeof Hammer === 'function' && [HAMMER_EVENTS].indexOf(event) > -1) {
-            eventOff(event, selector, page, callback, 'hammer');
-        } else {
-            eventOff(event, selector, page, callback, 'jquery');
+        var events = event.split(' ');
+        for (var i = 0; i < events.length; i++) {
+            if (checkForEvent(events[i])) {
+                eventOff(events[i], '', arguments[1], arguments[2], 'topcoat');
+            } else if (typeof Hammer === 'function' && [HAMMER_EVENTS].indexOf(event) > -1) {
+                eventOff(events[i], selector, page, callback, 'hammer');
+            } else {
+                eventOff(events[i], selector, page, callback, 'jquery');
+            }
         }
         return self;
     };
@@ -728,9 +760,10 @@ function TopcoatTouch($container, options) {
     this.closeDialog = function () {
         this.goBack();
     };
+
     /**
      * Goes back one page, note: numberOfPages can come first...
-     * @param callback {Function}
+     * @param [callback] {Function}
      * @param [numberOfPages] {Number}
      */
     this.goBack = function (callback, numberOfPages) {
@@ -927,12 +960,17 @@ function TopcoatTouch($container, options) {
     };
 
     this.showSideDrawer = function() {
-        _$currentPage.addClass('with-side-drawer');
+        if (_$currentPage.find('.side-drawer').length > 0) {
+            _$currentPage.addClass('with-side-drawer');
+        }
     };
 
     this.hideSideDrawer = function() {
-        _$currentPage.addClass('remove-side-drawer').removeClass('with-side-drawer');
+        if (_$currentPage.hasClass('with-side-drawer')) {
+            _$currentPage.addClass('remove-side-drawer').removeClass('with-side-drawer');
+        }
     };
+
 
     /**
      *
