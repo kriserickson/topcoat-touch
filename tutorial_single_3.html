@@ -383,21 +383,20 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 
         You don't have to use this MochaPhantom combination, however the Yeoman Generator will probably start including
         it as a default option in the near future.  For now you are going to have to do a little work.  First, crack
-        open your package.json and add the following under devDependencies:
+        open your package.json and notice the follwing devDependencies have been added for you Yeonman:
 
         <code class="language-javascript">"mocha": "1.18.2",
     "chai": "1.9.1",
     "mocha-phantomjs": "3.3.2"</code>
 
         (Note: these modules change pretty fast, feel free to keep up to date with the latest versions, however I know that
-        there particular versions work).  Also add a new node call scripts, in the package.json
+        there particular versions work).  Also note the node in package.json called scripts:
 
         <code class="language-javascript">"scripts": {
     "test": "mocha-phantomjs TestRunner.html"
   }</code>
 
-        In your root diretory, run <code class="noblock">npm install</code>, to get the new pacakges.  Next you have to
-        create a file in the root of project (the same level as the package.json) called TestRunner.html:
+        Next open the file in the root of project (the same level as the package.json) called TestRunner.html, and take a look at it.
         
         <code class="language-markup">&lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -442,8 +441,7 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
         mocha.reporter('html');
         var expect = chai.expect;
     &lt;/script&gt;
-    &lt;script src="test/testToDoService.js"&gt;&lt;/script&gt;
-    &lt;!-- &lt;script src="test/testApp.js"&gt;&lt;/script&gt; --&gt;
+    &lt;script src="test/testApp.js"&gt;&lt;/script&gt;
 &lt;/head&gt;
 &lt;body&gt;
     &lt;div id="mocha"&gt;
@@ -472,9 +470,19 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 &lt;/body&gt;
 &lt;/html&gt;</code>
 
-        This file will run all of our tests (both Unit and E2E).  For now we are only creating unit tests, so lets create the
-        tests for toDoService.  First create a directory called <code class="noblock">test</code>, and add a file called
-        <code class="noblock">testToDoService.js</code>, which contains some simple tests of our ToDo service:
+        Go the file and change two lines, first comment out the reference to testApp.js and add a reference to a file called
+        testToDoService.js.
+
+        <code class="language-markup">&lt;script src="test/testApp.js"&gt;&lt;/script&gt;</code>
+
+        Becomes:
+
+        <code class="language-markup">&lt;script src="test/testToDoService.js"&gt;&lt;/script&gt;
+        &lt;-- &lt;script src="test/testApp.js"&gt;&lt;/script&gt; --&gt;</code>
+
+        The TestRunner.html file will run all of our tests (both Unit and E2E).  For now we are only creating unit tests, so lets create the
+        tests for toDoService.  First create a file called <code class="noblock">testToDoService.js</code> in the <code class="noblock">test</code> directory.
+        This file will contain some simple tests of our ToDo service:
 
         <code class="language-javascript">describe("Test ToDoService", function () {
     var toDoService;
@@ -532,6 +540,7 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
 
     <code class="language-markup">&lt;script&gt;
     if (window.location.hash == '#testing') {
+        &lt;-- Add Code here --&gt;
         window.injectedStorage = {todos: "{\"1\":{\"id\":1,\"name\":\"Test 1 Name\",\"details\":\"Test 1 Details.\",\"dateDue\":\"2014-01-01T00:00:00.000Z\",\"complete\":false}," +
                 "\"2\":{\"id\":2,\"name\":\"Test 2 Name\",\"details\":\"Test 2 Details\",\"dateDue\":\"2014-05-02T00:00:00.000Z\",\"complete\":true}," +
                 "\"3\":{\"id\":3,\"name\":\"Test 3 Name\",\"details\":\"Test 3 Details\",\"dateDue\":\"2014-05-05T00:00:00.000Z\",\"complete\":false}," +
@@ -559,8 +568,8 @@ tt.on(tt.EVENTS.PAGE_END, 'home', function() {
     look at the <code class="noblock">$('#testContainer').on('load', function() {</code> code and make sure you understand
     what is going on.  There is a little Mocha housekeeping to run one way in the browser and another in PhatomJS.<br/><br/>
 
-    Now let's write some end to end tests.  Create another file in the test folder, called testApp.js.  First we will
-    test that the home page is loaded and it has some events.
+    Now let's write some end to end tests.  Open the default testApp.js file in the test folder, and remove it's contents.
+    In the new testApp.js we will test that the home page is loaded and it has some events.
 
    <code class="language-javascript">describe("Test Home Page", function () {
 
