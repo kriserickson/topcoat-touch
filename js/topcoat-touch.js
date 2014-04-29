@@ -90,7 +90,7 @@ function TopcoatTouch($container, options) {
                 callback(_currentPage);
             });
 
-            if (_$currentPage.find('.side-drawer')) {
+            if (_$currentPage.find('.side-drawer').length) {
                 self.on('slideright dragright', function(ev) {
                     self.showSideDrawer();
                     ev.preventDefault();
