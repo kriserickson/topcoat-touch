@@ -57,14 +57,9 @@ function TopcoatTouch($container, options) {
     }
 
     // Setup FastClick...
-    if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) == false) {        
+    if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) == false) {
         _fastClick = new FastClick(document.body);
         this.clickEvent = 'click';
-    } else if (this.clickEvent == 'click' && !_fastClick) {
-        $container.on('touchend', function(e) {
-            e.type = 'click';
-            eventHandler(e);
-        });
     }
 
     // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
@@ -80,7 +75,7 @@ function TopcoatTouch($container, options) {
         if (_startedAnimation) {
 
             setupIScroll();
-            
+
             if (_skipUserEvents && _iScroll && _stashedScroll) {
                 _iScroll.scrollTo(_stashedScroll.x, _stashedScroll.y);
             }
@@ -91,12 +86,12 @@ function TopcoatTouch($container, options) {
             });
 
             if (_$currentPage.find('.side-drawer').length) {
-                self.on('slideright dragright', function(ev) {
+                self.on('slideright dragright', function (ev) {
                     self.showSideDrawer();
                     ev.preventDefault();
                     return false;
                 });
-                self.on('slideleft dragleft', function(ev) {
+                self.on('slideleft dragleft', function (ev) {
                     if (_$currentPage.hasClass('with-side-drawer')) {
                         self.hideSideDrawer();
                         ev.preventDefault();
@@ -114,7 +109,7 @@ function TopcoatTouch($container, options) {
             if (_controller) {
                 if (!_skipUserEvents) {
                     _controller.pagestart.call(_controller);
-                }                
+                }
                 _controller._pagestart.call(_controller);
                 var $page = $container.find('.page-remove');
                 if ($page.length > 0) {
@@ -128,8 +123,8 @@ function TopcoatTouch($container, options) {
                     }
                     prevController._pageend.call(prevController);
                 }
-                
-                if (!_isDialog) {                    
+
+                if (!_isDialog) {
                     $page.remove();
                 }
                 if (_skipUserEvents) {
@@ -146,7 +141,7 @@ function TopcoatTouch($container, options) {
                 _controller = null;
             } else {
                 // Remove unused classes
-                if (!_isDialog) { 
+                if (!_isDialog) {
                     $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
                 }
                 if (_skipUserEvents) {
@@ -166,8 +161,6 @@ function TopcoatTouch($container, options) {
             _$currentPage.removeClass('remove-side-drawer');
         }
     });
-
-
 
 
     // End Dropdown Box
@@ -428,15 +421,15 @@ function TopcoatTouch($container, options) {
         }
 
         // Position the page at the starting position of the animation
-        _$currentPage.attr('class', 'page ' + pageClass.next);        
-        
+        _$currentPage.attr('class', 'page ' + pageClass.next);
+
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
         //noinspection BadExpressionStatementJS  
         $container.get(0).offsetWidth;
 
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
-        
+
         _stashedScroll = _isDialog && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
@@ -444,17 +437,17 @@ function TopcoatTouch($container, options) {
 
         // SkipUserEvents means we are going from a dialog, and we have to adjust the zIndex
         if (_skipUserEvents) {
-             $prevPage.css('z-index', 30);
-             $('#topcoat-loading-overlay-div').css('z-index', 25);
+            $prevPage.css('z-index', 30);
+            $('#topcoat-loading-overlay-div').css('z-index', 25);
         }
-        
+
         if (_isDialog) {
             showOverlay(false);
             $prevPage.attr('class', 'page page-remove');
         } else {
             $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
         }
-        
+
         arrayEach(getActiveEvents(self.EVENTS.PAGE_END, _previousPage), function (callback) {
             callback(_previousPage);
         });
@@ -467,12 +460,12 @@ function TopcoatTouch($container, options) {
             return $(page).attr('id');
         }
     }
-    
+
     function showOverlay(loadOnCurrentPage) {
         var $overlayContainer = loadOnCurrentPage ? _$currentPage : $container;
         $overlayContainer.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');
     }
-    
+
     function removeOverlay() {
         $('#topcoat-loading-overlay-div').remove();
     }
@@ -572,7 +565,7 @@ function TopcoatTouch($container, options) {
 
         var storedEvent = _events[event];
         if (storedEvent) {
-            for (var j = storedEvent.length - 1; j >=0; j--) {
+            for (var j = storedEvent.length - 1; j >= 0; j--) {
                 if ((!selector || storedEvent[j].selector == selector) && (!page || storedEvent[j].page == page) &&
                     (!callback || storedEvent[j].callback == callback)) {
                     storedEvent.splice(j, 1);
@@ -606,7 +599,7 @@ function TopcoatTouch($container, options) {
         }
     };
 
-    this._getEvent = function(event) {
+    this._getEvent = function (event) {
         return _events[event];
     };
 
@@ -640,7 +633,6 @@ function TopcoatTouch($container, options) {
         }
         return self;
     };
-    
 
 
     /**
@@ -856,7 +848,7 @@ function TopcoatTouch($container, options) {
         var scrollX = $scrollable.data('scroll-x');
 
         // Create the iScroll object...
-        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY, tap: true});
+        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY, tap: true, preventDefault: false});
 
         _iScroll.on('scrollStart', function () {
             self.isScrolling = true;
@@ -906,13 +898,13 @@ function TopcoatTouch($container, options) {
         }
     };
 
-    this.showSideDrawer = function() {
+    this.showSideDrawer = function () {
         if (_$currentPage.find('.side-drawer').length > 0) {
             _$currentPage.addClass('with-side-drawer');
         }
     };
 
-    this.hideSideDrawer = function() {
+    this.hideSideDrawer = function () {
         if (_$currentPage.hasClass('with-side-drawer')) {
             _$currentPage.addClass('remove-side-drawer').removeClass('with-side-drawer');
         }
@@ -949,8 +941,8 @@ function TopcoatTouch($container, options) {
         }
         _loadingShowing = true;
         _$loadingDiv = $(ui || '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
-            '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
-            '<span class="topcoat-spinner"></span></aside>');
+        '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
+        '<span class="topcoat-spinner"></span></aside>');
         showOverlay(true);
         _$currentPage.append(_$loadingDiv);
     };
@@ -971,7 +963,7 @@ function TopcoatTouch($container, options) {
     this.hideLoading = function () {
         if (_loadingShowing) {
             _loadingShowing = false;
-            removeOverlay();            
+            removeOverlay();
             _$loadingDiv.remove();
         }
         return self;
@@ -1011,11 +1003,11 @@ function TopcoatTouch($container, options) {
         }
 
         var $dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
-            '<div id="topcoat-dialog-div" class="topcoat-overlay">' +
-            '<div class="topcoat-dialog-header">' + title + '</div>' +
-            '<div class="topcoat-dialog-content">' + content + '</div>' +
-            '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
-            '</div>');
+        '<div id="topcoat-dialog-div" class="topcoat-overlay">' +
+        '<div class="topcoat-dialog-header">' + title + '</div>' +
+        '<div class="topcoat-dialog-content">' + content + '</div>' +
+        '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
+        '</div>');
 
 
         _$currentPage.append($dialog);
@@ -1142,7 +1134,7 @@ function TopcoatTouch($container, options) {
         return false;
     });
 
-    this.on(self.clickEvent, '.side-drawer-toggle', function(e) {
+    this.on(self.clickEvent, '.side-drawer-toggle', function (e) {
         if (_$currentPage.hasClass('with-side-drawer')) {
             self.hideSideDrawer();
         } else {
@@ -1218,8 +1210,8 @@ function TopcoatTouch($container, options) {
                 for (var i = 0; i < menuItems.length; i++) {
                     if (menuItems[i].id) {
                         menuDiv += '<li class="menuItem" id="menuItem' + ucFirst(menuItems[i].id) + '" data-id="' + menuItems[i].id + '">' +
-                            (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
-                            '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
+                        (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
+                        '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
                     } else {
                         menuDiv += '<li><hr></li>';
                     }
@@ -1314,7 +1306,8 @@ function PageController(pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            this[name] = fns[name] || defaultFunctions[name] || function () { };
+            this[name] = fns[name] || defaultFunctions[name] || function () {
+            };
         }
     }
 
@@ -1360,7 +1353,7 @@ function PageController(pageName, fns, data, tt) {
      * Helper funciton to go to a page.
      * @param [transition] {String}
      */
-    this.goTo = function(transition) {
+    this.goTo = function (transition) {
         self.tt.goTo(self.pageName, transition);
     };
 
