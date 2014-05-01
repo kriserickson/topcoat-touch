@@ -13,7 +13,7 @@
     <!-- This apps stylesheet -->
     <link href="css/app.css" rel="stylesheet">
     <!-- jQuery is currently required -->
-    <script src="../../js/jquery-2.0.3.js"></script>
+    <script src="../../js/jquery.js"></script>
     <!--  The topcoat touch library -->
     <script src="../../js/topcoat-touch.js"></script>
     <!-- iScroll is not required, feel to remove it you aren't scrolling anything, also you could replace it IScroll lite -->
@@ -29,6 +29,9 @@
 <div id="home">
     <div class="topcoat-navigation-bar"> <!-- Navigation bar -->
         <div class="topcoat-navigation-bar__item left quarter">
+            <a class="topcoat-icon-button--quiet side-drawer-toggle" href="#">
+                <span class="topcoat-icon topcoat-icon--menu-stack"></span>
+            </a>
         </div>
         <div class="topcoat-navigation-bar__item center half">
             <h1 class="topcoat-navigation-bar__title">Topcoat Touch</h1>
@@ -64,6 +67,30 @@
                 <li class="topcoat-list__item" data-rel="carouselExample">
                     <span class="formItem">Carousel Example</span><span class="chevron"></span><span
                         class="count"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="side-drawer">
+        <div class="topcoat-list__container">
+            <ul class="topcoat-list">
+                <li class="topcoat-list__item">
+                    <span class="formItem">List Item 1</span>
+                </li>
+                <li class="topcoat-list__item">
+                    <span class="formItem">List Item 2</span>
+                </li>
+                <li class="topcoat-list__item">
+                    <span class="formItem">List Item 3</span>
+                </li>
+                <li class="topcoat-list__item">
+                    <span class="formItem">List Item 4</span>
+                </li>
+                <li class="topcoat-list__item">
+                    <span class="formItem">List Item 5</span>
+                </li>
+                <li class="topcoat-list__item">
+                    <span class="formItem">List Item 6</span>
                 </li>
             </ul>
         </div>
@@ -277,7 +304,8 @@
             <br>
             <br>
             <label class="topcoat-switch">
-                <input type="checkbox" class="topcoat-switch__input" disabled>
+                <input type="checkbox" class="topcoat-switch__input" disabled
+                        >
 
                 <div class="topcoat-switch__toggle"></div>
             </label>

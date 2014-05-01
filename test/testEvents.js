@@ -25,16 +25,18 @@ describe('Test on event', function() {
         window.$ = jQuery;
         $('body').append(testPageHtml);
         tt = new TopcoatTouch($('#testContainer'));
-        tt.goTo('home');
         tt.on(tt.EVENTS.PAGE_START, 'home', function () {
             onFired = true;
             done();
         });
+        tt.goTo('home');
     });
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START, 'home');
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -70,6 +72,9 @@ describe('On should fire on every page', function() {
 
     after(function() {
         $('#testContainer').remove();
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('on should have fired 2 times', function() {
@@ -108,7 +113,9 @@ describe('On should fire on fire on home and page2', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('on should have fired 2 times', function() {
@@ -153,7 +160,12 @@ describe('Button events should only fire when we are on a page', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
+        tt.off(tt.clickEvent);
+        var clickEvents = tt._getEvent(tt.clickEvent);
+        expect(!!clickEvents).to.be.false;
     });
 
     it('on should have fired on page2', function() {
@@ -196,7 +208,9 @@ describe('Not setting a page should fire on every page', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('on should have fired 3 times', function() {
@@ -241,7 +255,12 @@ describe('Not setting a selector should still trigger event', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
+        tt.off(tt.clickEvent);
+        var clickEvents = tt._getEvent(tt.clickEvent);
+        expect(!!clickEvents).to.be.false;
     });
 
     it('on should have fired on page2', function() {
@@ -290,7 +309,12 @@ describe('Not setting a selector or page should still trigger event', function()
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
+        tt.off(tt.clickEvent);
+        var clickEvents = tt._getEvent(tt.clickEvent);
+        expect(!!clickEvents).to.be.false;
     });
 
     it('on should have fired on page2', function() {
@@ -302,3 +326,57 @@ describe('Not setting a selector or page should still trigger event', function()
     });
 
 });
+
+describe('space separated events should both register', function() {
+
+    var tt;
+    var onFiredMouseUp = false;
+    var onFiredMouseDown = false;
+
+    before(function(done) {
+        window.$ = jQuery;
+        $('body').append(testPageHtml);
+        tt = new TopcoatTouch($('#testContainer'));
+        tt.on('mouseup mousedown', function(ev) {
+            if (ev.type == 'mousedown') {
+                // We have to use the query selector here, since currentPageFind will NOT find the gotoPage3Button..
+                $('#gotoPage3Button').trigger('mouseup');
+                onFiredMouseDown = true;
+            } else if (ev.type == 'mouseup') {
+                onFiredMouseUp = true;
+                done();
+            }
+        });
+        tt.on(tt.EVENTS.PAGE_START, function() {
+            if (tt.currentPage() == 'home') {
+                setTimeout(function() {
+                    $('#gotoPage3Button').trigger('mousedown');
+                }, 1);
+            }
+        });
+        tt.goTo('home');
+    });
+
+    after(function() {
+        $('#testContainer').remove();
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
+        tt.off('mousedown mouseup');
+        var mouseDownEvent = tt._getEvent('mousedown');
+        expect(!!mouseDownEvent).to.be.false;
+        var mouseUpEvent = tt._getEvent('mouseup');
+        expect(!!mouseUpEvent).to.be.false;
+    });
+
+    it('on should have fired on mousedown', function() {
+        expect(onFiredMouseDown).to.be.true;
+
+    });
+
+    it('on should have fired on mouseup', function() {
+        expect(onFiredMouseUp).to.be.true;
+    });
+
+});
+

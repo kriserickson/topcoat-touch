@@ -44,3 +44,18 @@ Version 0.3.1
 
 Version 0.3.3
 - Don't go to a page if you have already been there.
+
+Version 0.3.4
+- Small bugfixes...
+
+Version 0.3.5
+- Let iScroll emit tap event when the scroll area is clicked/tapped but not scrolled.
+- Fix loading not properly showing overlay.
+- Updated components.
+
+Version 0.4.0
+- Add side-drawer
+- Fix hammer.js events where multiple events where passed in the same string.
+
+Version 0.4.1
+- Fixes to get the new FastClick working with modern Android browsers.

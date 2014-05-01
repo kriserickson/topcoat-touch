@@ -73,7 +73,9 @@ describe('Single Page Go home tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -109,7 +111,9 @@ describe('Single Page Go to page2 tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -160,7 +164,9 @@ describe('Single Page Go to jQuery object tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -196,7 +202,9 @@ describe('Single Page Go to cssSelector tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('currentPage should be page2', function() {
@@ -237,7 +245,9 @@ describe('Single Page back to home tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('should be on the home page', function() {
@@ -279,7 +289,9 @@ describe('Single Page Click to page 3 tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
     it('should be on the page3', function() {
@@ -324,7 +336,9 @@ describe('Single Page Show Loading tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -363,7 +377,9 @@ describe('Single Page Simple Dialog tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
@@ -412,7 +428,9 @@ describe('Single Page Complex Dialog tests', function() {
 
     after(function() {
         $('#testContainer').remove();
-
+        tt.off(tt.EVENTS.PAGE_START);
+        var pageEvents = tt._getEvent(tt.EVENTS.PAGE_START);
+        expect(!!pageEvents).to.be.false;
     });
 
 
