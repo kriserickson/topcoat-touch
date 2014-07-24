@@ -1,25 +1,26 @@
 function TopcoatTouch($container, options) {
 
-    var _$currentPage,
-        _$loadingDiv,
-        _currentPage,
-        _previousPage,
-        _startedAnimation,
-        _dialogShowing,
-        _loadingShowing,
-        _iScroll = null,
-        _events = {},
-        _hammer,
-        _pages = [],
-        _controllers = {},
-        _controller,
-        _fastClick,
-        _showingMenu,
-        _isDialog,
-        _skipUserEvents,
-        _stashedScroll,
-        _backCallback,
-        self = this;
+    var _$currentPage;
+    var _$loadingDiv;
+    var _currentPage;
+    var _previousPage;
+    var _startedAnimation;
+    var _dialogShowing;
+    var _loadingShowing;
+    var _iScroll = null;
+    var _events = {};
+    var _hammer;
+    var _pages = [];
+    var _controllers = {};
+    var _controller;
+    var _fastClick;
+    var _showingMenu;
+    var _isDialog;
+    var _dialogTransition;
+    var _skipUserEvents;
+    var _stashedScroll;
+    var _backCallback;
+    var self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
         'dragright', 'swipe', 'swipeup', 'swipedown', 'swipeleft', 'swiperight', 'transform', 'transformstart',
@@ -47,19 +48,19 @@ function TopcoatTouch($container, options) {
 
     // Setup the defaults
     var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50, menuHasIcons: false,
-        renderFunction: false, initializeFunction: false, exceptionOnError: false, hammerSwipeVelocity: 0.5};
+        renderFunction: false, initializeFunction: false, exceptionOnError: false, hammerSwipeVelocity: 0.5, iScrollPreventDefault: false};
     options = options || {};
-    this.options = {};
-    for (var defaultName in defaults) {
-        if (defaults.hasOwnProperty(defaultName)) {
-            this.options[defaultName] = options[defaultName] || defaults[defaultName];
-        }
-    }
+
+    this.options = $.extend(defaults, options);
 
     // Setup FastClick...
-    if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) == false) {
+    if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) === false) {
         _fastClick = new FastClick(document.body);
         this.clickEvent = 'click';
+    }
+
+    if (typeof Hammer === 'function') {
+        this.clickEvent = 'tap';
     }
 
     // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
@@ -408,16 +409,17 @@ function TopcoatTouch($container, options) {
         _$currentPage = $page;
 
         // Transition type one of page-left, page-right, page-down, pop and flip...
-        transition = transition ? transition.toLowerCase() : 'slideleft';
+        transition = transition ? transition.toLowerCase() : 'none';
 
-        var pageClass = TRANSITIONS[transition] || TRANSITIONS['slideleft'];
+        var pageClass = TRANSITIONS[transition] || TRANSITIONS['none'];
         if (_isDialog) {
-            pageClass = {next: '', prev: _isDialog};
+            pageClass = {next: '', prev: _dialogTransition};
             _isDialog = false;
             _skipUserEvents = true;
         } else {
             _skipUserEvents = false;
-            _isDialog = dialog ? pageClass.next : false;
+            _isDialog = dialog;
+            _dialogTransition = pageClass.next;
         }
 
         // Position the page at the starting position of the animation
@@ -570,7 +572,7 @@ function TopcoatTouch($container, options) {
                     (!callback || storedEvent[j].callback == callback)) {
                     storedEvent.splice(j, 1);
                 }
-                if (storedEvent.length == 0) {
+                if (storedEvent.length === 0) {
                     if (type == 'hammer') {
                         _hammer.off(event, eventHandler);
                     } else if (type == 'jquery') {
@@ -707,10 +709,11 @@ function TopcoatTouch($container, options) {
      */
     this.goBack = function (callback, numberOfPages) {
         if (typeof callback != 'function') {
-            numberOfPages = callback;
+            numberOfPages = callback || 1;
             _backCallback = undefined;
         } else {
             _backCallback = callback;
+            numberOfPages = numberOfPages || 1;
         }
         if (numberOfPages) {
             if (_pages.length > numberOfPages) {
@@ -726,7 +729,7 @@ function TopcoatTouch($container, options) {
         }
 
         if (self.hasBack()) {
-            this.goTo(_pages[_pages.length - 2], 'slideright', false, true);
+            this.goTo(_pages[_pages.length - 2], 'none', false, true);
         } else {
             if (callback) {
                 _pages = [];
@@ -748,7 +751,7 @@ function TopcoatTouch($container, options) {
     this.goTo = function (page, transition, dialog, back) {
 
         if (page == _currentPage) {
-            return;
+            return self;
         }
 
         if (_currentPage == getPageName(page)) {
@@ -756,7 +759,7 @@ function TopcoatTouch($container, options) {
         }
 
         if (_isDialog && !back) {
-            throw 'Cannot goTo a page when a dialog is showing, can only go back..';
+            throw 'Cannot goTo a page when a dialog is showing, can only go back.. On page ' + _currentPage.id + ' going to page ' + getPageName(page);
         }
 
         _previousPage = _currentPage;
@@ -819,7 +822,7 @@ function TopcoatTouch($container, options) {
     };
 
     this.clearHistory = function (removeAllPages) {
-        if (removeAllPages || _pages.length == 0) {
+        if (removeAllPages || _pages.length === 0) {
             _pages = [];
         } else {
             _pages = [_pages[_pages.length - 1]];
@@ -848,7 +851,7 @@ function TopcoatTouch($container, options) {
         var scrollX = $scrollable.data('scroll-x');
 
         // Create the iScroll object...
-        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY, tap: true, preventDefault: false});
+        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY, tap: true, preventDefault: this.options.iScrollPreventDefault});
 
         _iScroll.on('scrollStart', function () {
             self.isScrolling = true;
@@ -869,7 +872,7 @@ function TopcoatTouch($container, options) {
      * Destroys the iScroll object if it is instantiated to free memory and resources.
      */
     this.destroyScroll = function () {
-        if (_iScroll != null) {
+        if (_iScroll !== null) {
             _iScroll.destroy();
             _iScroll = null;
         }
@@ -879,7 +882,7 @@ function TopcoatTouch($container, options) {
      * Refreshes the iScroll in case the page size has changed without leaving and coming back to the page...
      */
     this.refreshScroll = function () {
-        if (_iScroll != null) {
+        if (_iScroll !== null) {
             _iScroll.refresh();
         }
     };
@@ -893,7 +896,7 @@ function TopcoatTouch($container, options) {
      * @param [easing] {String}
      */
     this.scrollTo = function (x, y, duration, easing) {
-        if (_iScroll != null) {
+        if (_iScroll !== null) {
             _iScroll.scrollTo(x, y, duration, easing);
         }
     };
@@ -920,7 +923,7 @@ function TopcoatTouch($container, options) {
      * @param [easing] {String}
      */
     this.scrollToElement = function (el, time, offsetX, offsetY, easing) {
-        if (_iScroll != null) {
+        if (_iScroll !== null) {
             if (el instanceof jQuery) {
                 el = el[0];
             }
@@ -1306,8 +1309,7 @@ function PageController(pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            this[name] = fns[name] || defaultFunctions[name] || function () {
-            };
+            this[name] = fns[name] || defaultFunctions[name] || function () { };
         }
     }
 
