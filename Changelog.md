@@ -59,3 +59,9 @@ Version 0.4.0
 
 Version 0.4.1
 - Fixes to get the new FastClick working with modern Android browsers.
+
+Version 0.4.2
+- Fix to examples, using href="#" created another entry on the popstack which caused
+  back to need to be pressed twice if the menu or side-drawer was ever shown.
+- Fix for Pop creating a blurry page in Android 4.4 WebView (Chrome 30).
+- Tap and click adjustments when using tt.clickEvent

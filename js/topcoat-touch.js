@@ -59,7 +59,8 @@ function TopcoatTouch($container, options) {
         this.clickEvent = 'click';
     }
 
-    if (typeof Hammer === 'function') {
+    // Use Hammer for clickevent handling...
+    if (typeof Hammer === 'function' && this.clickEvent === 'touchend') {
         this.clickEvent = 'tap';
     }
 
