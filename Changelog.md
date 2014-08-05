@@ -65,3 +65,9 @@ Version 0.4.2
   back to need to be pressed twice if the menu or side-drawer was ever shown.
 - Fix for Pop creating a blurry page in Android 4.4 WebView (Chrome 30).
 - Tap and click adjustments when using tt.clickEvent
+
+Version 0.4.3
+- Added simple toast (tt.showToast(msg))
+- Improved event adding (allow either comma separated lists or arrays of selectors).
+- Change transition default back to slideleft.
+- Added a TRANSITIONS object to tt which means you don't have to use strings to specify transitions.
