@@ -41,7 +41,7 @@ function TopcoatTouch($container, options) {
     this.EVENTS = {PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
         MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', BACK: 'back'};
 
-    this.TRANSITIONS = {LEFT: 'slideleft', RIGHT: 'slighright', DOWN: 'slidedown', POP: 'pop', FLIP: 'flip', NONE: 'none'};
+    this.TRANSITIONS = {LEFT: 'slideleft', RIGHT: 'slideright', DOWN: 'slidedown', POP: 'pop', FLIP: 'flip', NONE: 'none'};
 
     this.isScrolling = false;
     this.clickEvent = 'ontouchend' in document.documentElement ? 'touchend' : 'click';
