@@ -33,13 +33,15 @@ function TopcoatTouch($container, options) {
     }
     $container = $container || $('body');
 
-    var TRANSITIONS = {slideleft: {next: 'page-right', prev: 'page-left'}, slideright: {next: 'page-left', prev: 'page-right'},
+    var TRANSITION_TO_CLASS = {slideleft: {next: 'page-right', prev: 'page-left'}, slideright: {next: 'page-left', prev: 'page-right'},
         slidedown: {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'page-scale', prev: ''},
         flip: {next: 'page-flip', prev: 'page-flip'}, none: {next: '', prev: ''}};
 
     // The TT events...
     this.EVENTS = {PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
         MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', BACK: 'back'};
+
+    this.TRANSITIONS = {LEFT: 'slideleft', RIGHT: 'slideright', DOWN: 'slidedown', POP: 'pop', FLIP: 'flip', NONE: 'none'};
 
     this.isScrolling = false;
     this.clickEvent = 'ontouchend' in document.documentElement ? 'touchend' : 'click';
@@ -183,6 +185,7 @@ function TopcoatTouch($container, options) {
                 arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
                     if (callback(_currentPage) === false) {
                         goBack = false;
+                        return false;
                     }
                 });
                 if (goBack) {
@@ -262,8 +265,9 @@ function TopcoatTouch($container, options) {
      * @param callback
      */
     function arrayEach(arr, callback) {
-        for (var index = 0; index < arr.length; index++) {
-            callback(arr[index], index);
+        var cont;
+        for (var index = 0; cont !== false && index < arr.length; index++) {
+            cont = callback(arr[index], index);
         }
     }
 
@@ -310,7 +314,7 @@ function TopcoatTouch($container, options) {
                 }
             }
         }
-        return callbacks;
+        return callbacks.reverse();
     }
 
     /**
@@ -360,8 +364,10 @@ function TopcoatTouch($container, options) {
      * @param back {Boolean}
      * @param transition {String}
      * @param dialog {Boolean}
+     * @param [noOverlay] {Boolean}
+     * @param [dontResetPage] (Boolean)
      */
-    function goToPage(page, $page, back, transition, dialog) {
+    function goToPage(page, $page, back, transition, dialog, noOverlay, dontResetPage) {
         var pagesLength = _pages.length;
 
         // If this is the first page...
@@ -380,7 +386,7 @@ function TopcoatTouch($container, options) {
             } else {
                 _pages.push(page);
             }
-            goDirectly($page, transition, dialog);
+            goDirectly($page, transition, dialog, noOverlay, dontResetPage, back);
         }
     }
 
@@ -389,8 +395,11 @@ function TopcoatTouch($container, options) {
      * @param $page {jQuery}
      * @param transition {String}
      * @param [dialog] {Boolean}
+     * @param [noOverlay] {Boolean}
+     * @param [dontResetPage] (Boolean)
+     * @param [back] (Boolean)
      */
-    function goDirectly($page, transition, dialog) {
+    function goDirectly($page, transition, dialog, noOverlay, dontResetPage, back) {
 
         // Transition type one of page-left, page-right, page-down, pop and flip...
 
@@ -410,9 +419,9 @@ function TopcoatTouch($container, options) {
         _$currentPage = $page;
 
         // Transition type one of page-left, page-right, page-down, pop and flip...
-        transition = transition ? transition.toLowerCase() : 'none';
+        transition = transition ? transition.toLowerCase() : self.TRANSITIONS.LEFT;
 
-        var pageClass = TRANSITIONS[transition] || TRANSITIONS['none'];
+        var pageClass = TRANSITION_TO_CLASS[transition] || TRANSITION_TO_CLASS[self.TRANSITIONS.LEFT];
         if (_isDialog) {
             pageClass = {next: '', prev: _dialogTransition};
             _isDialog = false;
@@ -433,7 +442,9 @@ function TopcoatTouch($container, options) {
         // Position the page at the starting position of the animation        
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
 
-        _stashedScroll = _isDialog && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
+        if (!back) {
+            _stashedScroll = (_isDialog || dontResetPage) && _iScroll ? {x: _iScroll.x, y: _iScroll.y} : false;
+        }
 
         // Position the new page and the current page at the ending position of their animation with a transition class indicating the duration of the animation
         _$currentPage.attr('class', 'page page-center ' + pageTransition);
@@ -445,7 +456,9 @@ function TopcoatTouch($container, options) {
         }
 
         if (_isDialog) {
-            showOverlay(false);
+            if (!noOverlay) {
+            	showOverlay(false);
+            }
             $prevPage.attr('class', 'page page-remove');
         } else {
             $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
@@ -624,7 +637,14 @@ function TopcoatTouch($container, options) {
         var events = event.split(' ');
         for (var i = 0; i < events.length; i++) {
             if (checkForEvent(events[i])) {
-                eventOn(events[i], '', arguments[1], arguments[2], 'topcoat');
+                // For now we assume that for topcoat touch events we need a page, and if only a single string
+                // is passed in it is a page and not a selector.  Not true for jQuery and Hammer events...
+                if (typeof page === 'function') {
+                    callback = page;
+                    page = selector;
+                    selector = '';
+                }
+                eventOn(events[i], selector, page, callback, 'topcoat');
             } else if (typeof Hammer === 'function' && HAMMER_EVENTS.indexOf(events[i]) > -1) {
                 if (!_hammer) {
                     _hammer = Hammer(document.body, {swipe_velocity: 0.5});
@@ -707,30 +727,31 @@ function TopcoatTouch($container, options) {
      * Goes back one page, note: numberOfPages can come first...
      * @param [callback] {Function}
      * @param [numberOfPages] {Number}
+     * @param [dontResetPage] (Boolean)
      */
-    this.goBack = function (callback, numberOfPages) {
+    this.goBack = function (callback, numberOfPages, dontResetPage) {
         if (typeof callback != 'function') {
-            numberOfPages = callback || 1;
+            numberOfPages = callback;
             _backCallback = undefined;
         } else {
             _backCallback = callback;
-            numberOfPages = numberOfPages || 1;
         }
+        if (typeof numberOfPages != 'number') {
+            dontResetPage = numberOfPages;
+            numberOfPages = 1;
+        }
+
         if (numberOfPages) {
             if (_pages.length > numberOfPages) {
                 // Remove all but the last page...
                 for (var i = 0; i < numberOfPages - 1; i++) {
                     _pages.pop();
                 }
-
-            } else {
-                this._error('Cannot go back ' + numberOfPages + ', there are only ' + _pages.length + ' pages on the backstack');
-                return;
-            }
+            } 
         }
 
         if (self.hasBack()) {
-            this.goTo(_pages[_pages.length - 2], 'none', false, true);
+            this.goTo(_pages[_pages.length - 2], self.TRANSITIONS.RIGHT, false, true, false, dontResetPage);
         } else {
             if (callback) {
                 _pages = [];
@@ -748,8 +769,10 @@ function TopcoatTouch($container, options) {
      * @param [transition] {String}
      * @param [dialog] {Boolean}
      * @param [back] {Boolean}
+     * @param [noOverlay] (Boolean)
+     * @param [dontResetPage] (Boolean)
      */
-    this.goTo = function (page, transition, dialog, back) {
+    this.goTo = function (page, transition, dialog, back, noOverlay, dontResetPage) {
 
         if (page == _currentPage) {
             return self;
@@ -772,7 +795,7 @@ function TopcoatTouch($container, options) {
                 renderPage(_currentPage, function ($page) {
                     // We call postAdd here since reloadPage should not call postAdd.
                     _controller.postadd.call(_controller);
-                    goToPage(_currentPage, $page, back, transition, dialog);
+                    goToPage(_currentPage, $page, back, transition, dialog, noOverlay, dontResetPage);
                 });
             } else {
                 if (_controllers[_currentPage] && _isDialog) {
@@ -782,12 +805,12 @@ function TopcoatTouch($container, options) {
                     page = '#' + page;
                 }
                 var $page = $(page);
-                goToPage(page, $page, back, transition, dialog);
+                goToPage(page, $page, back, transition, dialog, noOverlay, dontResetPage);
             }
         } else {
             $page = page;
             _currentPage = $page.attr('id');
-            goToPage(_currentPage, $page, back, transition, dialog);
+            goToPage(_currentPage, $page, back, transition, dialog, noOverlay, dontResetPage);
         }
 
         return self;
@@ -971,6 +994,19 @@ function TopcoatTouch($container, options) {
             _$loadingDiv.remove();
         }
         return self;
+    };
+
+    this.showToast = function(msg, duration) {
+        duration = duration || 1500;
+        var $toast = $('<div id="toast">' + msg + '</div>');
+        _$currentPage.append($toast);
+        setTimeout(function() {
+            $toast.css({opacity : 0});
+            setTimeout(function() {
+                $toast.remove();
+            }, 1000);
+        }, duration);
+
     };
 
     /**
@@ -1162,9 +1198,8 @@ function TopcoatTouch($container, options) {
         this.on(self.touchStartEvent, function (e) {
             var $target = $(e.target);
             if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
-                if (!_showingMenu) {
+                if (_showingMenu) {
                     $menuDiv.fadeOut(50);
-                } else {
                     _showingMenu = false;
                 }
             }
@@ -1178,7 +1213,11 @@ function TopcoatTouch($container, options) {
         });
 
         // Show the menu when it is clicked...
-        this.on(self.clickEvent, '.menu-button', showMenu);
+        this.on(self.clickEvent, '.menu-button', function (e) {
+            e.preventDefault();
+            return showMenu(e)
+        });
+
 
         // setup menu handlers
         this.on(self.clickEvent, '#menuDiv .menuItem', function () {
@@ -1338,22 +1377,27 @@ function PageController(pageName, fns, data, tt) {
     /**
      * Adds an event to the page, automatically added before the page is shown and automatically removed when the page is exited..
      *
-     * @param event {String}
+     * @param events {Array|String}
      * @param [selector] {String}
      * @param callback {Function}
      * @returns PageController
      */
-    this.addEvent = function (event, selector, callback) {
+    this.addEvent = function (events, selector, callback) {
         if (typeof selector == 'function') {
             callback = selector;
             selector = '';
         }
-        this.events.push({event: event, selector: selector, callback: callback});
+        if (typeof events == 'string') {
+            events = events.split(',');
+        }
+        for (var i = 0; i < events.length; i++) {
+            this.events.push({event: events[i], selector: selector, callback: callback});
+        }
         return this;
     };
 
     /**
-     * Helper funciton to go to a page.
+     * Helper function to go to a page.
      * @param [transition] {String}
      */
     this.goTo = function (transition) {

@@ -121,13 +121,13 @@ body > div {
 }
 
 .page.transition {
-    -webkit-transition-duration: .25s;
-    transition-duration: .25s;
+    -webkit-transition: .25s ease;
+    transition: .25s ease;
 }
 
 .page.transition-slow {
-    -webkit-transition-duration: .5s;
-    transition-duration: .5s;
+    -webkit-transition: .5s ease;
+    transition: .5s ease;
 }
 
 .page.with-side-drawer {
@@ -537,4 +537,23 @@ body > div {
 
 .topcoat-touch-grid.buttons button {
 	width: 95%;
+}
+
+
+#toast{
+	position: fixed;
+	top: 20px;
+	left: 50%;
+	width: 200px;
+	margin-left: -100px;
+	border: 1px solid #666;
+	background-color: #a0a0a0;
+	padding: 10px 0;
+	text-align:center;
+	opacity: .9;
+
+	/*The good stuff */
+	-webkit-transition: opacity 0.5s ease-out;  /* Saf3.2+, Chrome */
+	-moz-transition: opacity 0.5s ease-out;  /* FF4+ */
+	transition: opacity 0.5s ease-out;
 }
