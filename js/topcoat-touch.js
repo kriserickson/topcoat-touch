@@ -46,6 +46,7 @@ function TopcoatTouch($container, options) {
     this.isScrolling = false;
     this.clickEvent = 'ontouchend' in document.documentElement ? 'touchend' : 'click';
     this.touchStartEvent = 'ontouchstart' in document.documentElement ? 'touchstart' : 'mousedown';
+    this.touchMoveEvent = 'ontouchmove' in document.documentElement ? 'touchmove' : 'mousemove';
     this.touchEndEvent = 'ontouchend' in document.documentElement ? 'touchend touchcancel touchleave' : 'mouseup';
 
     // Setup the defaults
@@ -1196,9 +1197,9 @@ function TopcoatTouch($container, options) {
 
         // Hide the menu one mousedown
         this.on(self.touchStartEvent, function (e) {
-            var $target = $(e.target);
-            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
-                if (_showingMenu) {
+            if (_showingMenu) {
+            	var $target = $(e.target);
+            	if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {                
                     $menuDiv.fadeOut(50);
                     _showingMenu = false;
                 }
@@ -1220,12 +1221,14 @@ function TopcoatTouch($container, options) {
 
 
         // setup menu handlers
-        this.on(self.clickEvent, '#menuDiv .menuItem', function () {
+        this.on(self.clickEvent, '#menuDiv .menuItem', function (e) {
             $('#menuDiv').hide();
             var menuId = $(this).data('id');
             arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
                 callback.apply(this, [_currentPage, menuId]);
             });
+            e.preventDefault();
+            return false;
         });
 
         this.on(self.touchStartEvent, '#menuDiv .menuItem', function () {
