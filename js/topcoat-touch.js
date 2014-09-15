@@ -39,7 +39,7 @@ function TopcoatTouch($container, options) {
 
     // The TT events...
     this.EVENTS = {PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
-        MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', BACK: 'back'};
+        MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', HIDE_MENU: 'hidemenu', BACK: 'back'};
 
     this.TRANSITIONS = {LEFT: 'slideleft', RIGHT: 'slideright', DOWN: 'slidedown', POP: 'pop', FLIP: 'flip', NONE: 'none'};
 
@@ -252,10 +252,13 @@ function TopcoatTouch($container, options) {
      */
     function returnButtonFunction(callback) {
         return function () {
+            var res;
             if (callback) {
-                callback();
+                res = callback();
             }
-            self.hideDialog();
+            if (res !== false) {
+                self.hideDialog();
+            }
         }
     }
 
@@ -266,7 +269,7 @@ function TopcoatTouch($container, options) {
      * @param callback
      */
     function arrayEach(arr, callback) {
-        var cont;
+        var cont = undefined;
         for (var index = 0; cont !== false && index < arr.length; index++) {
             cont = callback(arr[index], index);
         }
@@ -297,6 +300,20 @@ function TopcoatTouch($container, options) {
      */
     function clone(arr) {
         return arr.slice(0);
+    }
+
+    /**
+     *
+     * @param id {String}
+     * @returns {number}
+     */
+    function getMenuIndex(id) {
+        for (var i = 0; i < self.options.menu.length; i++) {
+            if (self.options.menu[i].id == id) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -495,6 +512,9 @@ function TopcoatTouch($container, options) {
      * @returns {*}
      */
     function eventHandler(event) {
+        if (event.type == self.clickEvent && self.isScrolling && !self.options.iScrollPreventDefault) {
+            return;
+        }
         var events = _events[event.type];
         if (events) {
             for (var i = 0; i < events.length; i++) {
@@ -886,10 +906,12 @@ function TopcoatTouch($container, options) {
         });
 
         _iScroll.on('scrollEnd', function () {
-            self.isScrolling = false;
             arrayEach(getActiveEvents(self.EVENTS.SCROLL_END, _currentPage), function (callback) {
                 callback(_currentPage);
             });
+            setTimeout(function() {
+                self.isScrolling = false;
+            },150);
         });
     };
 
@@ -1008,6 +1030,24 @@ function TopcoatTouch($container, options) {
             }, 1000);
         }, duration);
 
+    };
+
+    this.changeMenuCaption = function(id, newName) {
+        var menuIndex = getMenuIndex(id);
+        if (menuIndex > -1) {
+            self.options.menu[menuIndex].name = newName;
+        }
+    };
+
+    this.addMenuItem = function(id, name) {
+        self.options.menu.push({id: id, name: name});
+    };
+
+    this.removeMenuItem = function(id) {
+        var menuIndex = getMenuIndex(id);
+        if (menuIndex > -1) {
+            self.options.menu.splice(menuIndex, 1);
+        }
     };
 
     /**
@@ -1198,8 +1238,8 @@ function TopcoatTouch($container, options) {
         // Hide the menu one mousedown
         this.on(self.touchStartEvent, function (e) {
             if (_showingMenu) {
-            	var $target = $(e.target);
-            	if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {                
+	            var $target = $(e.target);
+	            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
                     $menuDiv.fadeOut(50);
                     _showingMenu = false;
                 }
@@ -1208,8 +1248,7 @@ function TopcoatTouch($container, options) {
 
         this.on(self.EVENTS.PAGE_END, function () {
             if ($menuDiv.is(':visible')) {
-                $menuDiv.hide();
-                _showingMenu = false;
+                hideMenu(false);
             }
         });
 
@@ -1238,6 +1277,18 @@ function TopcoatTouch($container, options) {
         this.on(self.touchEndEvent, '#menuDiv .menuItem', function () {
             $(this).removeClass('selected');
         });
+
+        function hideMenu(fade) {
+            if (fade) {
+                $menuDiv.fadeOut(self.options.menuFadeOut);
+            } else {
+                $menuDiv.hide();
+            }
+            arrayEach(getActiveEvents(self.EVENTS.HIDE_MENU, _currentPage), function (callback) {
+                callback(_currentPage);
+            });
+            _showingMenu = false;
+        }
 
         function showMenu(e) {
 
@@ -1273,7 +1324,7 @@ function TopcoatTouch($container, options) {
 
                 return false;
             } else {
-                $menuDiv.fadeOut(self.options.menuFadeOut);
+                hideMenu(true);
             }
 
             // Difference between false and undefined in jQuery events...
