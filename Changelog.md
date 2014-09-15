@@ -71,3 +71,9 @@ Version 0.4.3
 - Improved event adding (allow either comma separated lists or arrays of selectors).
 - Change transition default back to slideleft.
 - Added a TRANSITIONS object to tt which means you don't have to use strings to specify transitions.
+
+Versino 0.4.4
+- Added menu close event.
+- Tried to fix scrolling and select on automatic scrolled div's.
+- Don't close dialog if false is returned in dialog button event.
+- Allow changing, adding, removing of menu items.
