@@ -274,6 +274,12 @@ function TopcoatTouch($container, options) {
         }
     }
 
+    function zeptoOuterHeightWithMargin(el) {
+        var size = el.height();
+        size += parseInt(el.css('margin-top'), 10) + parseInt(el.css('margin-bottom'), 10);
+        return size;
+    }
+
     /**
      * Sets up the IScroll if necessary
      */
@@ -814,7 +820,7 @@ function TopcoatTouch($container, options) {
                 _controller = _controllers[_currentPage];
                 renderPage(_currentPage, function ($page) {
                     // We call postAdd here since reloadPage should not call postAdd.
-                    _controller.postadd.call(_controller);
+                    _controller.postadd.call(_controller, $page);
                     goToPage(_currentPage, $page, back, transition, dialog, noOverlay, dontResetPage);
                 });
             } else {
@@ -1055,39 +1061,41 @@ function TopcoatTouch($container, options) {
      * @param content {String}
      * @param [title] {String}
      * @param [buttons] {Object}
+     * @param [dialogId] {String}
      */
-    this.showDialog = function (content, title, buttons) {
+    this.showDialog = function (content, title, buttons, dialogId) {
         if (self.dialogShowing()) {
             self.hideDialog();
         }
         _dialogShowing = true;
         if (typeof title == 'object') {
+            dialogId = buttons;
             buttons = title;
             title = '';
         }
         var buttonText = '';
         var buttonCount = 1;
         title = title || 'Info';
+        dialogId = dialogId || 'topcoat-dialog-div';
 
         buttons = buttons || {OK: null};
 
         for (var buttonCaption in buttons) {
             if (buttons.hasOwnProperty(buttonCaption)) {
-                var buttonId = 'topcoat-button-' + buttonCount++;
+                var buttonId = 'topcoat-button-' + buttonCount;
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
                 $container.off(self.clickEvent, '#' + buttonId)
                     .on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
+                buttonCount++;
             }
-
-            buttonCount++;
         }
 
         var $dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
-        '<div id="topcoat-dialog-div" class="topcoat-overlay">' +
-        '<div class="topcoat-dialog-header">' + title + '</div>' +
-        '<div class="topcoat-dialog-content">' + content + '</div>' +
-        '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
-        '</div>');
+            '<div id="' + dialogId + '" class="topcoat-overlay">' +
+            '<div class="topcoat-dialog-header">' + title + '</div>' +
+            '<div class="topcoat-dialog-content">' + content + '</div>' +
+            '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
+            '</div>');
 
 
         _$currentPage.append($dialog);
@@ -1104,15 +1112,24 @@ function TopcoatTouch($container, options) {
                 imagesLoaded--;
             }
         }
+
+
+
         function setDialogHeight() {
             if (imagesLoaded > 0) {
                 setTimeout(setDialogHeight, 50);
             } else {
                 var dialogHeight = 20;
-                $dialog.children('div').each(function (index, div) {
-                    dialogHeight += $(div).height();
+                $dialog.children('div').each(function () {
+                    var $this = $(this);
+                    if ($this.outerHeight) {
+                        dialogHeight += $this.outerHeight(true);
+                    } else {
+                        // zepto doesn't have outerHeight, polyfill...
+                        dialogHeight += zeptoOuterHeightWithMargin($this);
+                    }
                 });
-                $('#topcoat-dialog-div').height(dialogHeight).css('visibility', 'visible');
+                $('.topcoat-overlay').height(dialogHeight).css('visibility', 'visible');
                 $dialog[1].style.top = "0px";
             }
         }
@@ -1145,7 +1162,7 @@ function TopcoatTouch($container, options) {
      */
     this.hideDialog = function () {
         _dialogShowing = false;
-        $('#topcoat-loading-overlay-div,#topcoat-dialog-div').remove();
+        $('#topcoat-loading-overlay-div,.topcoat-overlay').remove();
         return self;
     };
 
