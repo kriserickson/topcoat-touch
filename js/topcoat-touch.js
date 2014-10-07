@@ -46,6 +46,7 @@ function TopcoatTouch($container, options) {
     this.isScrolling = false;
     this.clickEvent = 'ontouchend' in document.documentElement ? 'touchend' : 'click';
     this.touchStartEvent = 'ontouchstart' in document.documentElement ? 'touchstart' : 'mousedown';
+    this.touchMoveEvent = 'ontouchmove' in document.documentElement ? 'touchmove' : 'mousemove';
     this.touchEndEvent = 'ontouchend' in document.documentElement ? 'touchend touchcancel touchleave' : 'mouseup';
 
     // Setup the defaults
@@ -1253,10 +1254,11 @@ function TopcoatTouch($container, options) {
 
         // Hide the menu one mousedown
         this.on(self.touchStartEvent, function (e) {
-            var $target = $(e.target);
-            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
-                if (_showingMenu) {
-                    hideMenu(true)
+            if (_showingMenu) {
+	            var $target = $(e.target);
+	            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
+                    $menuDiv.fadeOut(50);
+                    _showingMenu = false;
                 }
             }
         });
