@@ -1003,6 +1003,30 @@ function TopcoatTouch($container, options) {
         _$currentPage.append(_$loadingDiv);
     };
 
+    this.showProgress = function (msg) {
+        if (_loadingShowing) {
+            self.hideLoading();
+        }
+        _loadingShowing = true;
+        _$loadingDiv = $('<aside id="topcoat-loading-div" class="topcoat-overlay">' +
+            '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
+            '<div class="progress-container">' +
+                '<div class="progress progress-wrap">' +
+                    '<div class="progress progress-bar"></div>' +
+                '</div>' +
+            '</div>' +
+        '</aside>');
+        showOverlay(true);
+        _$currentPage.append(_$loadingDiv);
+    };
+
+    this.updateProgress = function(percent) {
+        if (percent < 1) {
+            percent *= 100;
+        }
+        _$loadingDiv.find('.progress-bar').css('left', percent + '%');
+    };
+
     /**
      * Set the loading message
      *
@@ -1036,6 +1060,22 @@ function TopcoatTouch($container, options) {
             }, 1000);
         }, duration);
 
+    };
+
+    this.createToggleButton = function($el, value) {
+        $el.addClass('toggleButton').html('<div class="button-wrap' + (value ? ' button-active' : '') + '">' +
+            '<div class="button-bg">' +
+               '<div class="button-out"></div>' +
+                '<div class="button-in"></div>' +
+                '<div class="button-switch"></div>' +
+            '</div>' +
+        '</div>');
+        $el.on('click', function() {
+            var $wrap = $el.find('.button-wrap');
+            $wrap.toggleClass('button-active');
+            $el.trigger('toggle', $wrap.hasClass('button-active'));
+        });
+        return $el;
     };
 
     this.changeMenuCaption = function(id, newName) {
@@ -1334,11 +1374,7 @@ function TopcoatTouch($container, options) {
 
                 $menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
                 _showingMenu = true;
-                e.preventDefault();
-                setTimeout(function () {
-                    _showingMenu = false;
-                }, 100);
-
+                e.preventDefault();                
                 return false;
             } else {
                 hideMenu(true);

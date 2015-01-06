@@ -83,3 +83,8 @@ Version 0.4.5
 - Allowed for adding an id to a dialog.
 - Updated all vendor libraries (jquery from 2.1.0 to 2.1.1, hammer from 1.0.10 to 2.0.3,
   fastclick from 1.0.1 to 1.0.3, Zepto from 1.1.3 to 1.1.4.
+
+Version 0.4.6
+- Add toggle button.
+- Add Progress Dialog.
+
