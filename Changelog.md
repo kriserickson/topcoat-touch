@@ -88,3 +88,7 @@ Version 0.4.6
 - Add toggle button.
 - Add Progress Dialog.
 
+Version 0.4.7
+- Allow instantiation of TopCoatTouch before document.ready.
+- Improve menu handling (allow ordering of menu items, allow new page option that will go to a page)
+

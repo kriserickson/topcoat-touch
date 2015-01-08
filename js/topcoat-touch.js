@@ -1,4 +1,5 @@
 function TopcoatTouch($container, options) {
+    'use strict';
 
     var _$currentPage;
     var _$loadingDiv;
@@ -20,6 +21,7 @@ function TopcoatTouch($container, options) {
     var _skipUserEvents;
     var _stashedScroll;
     var _backCallback;
+    var _$menuDiv;
     var self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -31,8 +33,6 @@ function TopcoatTouch($container, options) {
         options = $container;
         $container = false;
     }
-    $container = $container || $('body');
-
     var TRANSITION_TO_CLASS = {slideleft: {next: 'page-right', prev: 'page-left'}, slideright: {next: 'page-left', prev: 'page-right'},
         slidedown: {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'page-scale', prev: ''},
         flip: {next: 'page-flip', prev: 'page-flip'}, none: {next: '', prev: ''}};
@@ -50,153 +50,289 @@ function TopcoatTouch($container, options) {
     this.touchEndEvent = 'ontouchend' in document.documentElement ? 'touchend touchcancel touchleave' : 'mouseup';
 
     // Setup the defaults
-    var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 100, menuFadeOut: 50, menuHasIcons: false,
+    var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 250, menuFadeOut: 250, menuHasIcons: false,
         renderFunction: false, initializeFunction: false, exceptionOnError: false, hammerSwipeVelocity: 0.5, iScrollPreventDefault: false};
     options = options || {};
 
+    if (typeof $ == 'undefined') {
+        console.error('jQUery or Zepto must be included before instantiating TopcoatTouch');
+    }
+
     this.options = $.extend(defaults, options);
 
-    // Setup FastClick...
-    if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) === false) {
-        _fastClick = new FastClick(document.body);
-        this.clickEvent = 'click';
-    }
+    // This will allow for creating TopCoat touch before the document.ready has fired, as well as creating
+    // it in the head before the body has been parsed
+    $(document).ready(function() {
 
-    // Use Hammer for clickevent handling...
-    if (typeof Hammer === 'function' && this.clickEvent === 'touchend') {
-        this.clickEvent = 'tap';
-    }
+        $container = $container || $('body');
 
-    // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
-    if (typeof IScroll == 'function') {
-        document.addEventListener('touchmove', function (e) {
-            e.preventDefault();
-        }, false);
-    }
+        // Setup FastClick...
+        if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) === false) {
+            _fastClick = new FastClick(document.body);
+            self.clickEvent = 'click';
+        }
+
+        // Use Hammer for clickevent handling...
+        if (typeof Hammer === 'function' && self.clickEvent === 'touchend') {
+            self.clickEvent = 'tap';
+        }
+        // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
+        if (typeof IScroll == 'function') {
+            document.addEventListener('touchmove', function (e) {
+                e.preventDefault();
+            }, false);
+        }
 
 
-    // Page Start event...  Handle when the page transition has ended...
-    $container.on('transitionend webkitTransitionEnd', '.page', function () {
-        if (_startedAnimation) {
+        // Page Start event...  Handle when the page transition has ended...
+        $container.on('transitionend webkitTransitionEnd', '.page', function () {
+            if (_startedAnimation) {
 
-            setupIScroll();
+                setupIScroll();
 
-            if (_skipUserEvents && _iScroll && _stashedScroll) {
-                _iScroll.scrollTo(_stashedScroll.x, _stashedScroll.y);
-            }
+                if (_skipUserEvents && _iScroll && _stashedScroll) {
+                    _iScroll.scrollTo(_stashedScroll.x, _stashedScroll.y);
+                }
 
-            // If we have a PAGE_START event fire the event...
-            arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
-                callback(_currentPage);
-            });
-
-            if (_$currentPage.find('.side-drawer').length) {
-                self.on('slideright dragright', function (ev) {
-                    self.showSideDrawer();
-                    ev.preventDefault();
-                    return false;
+                // If we have a PAGE_START event fire the event...
+                arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
+                    callback(_currentPage);
                 });
-                self.on('slideleft dragleft', function (ev) {
-                    if (_$currentPage.hasClass('with-side-drawer')) {
-                        self.hideSideDrawer();
+
+                if (_$currentPage.find('.side-drawer').length) {
+                    self.on('slideright dragright', function (ev) {
+                        self.showSideDrawer();
                         ev.preventDefault();
                         return false;
+                    });
+                    self.on('slideleft dragleft', function (ev) {
+                        if (_$currentPage.hasClass('with-side-drawer')) {
+                            self.hideSideDrawer();
+                            ev.preventDefault();
+                            return false;
+                        }
+                    });
+                }
+
+                // Remove the transition class, it isn't needed any more...
+                $container.find('.page.transition').removeClass('transition');
+                $container.find('.page.transition-slow').removeClass('transition-slow');
+
+                // If _controller is set, we are running from a controller not a single page app.  Remove the
+                // page rather than hide it.
+                if (_controller) {
+                    if (!_skipUserEvents) {
+                        _controller.pagestart.call(_controller);
                     }
-                });
-            }
+                    _controller._pagestart.call(_controller);
+                    var $page = $container.find('.page-remove');
+                    var prevController;
 
-            // Remove the transition class, it isn't needed any more...
-            $container.find('.page.transition').removeClass('transition');
-            $container.find('.page.transition-slow').removeClass('transition-slow');
-
-            // If _controller is set, we are running from a controller not a single page app.  Remove the
-            // page rather than hide it.
-            if (_controller) {
-                if (!_skipUserEvents) {
-                    _controller.pagestart.call(_controller);
-                }
-                _controller._pagestart.call(_controller);
-                var $page = $container.find('.page-remove');
-                if ($page.length > 0) {
-                    var prevController = _controllers[$page.attr('id')];
-                }
+                    if ($page.length > 0) {
+                        prevController = _controllers[$page.attr('id')];
+                    }
 
 
-                if (prevController) {
+                    if (prevController) {
+                        if (!_isDialog) {
+                            prevController.pageend.call(prevController);
+                        }
+                        prevController._pageend.call(prevController);
+                    }
+
                     if (!_isDialog) {
-                        prevController.pageend.call(prevController);
+                        $page.remove();
                     }
-                    prevController._pageend.call(prevController);
-                }
+                    if (_skipUserEvents) {
+                        removeOverlay();
+                        if (_backCallback) {
+                            _backCallback();
+                        }
 
-                if (!_isDialog) {
-                    $page.remove();
-                }
-                if (_skipUserEvents) {
-                    removeOverlay();
-                    if (_backCallback) {
-                        _backCallback();
                     }
-                }
-                if (prevController && !_isDialog) {
-                    prevController.postremove.call(prevController, $page);
-                }
+                    if (prevController && !_isDialog) {
+                        prevController.postremove.call(prevController, $page);
+                    }
 
 
-                _controller = null;
-            } else {
-                // Remove unused classes
-                if (!_isDialog) {
-                    $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
-                }
-                if (_skipUserEvents) {
-                    removeOverlay();
-                    if (_backCallback) {
-                        _backCallback();
+                    _controller = null;
+                } else {
+                    // Remove unused classes
+                    if (!_isDialog) {
+                        $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
+                    }
+                    if (_skipUserEvents) {
+                        removeOverlay();
+                        if (_backCallback) {
+                            _backCallback();
+                        }
                     }
                 }
+                _startedAnimation = false;
+
+                if (_fastClick) {
+                    // We disable tracking of fastclicks during a page switch...
+                    _fastClick.trackingDisabled = false;
+                }
+            } else if (_$currentPage.hasClass('remove-side-drawer')) {
+                _$currentPage.removeClass('remove-side-drawer');
             }
-            _startedAnimation = false;
+        });
 
-            if (_fastClick) {
-                // We disable tracking of fastclicks during a page switch...
-                _fastClick.trackingDisabled = false;
+
+        // End Dropdown Box
+
+
+        // Add next and previous events that can be caught...
+        if (window.history && history.pushState) { // check for history api support
+
+            // create history states
+            history.pushState(-1, null); // back state
+            history.pushState(0, null); // main state
+            history.pushState(1, null); // forward state
+            history.go(-1); // start in main state
+            window.addEventListener('popstate', function (event) {
+                var state = event.state;
+                if (state == -1) {
+                    var goBack = true;
+                    arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
+                        if (callback(_currentPage) === false) {
+                            goBack = false;
+                            return false;
+                        }
+                    });
+                    if (goBack) {
+                        self.goBack();
+                    }
+                    // reset state to what it should be
+                    history.go(-state);
+                }
+            }, false);
+
+        }
+
+        // Setup the Menu, requires access to public function so it has to be declared here:
+        if (self.options.menu) {
+
+            if (!Array.isArray(self.options.menu)) {
+                self.options.menu = [];
             }
-        } else if (_$currentPage.hasClass('remove-side-drawer')) {
-            _$currentPage.removeClass('remove-side-drawer');
+
+            _$menuDiv = $('<div id="menuDiv"></div>');
+
+            $container.append(_$menuDiv);
+
+            // Hide the menu one mousedown
+            self.on(self.touchStartEvent, function (e) {
+                if (_showingMenu) {
+                    var $target = $(e.target);
+                    if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
+                        _$menuDiv.fadeOut(self.options.menuFadeOut);
+                        _showingMenu = false;
+                    }
+                }
+            });
+
+            self.on(self.EVENTS.PAGE_END, function () {
+                if (_$menuDiv.is(':visible')) {
+                    hideMenu(false);
+                }
+            });
+
+            // Show the menu when it is clicked...
+            self.on(self.clickEvent, '.menu-button', function (e) {
+                e.preventDefault();
+                return showMenu(e);
+            });
+
+
+            // setup menu handlers
+            self.on(self.clickEvent, '#menuDiv .menuItem', function (e) {
+                $('#menuDiv').hide();
+                var $this = $(this);
+                var page = $this.data('page');
+                if (page) {
+                    tt.goTo(page);
+                } else {
+                    var menuId = $(this).data('id');
+                    arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
+                        callback.apply(this, [_currentPage, menuId]);
+                    });
+                }
+                e.preventDefault();
+                return false;
+            });
+
+            self.on(self.touchStartEvent, '#menuDiv .menuItem', function () {
+                $(this).addClass('selected');
+            });
+
+            self.on(self.touchEndEvent, '#menuDiv .menuItem', function () {
+                $(this).removeClass('selected');
+            });
         }
     });
 
+    function hideMenu(fade) {
+        if (fade) {
+            _$menuDiv.fadeOut(self.options.menuFadeOut);
+        } else {
+            _$menuDiv.hide();
+        }
+        arrayEach(getActiveEvents(self.EVENTS.HIDE_MENU, _currentPage), function (callback) {
+            callback(_currentPage);
+        });
+        _showingMenu = false;
+    }
 
-    // End Dropdown Box
+    function showMenu(e) {
 
+        if (!_$menuDiv.is(':visible')) {
 
-    // Add next and previous events that can be caught...
-    if (window.history && history.pushState) { // check for history api support
+            var menuItems = clone(self.options.menu);
 
-        // create history states
-        history.pushState(-1, null); // back state
-        history.pushState(0, null); // main state
-        history.pushState(1, null); // forward state
-        history.go(-1); // start in main state
-        window.addEventListener('popstate', function (event) {
-            var state = event.state;
-            if (state == -1) {
-                var goBack = true;
-                arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
-                    if (callback(_currentPage) === false) {
-                        goBack = false;
-                        return false;
-                    }
-                });
-                if (goBack) {
-                    self.goBack();
+            arrayEach(getActiveEvents(self.EVENTS.SHOW_MENU, _currentPage), function (callback) {
+                var res = callback(_currentPage, menuItems);
+                if (res) {
+                    menuItems = res;
                 }
-                // reset state to what it should be
-                history.go(-state);
-            }
-        }, false);
+            });
 
+            menuItems.sort(function(a,b) {
+                if (!a.order  && !b.order) {
+                    return 0;
+                }
+                if ((!a.order || a.order > b.order) && b.order !== -1) {
+                    return 1;
+                }
+                return -1;
+            });
+
+            var menuDiv = '<ul id="menuList">';
+              for (var i = 0; i < menuItems.length; i++) {
+                if (menuItems[i].id) {
+                    if (!menuItems[i].page || menuItems[i].page != _currentPage) {
+                        menuDiv += '<li class="menuItem" id="menuItem' + i + '" data-id="' + menuItems[i].id + '"' +
+                            (menuItems[i].page ? ' data-page="' + menuItems[i].page + '"' : '') + '>' +
+                            (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
+                            '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
+                    }
+                } else {
+                    menuDiv += '<li><hr></li>';
+                }
+            }
+            menuDiv += '</ul>';
+
+            _$menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
+            _showingMenu = true;
+            e.preventDefault();
+            return false;
+        } else {
+            hideMenu(true);
+        }
+
+        // Difference between false and undefined in jQuery events...
+        return undefined;
     }
 
 
@@ -257,9 +393,9 @@ function TopcoatTouch($container, options) {
                 res = callback();
             }
             if (res !== false) {
-                self.hideDialog();
-            }
-        }
+            	self.hideDialog();
+        	}
+    	};
     }
 
     /**
@@ -353,8 +489,9 @@ function TopcoatTouch($container, options) {
         }
         _controller.prerender();
         if (_controller.template) {
+            var $page;
             try {
-                var $page = $(_controller.render.call(_controller));
+                $page = $(_controller.render.call(_controller));
             } catch (e) {
                 self._error('Error calling render on page : ' + page + '\nError: ' + e);
             }
@@ -481,7 +618,7 @@ function TopcoatTouch($container, options) {
 
         if (_isDialog) {
             if (!noOverlay) {
-            	showOverlay(false);
+                showOverlay(false);
             }
             $prevPage.attr('class', 'page page-remove');
         } else {
@@ -530,7 +667,7 @@ function TopcoatTouch($container, options) {
                     var selector = events[i].selector;
 
                     if ($target.is(selector) || !selector) {
-                        target = event.target
+                        target = event.target;
                     } else {
                         target = $target.closest(selector);
                         target = target.length > 0 ? target[0] : false;
@@ -774,7 +911,7 @@ function TopcoatTouch($container, options) {
                 for (var i = 0; i < numberOfPages - 1; i++) {
                     _pages.pop();
                 }
-            } 
+            }
         }
 
         if (self.hasBack()) {
@@ -814,6 +951,7 @@ function TopcoatTouch($container, options) {
         }
 
         _previousPage = _currentPage;
+        var $page;
 
         if (typeof page === 'string') {
             _currentPage = fixPage(page);
@@ -831,7 +969,7 @@ function TopcoatTouch($container, options) {
                 if (page.substr(0, 1) != '#') {
                     page = '#' + page;
                 }
-                var $page = $(page);
+                $page = $(page);
                 goToPage(page, $page, back, transition, dialog, noOverlay, dontResetPage);
             }
         } else {
@@ -997,8 +1135,8 @@ function TopcoatTouch($container, options) {
         }
         _loadingShowing = true;
         _$loadingDiv = $(ui || '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
-        '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
-        '<span class="topcoat-spinner"></span></aside>');
+            '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
+            '<span class="topcoat-spinner"></span></aside>');
         showOverlay(true);
         _$currentPage.append(_$loadingDiv);
     };
@@ -1127,20 +1265,20 @@ function TopcoatTouch($container, options) {
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
                 $container.off(self.clickEvent, '#' + buttonId)
                     .on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
-                buttonCount++;
-            }
+            	buttonCount++;
+        	}
         }
 
         var $dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
             '<div id="' + dialogId + '" class="topcoat-overlay">' +
-            '<div class="topcoat-dialog-header">' + title + '</div>' +
-            '<div class="topcoat-dialog-content">' + content + '</div>' +
-            '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
-            '</div>');
+	        '<div class="topcoat-dialog-header">' + title + '</div>' +
+	        '<div class="topcoat-dialog-content">' + content + '</div>' +
+	        '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
+	        '</div>');
 
 
         _$currentPage.append($dialog);
-        $dialog[1].style.top = "-1000px";
+        $dialog[1].style.top = '-1000px';
 
 
         var images = $dialog.find('img');
@@ -1171,7 +1309,7 @@ function TopcoatTouch($container, options) {
                     }
                 });
                 $('.topcoat-overlay').height(dialogHeight).css('visibility', 'visible');
-                $dialog[1].style.top = "0px";
+                $dialog[1].style.top = '0px';
             }
         }
 
@@ -1216,7 +1354,8 @@ function TopcoatTouch($container, options) {
      * @returns PageController
      */
     this.createController = function (pageName, fns, data) {
-        return _controllers[pageName] = new PageController(pageName, fns, data, self);
+        _controllers[pageName] = new PageController(pageName, fns, data, self);
+        return _controllers[pageName];
     };
 
 
@@ -1282,110 +1421,7 @@ function TopcoatTouch($container, options) {
         return false;
     });
 
-    // Setup the Menu, requires access to public function so it has to be declared here:
-    if (this.options.menu) {
 
-        if (!Array.isArray(this.options.menu)) {
-            this.options.menu = [];
-        }
-
-        var $menuDiv = $('<div id="menuDiv"></div>');
-        $container.append($menuDiv);
-
-        // Hide the menu one mousedown
-        this.on(self.touchStartEvent, function (e) {
-            if (_showingMenu) {
-	            var $target = $(e.target);
-	            if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
-                    $menuDiv.fadeOut(50);
-                    _showingMenu = false;
-                }
-            }
-        });
-
-        this.on(self.EVENTS.PAGE_END, function () {
-            if ($menuDiv.is(':visible')) {
-                hideMenu(false);
-            }
-        });
-
-        // Show the menu when it is clicked...
-        this.on(self.clickEvent, '.menu-button', function (e) {
-            e.preventDefault();
-            return showMenu(e)
-        });
-
-
-        // setup menu handlers
-        this.on(self.clickEvent, '#menuDiv .menuItem', function (e) {
-            $('#menuDiv').hide();
-            var menuId = $(this).data('id');
-            arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
-                callback.apply(this, [_currentPage, menuId]);
-            });
-            e.preventDefault();
-            return false;
-        });
-
-        this.on(self.touchStartEvent, '#menuDiv .menuItem', function () {
-            $(this).addClass('selected');
-        });
-
-        this.on(self.touchEndEvent, '#menuDiv .menuItem', function () {
-            $(this).removeClass('selected');
-        });
-
-        function hideMenu(fade) {
-            if (fade) {
-                $menuDiv.fadeOut(self.options.menuFadeOut);
-            } else {
-                $menuDiv.hide();
-            }
-            arrayEach(getActiveEvents(self.EVENTS.HIDE_MENU, _currentPage), function (callback) {
-                callback(_currentPage);
-            });
-            _showingMenu = false;
-        }
-
-        function showMenu(e) {
-
-            if (!$menuDiv.is(':visible')) {
-
-                var menuItems = clone(self.options.menu);
-
-                arrayEach(getActiveEvents(self.EVENTS.SHOW_MENU, _currentPage), function (callback) {
-                    var res = callback(_currentPage, menuItems);
-                    if (res) {
-                        menuItems = res;
-                    }
-                });
-
-                var menuDiv = '<ul id="menuList">';
-                for (var i = 0; i < menuItems.length; i++) {
-                    if (menuItems[i].id) {
-                        menuDiv += '<li class="menuItem" id="menuItem' + ucFirst(menuItems[i].id) + '" data-id="' + menuItems[i].id + '">' +
-                        (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
-                        '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
-                    } else {
-                        menuDiv += '<li><hr></li>';
-                    }
-                }
-                menuDiv += '</ul>';
-
-                $menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
-                _showingMenu = true;
-                e.preventDefault();                
-                return false;
-            } else {
-                hideMenu(true);
-            }
-
-            // Difference between false and undefined in jQuery events...
-            return undefined;
-        }
-
-
-    }
 
 }
 
@@ -1394,6 +1430,8 @@ function TopcoatTouch($container, options) {
  * @constructor
  */
 function PageController(pageName, fns, data, tt) {
+    'use strict';
+
     fns = fns || {};
     var self = this;
 
