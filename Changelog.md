@@ -92,3 +92,6 @@ Version 0.4.7
 - Allow instantiation of TopCoatTouch before document.ready.
 - Improve menu handling (allow ordering of menu items, allow new page option that will go to a page)
 
+Version 0.4.8
+- Improve menu handling (don't highlight the first menu item when opening the menu).
+- Allow passing of locals to the default template engine.

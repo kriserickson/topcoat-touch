@@ -55,10 +55,14 @@ function TopcoatTouch($container, options) {
     options = options || {};
 
     if (typeof $ == 'undefined') {
-        console.error('jQUery or Zepto must be included before instantiating TopcoatTouch');
+        console.error('jQuery or Zepto must be included before instantiating TopcoatTouch');
     }
 
     this.options = $.extend(defaults, options);
+
+    this.locals = options.locals || {};
+
+    delete this.options.locals;
 
     // This will allow for creating TopCoat touch before the document.ready has fired, as well as creating
     // it in the head before the body has been parsed
@@ -218,17 +222,16 @@ function TopcoatTouch($container, options) {
                 self.options.menu = [];
             }
 
-            _$menuDiv = $('<div id="menuDiv"></div>');
+            _$menuDiv = $('<div id="menuDiv" disabled></div>');
 
             $container.append(_$menuDiv);
 
             // Hide the menu one mousedown
             self.on(self.touchStartEvent, function (e) {
-                if (_showingMenu) {
+                if (!_showingMenu) {
                     var $target = $(e.target);
                     if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
                         _$menuDiv.fadeOut(self.options.menuFadeOut);
-                        _showingMenu = false;
                     }
                 }
             });
@@ -274,15 +277,10 @@ function TopcoatTouch($container, options) {
     });
 
     function hideMenu(fade) {
-        if (fade) {
-            _$menuDiv.fadeOut(self.options.menuFadeOut);
-        } else {
-            _$menuDiv.hide();
-        }
+        _$menuDiv.fadeOut(fade ? self.options.menuFadeOut : 0).attr('disabled', 'disabled');
         arrayEach(getActiveEvents(self.EVENTS.HIDE_MENU, _currentPage), function (callback) {
             callback(_currentPage);
         });
-        _showingMenu = false;
     }
 
     function showMenu(e) {
@@ -325,6 +323,10 @@ function TopcoatTouch($container, options) {
 
             _$menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
             _showingMenu = true;
+            setTimeout(function() {
+                _showingMenu = false;
+                _$menuDiv.removeAttr('disabled');
+            }, self.options.menuFadeIn);
             e.preventDefault();
             return false;
         } else {
@@ -1436,7 +1438,7 @@ function PageController(pageName, fns, data, tt) {
     var self = this;
 
     this.tt = tt;
-    this.data = data || {};
+    this.data = _.extend(data || {}, tt.locals);
     this.events = [];
     this.pageName = pageName;
 
@@ -1533,10 +1535,11 @@ function PageController(pageName, fns, data, tt) {
             selector = '';
         }
         if (typeof events == 'string') {
-            events = events.split(',');
+            events = events.split(/[, ]/);
         }
         for (var i = 0; i < events.length; i++) {
-            this.events.push({event: events[i], selector: selector, callback: callback});
+            var event = events[i] == 'click' ? tt.clickEvent : events[i];
+            this.events.push({event: event, selector: selector, callback: callback});
         }
         return this;
     };
