@@ -95,3 +95,9 @@ Version 0.4.7
 Version 0.4.8
 - Improve menu handling (don't highlight the first menu item when opening the menu).
 - Allow passing of locals to the default template engine.
+
+Version 0.4.9
+- Allow checking whether a page has loaded.
+- Fix bounce option for iScroll
+- Wait until the document loads before initializing container (important
+  when no container is passed into contstructor).

@@ -22,6 +22,7 @@ function TopcoatTouch($container, options) {
     var _stashedScroll;
     var _backCallback;
     var _$menuDiv;
+    var _containerLoadEvents = [];
     var self = this;
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
@@ -33,25 +34,52 @@ function TopcoatTouch($container, options) {
         options = $container;
         $container = false;
     }
-    var TRANSITION_TO_CLASS = {slideleft: {next: 'page-right', prev: 'page-left'}, slideright: {next: 'page-left', prev: 'page-right'},
-        slidedown: {next: 'page-up', prev: ''}, slideup: {next: 'page-down', prev: ''}, pop: {next: 'page-scale', prev: ''},
-        flip: {next: 'page-flip', prev: 'page-flip'}, none: {next: '', prev: ''}};
+    var TRANSITION_TO_CLASS = {
+        slideleft: {next: 'page-right', prev: 'page-left'},
+        slideright: {next: 'page-left', prev: 'page-right'},
+        slidedown: {next: 'page-up', prev: ''},
+        slideup: {next: 'page-down', prev: ''},
+        pop: {next: 'page-scale', prev: ''},
+        flip: {next: 'page-flip', prev: 'page-flip'},
+        none: {next: '', prev: ''}
+    };
 
     // The TT events...
-    this.EVENTS = {PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
-        MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', HIDE_MENU: 'hidemenu', BACK: 'back'};
+    this.EVENTS = {
+        PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
+        MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', HIDE_MENU: 'hidemenu', BACK: 'back'
+    };
 
-    this.TRANSITIONS = {LEFT: 'slideleft', RIGHT: 'slideright', DOWN: 'slidedown', POP: 'pop', FLIP: 'flip', NONE: 'none'};
+    this.TRANSITIONS = {
+        LEFT: 'slideleft',
+        RIGHT: 'slideright',
+        DOWN: 'slidedown',
+        POP: 'pop',
+        FLIP: 'flip',
+        NONE: 'none'
+    };
 
     this.isScrolling = false;
-    this.clickEvent = 'ontouchend' in document.documentElement ? 'touchend' : 'click';
+    this.clickEvent = 'ontap' in document.documentElement ? 'tap' : 'click';
     this.touchStartEvent = 'ontouchstart' in document.documentElement ? 'touchstart' : 'mousedown';
     this.touchMoveEvent = 'ontouchmove' in document.documentElement ? 'touchmove' : 'mousemove';
     this.touchEndEvent = 'ontouchend' in document.documentElement ? 'touchend touchcancel touchleave' : 'mouseup';
 
     // Setup the defaults
-    var defaults = {templateDirectory: 'templates', menu: false, menuFadeIn: 250, menuFadeOut: 250, menuHasIcons: false,
-        renderFunction: false, initializeFunction: false, exceptionOnError: false, hammerSwipeVelocity: 0.5, iScrollPreventDefault: false};
+    var defaults = {
+        templateDirectory: 'templates',
+        menu: false,
+        menuFadeIn: 100,
+        menuFadeOut: 50,
+        menuHasIcons: false,
+        renderFunction: false,
+        initializeFunction: false,
+        exceptionOnError: false,
+        hammerSwipeVelocity: 0.5,
+        iScrollPreventDefault: false,
+        iScrollBounce: true
+    };
+
     options = options || {};
 
     if (typeof $ == 'undefined') {
@@ -64,218 +92,11 @@ function TopcoatTouch($container, options) {
 
     delete this.options.locals;
 
-    // This will allow for creating TopCoat touch before the document.ready has fired, as well as creating
-    // it in the head before the body has been parsed
-    $(document).ready(function() {
 
-        $container = $container || $('body');
-
-        // Setup FastClick...
-        if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) === false) {
-            _fastClick = new FastClick(document.body);
-            self.clickEvent = 'click';
-        }
-
-        // Use Hammer for clickevent handling...
-        if (typeof Hammer === 'function' && self.clickEvent === 'touchend') {
-            self.clickEvent = 'tap';
-        }
-        // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
-        if (typeof IScroll == 'function') {
-            document.addEventListener('touchmove', function (e) {
-                e.preventDefault();
-            }, false);
-        }
-
-
-        // Page Start event...  Handle when the page transition has ended...
-        $container.on('transitionend webkitTransitionEnd', '.page', function () {
-            if (_startedAnimation) {
-
-                setupIScroll();
-
-                if (_skipUserEvents && _iScroll && _stashedScroll) {
-                    _iScroll.scrollTo(_stashedScroll.x, _stashedScroll.y);
-                }
-
-                // If we have a PAGE_START event fire the event...
-                arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
-                    callback(_currentPage);
-                });
-
-                if (_$currentPage.find('.side-drawer').length) {
-                    self.on('slideright dragright', function (ev) {
-                        self.showSideDrawer();
-                        ev.preventDefault();
-                        return false;
-                    });
-                    self.on('slideleft dragleft', function (ev) {
-                        if (_$currentPage.hasClass('with-side-drawer')) {
-                            self.hideSideDrawer();
-                            ev.preventDefault();
-                            return false;
-                        }
-                    });
-                }
-
-                // Remove the transition class, it isn't needed any more...
-                $container.find('.page.transition').removeClass('transition');
-                $container.find('.page.transition-slow').removeClass('transition-slow');
-
-                // If _controller is set, we are running from a controller not a single page app.  Remove the
-                // page rather than hide it.
-                if (_controller) {
-                    if (!_skipUserEvents) {
-                        _controller.pagestart.call(_controller);
-                    }
-                    _controller._pagestart.call(_controller);
-                    var $page = $container.find('.page-remove');
-                    var prevController;
-
-                    if ($page.length > 0) {
-                        prevController = _controllers[$page.attr('id')];
-                    }
-
-
-                    if (prevController) {
-                        if (!_isDialog) {
-                            prevController.pageend.call(prevController);
-                        }
-                        prevController._pageend.call(prevController);
-                    }
-
-                    if (!_isDialog) {
-                        $page.remove();
-                    }
-                    if (_skipUserEvents) {
-                        removeOverlay();
-                        if (_backCallback) {
-                            _backCallback();
-                        }
-
-                    }
-                    if (prevController && !_isDialog) {
-                        prevController.postremove.call(prevController, $page);
-                    }
-
-
-                    _controller = null;
-                } else {
-                    // Remove unused classes
-                    if (!_isDialog) {
-                        $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
-                    }
-                    if (_skipUserEvents) {
-                        removeOverlay();
-                        if (_backCallback) {
-                            _backCallback();
-                        }
-                    }
-                }
-                _startedAnimation = false;
-
-                if (_fastClick) {
-                    // We disable tracking of fastclicks during a page switch...
-                    _fastClick.trackingDisabled = false;
-                }
-            } else if (_$currentPage.hasClass('remove-side-drawer')) {
-                _$currentPage.removeClass('remove-side-drawer');
-            }
-        });
-
-
-        // End Dropdown Box
-
-
-        // Add next and previous events that can be caught...
-        if (window.history && history.pushState) { // check for history api support
-
-            // create history states
-            history.pushState(-1, null); // back state
-            history.pushState(0, null); // main state
-            history.pushState(1, null); // forward state
-            history.go(-1); // start in main state
-            window.addEventListener('popstate', function (event) {
-                var state = event.state;
-                if (state == -1) {
-                    var goBack = true;
-                    arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
-                        if (callback(_currentPage) === false) {
-                            goBack = false;
-                            return false;
-                        }
-                    });
-                    if (goBack) {
-                        self.goBack();
-                    }
-                    // reset state to what it should be
-                    history.go(-state);
-                }
-            }, false);
-
-        }
-
-        // Setup the Menu, requires access to public function so it has to be declared here:
-        if (self.options.menu) {
-
-            if (!Array.isArray(self.options.menu)) {
-                self.options.menu = [];
-            }
-
-            _$menuDiv = $('<div id="menuDiv" disabled></div>');
-
-            $container.append(_$menuDiv);
-
-            // Hide the menu one mousedown
-            self.on(self.touchStartEvent, function (e) {
-                if (!_showingMenu) {
-                    var $target = $(e.target);
-                    if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
-                        _$menuDiv.fadeOut(self.options.menuFadeOut);
-                    }
-                }
-            });
-
-            self.on(self.EVENTS.PAGE_END, function () {
-                if (_$menuDiv.is(':visible')) {
-                    hideMenu(false);
-                }
-            });
-
-            // Show the menu when it is clicked...
-            self.on(self.clickEvent, '.menu-button', function (e) {
-                e.preventDefault();
-                return showMenu(e);
-            });
-
-
-            // setup menu handlers
-            self.on(self.clickEvent, '#menuDiv .menuItem', function (e) {
-                $('#menuDiv').hide();
-                var $this = $(this);
-                var page = $this.data('page');
-                if (page) {
-                    tt.goTo(page);
-                } else {
-                    var menuId = $(this).data('id');
-                    arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
-                        callback.apply(this, [_currentPage, menuId]);
-                    });
-                }
-                e.preventDefault();
-                return false;
-            });
-
-            self.on(self.touchStartEvent, '#menuDiv .menuItem', function () {
-                $(this).addClass('selected');
-            });
-
-            self.on(self.touchEndEvent, '#menuDiv .menuItem', function () {
-                $(this).removeClass('selected');
-            });
-        }
-    });
-
+    /**
+     * Hides the menu, calling any events required on closing the menu
+     * @param fade
+     */
     function hideMenu(fade) {
         _$menuDiv.fadeOut(fade ? self.options.menuFadeOut : 0).attr('disabled', 'disabled');
         arrayEach(getActiveEvents(self.EVENTS.HIDE_MENU, _currentPage), function (callback) {
@@ -283,6 +104,36 @@ function TopcoatTouch($container, options) {
         });
     }
 
+    /**
+     * Uppercases the first character of a string...
+     *
+     * @param str
+     * @returns {string}
+     */
+    function ucFirst(str) {
+        return str.substr(0, 1).toUpperCase() + str.substr(1);
+    }
+
+    /**
+     *
+     */
+    function scrollResize() {
+        if (_iScroll !== null) {
+            // Setup iScroll automatically if there is a scrollable class on the page...
+            var $scrollable = $('#' + _currentPage + ' .scrollable');
+            // Resize the scroller to fit...
+            var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
+            var positionTop = $scrollable.position() ? $scrollable.position().top : 0;
+            $scrollable.height(_$currentPage.height() - positionTop - bottomBarHeight);
+            _iScroll.refresh();
+        }
+    }
+
+    /**
+     * Shows the menu if it s not visible.
+     * @param e
+     * @returns {*}
+     */
     function showMenu(e) {
 
         if (!_$menuDiv.is(':visible')) {
@@ -296,8 +147,8 @@ function TopcoatTouch($container, options) {
                 }
             });
 
-            menuItems.sort(function(a,b) {
-                if (!a.order  && !b.order) {
+            menuItems.sort(function (a, b) {
+                if (!a.order && !b.order) {
                     return 0;
                 }
                 if ((!a.order || a.order > b.order) && b.order !== -1) {
@@ -307,13 +158,13 @@ function TopcoatTouch($container, options) {
             });
 
             var menuDiv = '<ul id="menuList">';
-              for (var i = 0; i < menuItems.length; i++) {
+            for (var i = 0; i < menuItems.length; i++) {
                 if (menuItems[i].id) {
                     if (!menuItems[i].page || menuItems[i].page != _currentPage) {
-                        menuDiv += '<li class="menuItem" id="menuItem' + i + '" data-id="' + menuItems[i].id + '"' +
-                            (menuItems[i].page ? ' data-page="' + menuItems[i].page + '"' : '') + '>' +
-                            (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
-                            '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
+                        menuDiv += '<li class="menuItem" id="menuItem' + ucFirst(menuItems[i].id) + '" data-id="' + menuItems[i].id + '"' +
+                        (menuItems[i].page ? ' data-page="' + menuItems[i].page + '"' : '') + '>' +
+                        (self.options.menuHasIcons ? '<span class="menuItemIcon"></span>' : '') +
+                        '<span class="menuItemText">' + menuItems[i].name + '</span></li>';
                     }
                 } else {
                     menuDiv += '<li><hr></li>';
@@ -323,7 +174,7 @@ function TopcoatTouch($container, options) {
 
             _$menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
             _showingMenu = true;
-            setTimeout(function() {
+            setTimeout(function () {
                 _showingMenu = false;
                 _$menuDiv.removeAttr('disabled');
             }, self.options.menuFadeIn);
@@ -335,18 +186,6 @@ function TopcoatTouch($container, options) {
 
         // Difference between false and undefined in jQuery events...
         return undefined;
-    }
-
-
-    /**
-     * Uppercases the first character of a string...
-     *
-     * @param str
-     * @returns {string}
-     */
-
-    function ucFirst(str) {
-        return str.substr(0, 1).toUpperCase() + str.substr(1);
     }
 
     /**
@@ -395,9 +234,9 @@ function TopcoatTouch($container, options) {
                 res = callback();
             }
             if (res !== false) {
-            	self.hideDialog();
-        	}
-    	};
+                self.hideDialog();
+            }
+        };
     }
 
     /**
@@ -413,6 +252,11 @@ function TopcoatTouch($container, options) {
         }
     }
 
+    /**
+     * Required hack for zepto
+     * @param el
+     * @returns {*}
+     */
     function zeptoOuterHeightWithMargin(el) {
         var size = el.height();
         size += parseInt(el.css('margin-top'), 10) + parseInt(el.css('margin-bottom'), 10);
@@ -599,7 +443,7 @@ function TopcoatTouch($container, options) {
         _$currentPage.attr('class', 'page ' + pageClass.next);
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
-        //noinspection BadExpressionStatementJS  
+        // noinspection BadExpressionStatementJS
         $container.get(0).offsetWidth;
 
         // Position the page at the starting position of the animation        
@@ -798,6 +642,10 @@ function TopcoatTouch($container, options) {
      * @returns {TopcoatTouch}
      */
     this.on = function (event, selector, page, callback) {
+        if (!$container) {
+            _containerLoadEvents.push([event, selector, page, callback]);
+            return self;
+        }
         event = event.toLocaleLowerCase();
 
         var events = event.split(' ');
@@ -855,6 +703,10 @@ function TopcoatTouch($container, options) {
      */
     this.currentPage = function () {
         return _currentPage;
+    };
+
+    this.currentPageLoaded = function() {
+        return !!_$currentPage;
     };
 
     /**
@@ -1032,9 +884,8 @@ function TopcoatTouch($container, options) {
 
         // Resize the scroller to fit...
         var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
-        if (!$scrollable[0].style.height) {
-            $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
-        }
+        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
+
         // Clean up the old scroller if required...
         self.destroyScroll();
 
@@ -1042,7 +893,15 @@ function TopcoatTouch($container, options) {
         var scrollX = $scrollable.data('scroll-x');
 
         // Create the iScroll object...
-        _iScroll = new IScroll(scrollable, {scrollX: scrollX, scrollY: scrollY, tap: true, preventDefault: this.options.iScrollPreventDefault});
+        _iScroll = new IScroll(scrollable, {
+            scrollX: scrollX,
+            scrollY: scrollY,
+            tap: true,
+            preventDefault: this.options.iScrollPreventDefault,
+            bounce: this.options.iScrollBounce
+        });
+
+        $(window).on('resize', scrollResize);
 
         _iScroll.on('scrollStart', function () {
             self.isScrolling = true;
@@ -1057,7 +916,7 @@ function TopcoatTouch($container, options) {
             });
             setTimeout(function() {
                 self.isScrolling = false;
-            },150);
+            }, 150);
         });
     };
 
@@ -1067,6 +926,7 @@ function TopcoatTouch($container, options) {
     this.destroyScroll = function () {
         if (_iScroll !== null) {
             _iScroll.destroy();
+            $(window).off('resize', scrollResize);
             _iScroll = null;
         }
     };
@@ -1078,6 +938,14 @@ function TopcoatTouch($container, options) {
         if (_iScroll !== null) {
             _iScroll.refresh();
         }
+    };
+
+    /**
+     * Returns the current scroller, only use when necessary...
+     * @returns {*}
+     */
+    this.getScroll = function () {
+        return _iScroll;
     };
 
     /**
@@ -1272,11 +1140,11 @@ function TopcoatTouch($container, options) {
         }
 
         var $dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
-            '<div id="' + dialogId + '" class="topcoat-overlay">' +
-	        '<div class="topcoat-dialog-header">' + title + '</div>' +
-	        '<div class="topcoat-dialog-content">' + content + '</div>' +
-	        '<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
-	        '</div>');
+        	'<div id="' + dialogId + '" class="topcoat-overlay">' +
+        		'<div class="topcoat-dialog-header">' + title + '</div>' +
+        		'<div class="topcoat-dialog-content">' + content + '</div>' +
+        		'<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
+        	'</div>');
 
 
         _$currentPage.append($dialog);
@@ -1361,68 +1229,281 @@ function TopcoatTouch($container, options) {
     };
 
 
-    // Dropdown Box
-    this.on(self.clickEvent, '.toggle-dropdown', function () {
-        var $dropdown = $(this).parent().find('.dropdown');
-        $('.dropdown').removeClass('active');
-        if (!$dropdown.hasClass('active')) {
-            var $toggle = $(this);
-            var toggleTop = $toggle.offset().top;
-            var dropdownHeight = $dropdown.height();
-            var toggleHeight = $toggle.outerHeight(true);
-            var top = 0;
-            if (toggleTop + toggleHeight + dropdownHeight > window.innerHeight) {
-                top -= dropdownHeight;
-                if ($dropdown.hasClass('contained')) {
-                    top -= toggleHeight;
+    // This will allow for creating TopCoat touch before the document.ready has fired, as well as creating
+    // it in the head before the body has been parsed
+    $(document).ready(function() {
+
+        $container = $container || $('body');
+
+        for (var i = 0; i < _containerLoadEvents.length; i++) {
+            self.on(_containerLoadEvents[i][0], _containerLoadEvents[i][1], _containerLoadEvents[i][2], _containerLoadEvents[i][3]);
+        }
+
+        // Setup FastClick...
+        if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) === false) {
+            _fastClick = new FastClick(document.body);
+            self.clickEvent = 'click';
+        }
+
+        // Use Hammer for clickevent handling...
+        if (typeof Hammer === 'function' && self.clickEvent === 'touchend') {
+            self.clickEvent = 'tap';
+        }
+        // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
+        if (typeof IScroll == 'function') {
+            document.addEventListener('touchmove', function (e) {
+                e.preventDefault();
+            }, false);
+        }
+
+
+        // Page Start event...  Handle when the page transition has ended...
+        $container.on('transitionend webkitTransitionEnd', '.page', function () {
+            if (_startedAnimation) {
+
+                setupIScroll();
+
+                if (_skipUserEvents && _iScroll && _stashedScroll) {
+                    _iScroll.scrollTo(_stashedScroll.x, _stashedScroll.y);
                 }
-            } else {
-                top = toggleHeight;
+
+                // If we have a PAGE_START event fire the event...
+                arrayEach(getActiveEvents(self.EVENTS.PAGE_START, _currentPage), function (callback) {
+                    callback(_currentPage);
+                });
+
+                if (_$currentPage.find('.side-drawer').length) {
+                    self.on('slideright dragright', function (ev) {
+                        self.showSideDrawer();
+                        ev.preventDefault();
+                        return false;
+                    });
+                    self.on('slideleft dragleft', function (ev) {
+                        if (_$currentPage.hasClass('with-side-drawer')) {
+                            self.hideSideDrawer();
+                            ev.preventDefault();
+                            return false;
+                        }
+                    });
+                }
+
+                // Remove the transition class, it isn't needed any more...
+                $container.find('.page.transition').removeClass('transition');
+                $container.find('.page.transition-slow').removeClass('transition-slow');
+
+                // If _controller is set, we are running from a controller not a single page app.  Remove the
+                // page rather than hide it.
+                if (_controller) {
+                    if (!_skipUserEvents) {
+                        _controller.pagestart.call(_controller);
+                    }
+                    _controller._pagestart.call(_controller);
+                    var $page = $container.find('.page-remove');
+                    var prevController;
+
+                    if ($page.length > 0) {
+                        prevController = _controllers[$page.attr('id')];
+                    }
+
+
+                    if (prevController) {
+                        if (!_isDialog) {
+                            prevController.pageend.call(prevController);
+                        }
+                        prevController._pageend.call(prevController);
+                    }
+
+                    if (!_isDialog) {
+                        $page.remove();
+                    }
+                    if (_skipUserEvents) {
+                        removeOverlay();
+                        if (_backCallback) {
+                            _backCallback();
+                        }
+
+                    }
+                    if (prevController && !_isDialog) {
+                        prevController.postremove.call(prevController, $page);
+                    }
+
+
+                    _controller = null;
+                } else {
+                    // Remove unused classes
+                    if (!_isDialog) {
+                        $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
+                    }
+                    if (_skipUserEvents) {
+                        removeOverlay();
+                        if (_backCallback) {
+                            _backCallback();
+                        }
+                    }
+                }
+                _startedAnimation = false;
+
+                if (_fastClick) {
+                    // We disable tracking of fastclicks during a page switch...
+                    _fastClick.trackingDisabled = false;
+                }
+            } else if (_$currentPage.hasClass('remove-side-drawer')) {
+                _$currentPage.removeClass('remove-side-drawer');
             }
-            $dropdown.css({width: $toggle.outerWidth(), top: top});
-            $dropdown.addClass('active');
+        });
+
+
+
+        // Add next and previous events that can be caught...
+        if (window.history && history.pushState) { // check for history api support
+
+            // create history states
+            history.pushState(-1, null); // back state
+            history.pushState(0, null); // main state
+            history.pushState(1, null); // forward state
+            history.go(-1); // start in main state
+            window.addEventListener('popstate', function (event) {
+                var state = event.state;
+                if (state == -1) {
+                    var goBack = true;
+                    arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
+                        if (callback(_currentPage) === false) {
+                            goBack = false;
+                            return false;
+                        }
+                    });
+                    if (goBack) {
+                        self.goBack();
+                    }
+                    // reset state to what it should be
+                    history.go(-state);
+                }
+            }, false);
+
         }
-    });
 
-    this.on(self.clickEvent, '.dropdown-item', function () {
-        var $this = $(this),
-            $dropDown = $this.parent().parent(),
-            newId = $this.data('id');
-        $this.parent().removeClass('active');
-        $dropDown.find('.toggle-dropdown').text($this.text());
-        if (newId) {
-            $dropDown.data('value', newId);
-            $dropDown.trigger('change', newId);
-        } else {
-            $dropDown.trigger('change', this);
+        // Setup the Menu, requires access to public function so it has to be declared here:
+        if (self.options.menu) {
+
+            if (!Array.isArray(self.options.menu)) {
+                self.options.menu = [];
+            }
+
+            _$menuDiv = $('<div id="menuDiv" disabled></div>');
+
+            $container.append(_$menuDiv);
+
+            // Hide the menu one mousedown
+            self.on(self.touchStartEvent, function (e) {
+                if (!_showingMenu) {
+                    var $target = $(e.target);
+                    if (!$target.is('.menu-button') && $target.closest('.menu-button').length === 0 && $target.closest('#menuDiv').length === 0) {
+                        _$menuDiv.fadeOut(self.options.menuFadeOut);
+                    }
+                }
+            });
+
+            self.on(self.EVENTS.PAGE_END, function () {
+                if (_$menuDiv.is(':visible')) {
+                    hideMenu(false);
+                }
+            });
+
+            // Show the menu when it is clicked...
+            self.on(self.clickEvent, '.menu-button', function (e) {
+                e.preventDefault();
+                return showMenu(e);
+            });
+
+
+            // setup menu handlers
+            self.on(self.clickEvent, '#menuDiv .menuItem', function (e) {
+                $('#menuDiv').hide();
+                var $this = $(this);
+                var page = $this.data('page');
+                if (page) {
+                    tt.goTo(page);
+                } else {
+                    var menuId = $(this).data('id');
+                    arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
+                        callback.apply(this, [_currentPage, menuId]);
+                    });
+                }
+                e.preventDefault();
+                return false;
+            });
+
+            self.on(self.touchStartEvent, '#menuDiv .menuItem', function () {
+                $(this).addClass('selected');
+            });
+
+            self.on(self.touchEndEvent, '#menuDiv .menuItem', function () {
+                $(this).removeClass('selected');
+            });
         }
+
+        // Dropdown Box
+        self.on(self.clickEvent, '.toggle-dropdown', function () {
+            var $dropdown = $(this).parent().find('.dropdown');
+            $('.dropdown').removeClass('active');
+            if (!$dropdown.hasClass('active')) {
+                var $toggle = $(this);
+                var toggleTop = $toggle.offset().top;
+                var dropdownHeight = $dropdown.height();
+                var toggleHeight = $toggle.outerHeight(true);
+                var top = 0;
+                if (toggleTop + toggleHeight + dropdownHeight > window.innerHeight) {
+                    top -= dropdownHeight;
+                    if ($dropdown.hasClass('contained')) {
+                        top -= toggleHeight;
+                    }
+                } else {
+                    top = toggleHeight;
+                }
+                $dropdown.css({width: $toggle.outerWidth(), top: top});
+                $dropdown.addClass('active');
+            }
+        });
+
+        self.on(self.clickEvent, '.dropdown-item', function () {
+            var $this = $(this),
+                $dropDown = $this.parent().parent(),
+                newId = $this.data('id');
+            $this.parent().removeClass('active');
+            $dropDown.find('.toggle-dropdown').text($this.text());
+            if (newId) {
+                $dropDown.data('value', newId);
+                $dropDown.trigger('change', newId);
+            } else {
+                $dropDown.trigger('change', this);
+            }
+        });
+
+
+        // Setup all the linked pages
+        self.on(self.clickEvent, '[data-rel]', function (e) {
+            self.goTo($(this).data('rel'));
+            e.preventDefault();
+            return false;
+        });
+
+        // setup the all the back buttons
+        self.on(self.clickEvent, '.back-button', function (e) {
+            self.goBack();
+            e.preventDefault();
+            return false;
+        });
+
+        self.on(self.clickEvent, '.side-drawer-toggle', function (e) {
+            if (_$currentPage.hasClass('with-side-drawer')) {
+                self.hideSideDrawer();
+            } else {
+                self.showSideDrawer();
+            }
+            e.preventDefault();
+            return false;
+        });
     });
-
-
-    // Setup all the linked pages
-    this.on(self.clickEvent, '[data-rel]', function (e) {
-        self.goTo($(this).data('rel'));
-        e.preventDefault();
-        return false;
-    });
-
-    // setup the all the back buttons
-    this.on(self.clickEvent, '.back-button', function (e) {
-        self.goBack();
-        e.preventDefault();
-        return false;
-    });
-
-    this.on(self.clickEvent, '.side-drawer-toggle', function (e) {
-        if (_$currentPage.hasClass('with-side-drawer')) {
-            self.hideSideDrawer();
-        } else {
-            self.showSideDrawer();
-        }
-        e.preventDefault();
-        return false;
-    });
-
 
 
 }
