@@ -101,3 +101,7 @@ Version 0.4.9
 - Fix bounce option for iScroll
 - Wait until the document loads before initializing container (important
   when no container is passed into contstructor).
+
+Version 0.5.0
+- Improve handling of dialogs and loading modals (allow for Cancel, and varied button counts).
+- Added a progress modal, (call showProgress and updateProgess).

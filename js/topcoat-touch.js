@@ -21,6 +21,7 @@ function TopcoatTouch($container, options) {
     var _skipUserEvents;
     var _stashedScroll;
     var _backCallback;
+    var _cancelFunction;
     var _$menuDiv;
     var _containerLoadEvents = [];
     var self = this;
@@ -147,7 +148,7 @@ function TopcoatTouch($container, options) {
                 }
             });
 
-            menuItems.sort(function (a, b) {
+            menuItems.sort(function(a,b) {
                 if (!a.order && !b.order) {
                     return 0;
                 }
@@ -172,9 +173,9 @@ function TopcoatTouch($container, options) {
             }
             menuDiv += '</ul>';
 
-            _$menuDiv.html(menuDiv).fadeIn(self.options.menuFadeIn);
+            _$menuDiv.attr('disabled','disabled').html(menuDiv).fadeIn(self.options.menuFadeIn);
             _showingMenu = true;
-            setTimeout(function () {
+            setTimeout(function() {
                 _showingMenu = false;
                 _$menuDiv.removeAttr('disabled');
             }, self.options.menuFadeIn);
@@ -186,6 +187,19 @@ function TopcoatTouch($container, options) {
 
         // Difference between false and undefined in jQuery events...
         return undefined;
+    }
+
+	/**
+     * Counts number of items in an object.
+     * @param obj
+     * @returns {Number}
+     */
+    function objectSize(obj) {
+        var count = 0;
+        $.each(obj, function() { 
+            count++ 
+        });
+        return count;
     }
 
     /**
@@ -443,7 +457,7 @@ function TopcoatTouch($container, options) {
         _$currentPage.attr('class', 'page ' + pageClass.next);
 
         // Force reflow. More information here: http://www.phpied.com/rendering-repaint-reflowrelayout-restyle/
-        // noinspection BadExpressionStatementJS
+        //noinspection BadExpressionStatementJS  
         $container.get(0).offsetWidth;
 
         // Position the page at the starting position of the animation        
@@ -992,26 +1006,68 @@ function TopcoatTouch($container, options) {
         }
     };
 
-    /**
-     * Show a loading indicator with an optional message
-     * TODO: Make this more configurable...
-     *
-     * @param msg {String}
-     * @param [ui] {String}
-     * */
-    this.showLoading = function (msg, ui) {
+	/**
+	 * Show a custom loader
+     * 
+     * @param ui {String}
+     **/  
+    this.showCustomLoading = function(ui) {
         if (_loadingShowing) {
             self.hideLoading();
         }
         _loadingShowing = true;
-        _$loadingDiv = $(ui || '<aside id="topcoat-loading-div" class="topcoat-overlay">' +
-            '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
-            '<span class="topcoat-spinner"></span></aside>');
-        showOverlay(true);
-        _$currentPage.append(_$loadingDiv);
+        _$loadingDiv = $(ui);
+        showOverlay();
+        $container.append(_$loadingDiv);
     };
 
-    this.showProgress = function (msg) {
+    /**
+     * Show a loading indicator with an optional message
+     *
+     * @param msg {String}
+     * @param [cancelFunction] {Function}
+     * @param [cancelText] {String}
+     *
+     **/
+    this.showLoading = function (msg, cancelFunction, cancelText) {
+        if (typeof cancelFunction == 'string') {
+            cancelText = cancelFunction;
+        }
+        if (_loadingShowing) {
+            self.hideLoading();
+        }
+        _loadingShowing = true;
+        _$loadingDiv = $('<aside id="topcoat-loading-div" class="topcoat-overlay">' +
+            '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
+            '<span class="topcoat-spinner"></span></aside>');
+        $container.append(_$loadingDiv);    // Have to add the loading div for getting the height and top of the spinner to size the div...
+        if (cancelFunction) {
+            var $cancelButton = $('<button class="topcoat-button loading-cancel-button">' + (cancelText || 'Cancel') + '</button>');
+            _cancelFunction = function() {
+               self.hideLoading();
+               if (typeof cancelFunction == 'function') {
+                   cancelFunction();
+               }
+            };
+            $cancelButton.click(function() {
+               _cancelFunction();
+            });
+            _$loadingDiv.append($cancelButton);
+            _$loadingDiv.height($cancelButton.position().top + $cancelButton.height() + 75); // This is ugh and relies upon the margin-top set on the cancel button.
+        } else {
+            var $spinner = _$loadingDiv.find('.topcoat-spinner');
+            // This can't be static because the size the message text could change (could do a measure text somehow and determine the size of the message and add the values).
+            // Have to use absolute position and setting top,bottom to 0 to position overtop of the overlay
+            _$loadingDiv.height($spinner.position().top + $spinner.height() + 20);
+        }
+        showOverlay();
+
+    };
+
+    this.showProgress = function (msg, cancelFunction, cancelText) {
+        if (typeof cancelFunction == 'string') {
+            cancelText = cancelFunction;
+        }
         if (_loadingShowing) {
             self.hideLoading();
         }
@@ -1024,15 +1080,37 @@ function TopcoatTouch($container, options) {
                 '</div>' +
             '</div>' +
         '</aside>');
-        showOverlay(true);
-        _$currentPage.append(_$loadingDiv);
+        $container.append(_$loadingDiv); // Have to add the loading div for getting the height and top of the progress bar to size the div...
+
+        if (cancelFunction) {
+            var $cancelButton = $('<button class="topcoat-button progress-cancel-button">' + (cancelText || 'Cancel') + '</button>');
+            _cancelFunction = function() {
+               self.hideLoading();
+               if (typeof cancelFunction == 'function') {
+                   cancelFunction();
+               }
+            };
+            $cancelButton.click(function() {
+               _cancelFunction();
+            });
+            _$loadingDiv.append($cancelButton);
+            _$loadingDiv.height($cancelButton.position().top + $cancelButton.height() + 35); // This is ugh and relies upon the margin-top set on the cancel button.
+        } else {
+            var $spinner = _$loadingDiv.find('.progress-container');
+            // see notes in showLoading for why this has to happen
+            _$loadingDiv.height($spinner.position().top + $spinner.height() + 20);
+        }
+        showOverlay();        
     };
 
     this.updateProgress = function(percent) {
         if (percent < 1) {
             percent *= 100;
         }
-        _$loadingDiv.find('.progress-bar').css('left', percent + '%');
+        var oldProgress = parseInt(_$loadingDiv.find('.progress-bar').css('left'),10);
+        if (percent > oldProgress) {
+        	_$loadingDiv.find('.progress-bar').css('left', percent + '%');
+        }
     };
 
     /**
@@ -1054,6 +1132,7 @@ function TopcoatTouch($container, options) {
             removeOverlay();
             _$loadingDiv.remove();
         }
+        _cancelFunction = false;
         return self;
     };
 
@@ -1129,6 +1208,8 @@ function TopcoatTouch($container, options) {
 
         buttons = buttons || {OK: null};
 
+        var buttonClass = ['one','two','three','many'][Math.min(objectSize(buttons),4) - 1] + '-button';
+
         for (var buttonCaption in buttons) {
             if (buttons.hasOwnProperty(buttonCaption)) {
                 var buttonId = 'topcoat-button-' + buttonCount;
@@ -1143,7 +1224,7 @@ function TopcoatTouch($container, options) {
         	'<div id="' + dialogId + '" class="topcoat-overlay">' +
         		'<div class="topcoat-dialog-header">' + title + '</div>' +
         		'<div class="topcoat-dialog-content">' + content + '</div>' +
-        		'<div class="topcoat-dialog-button-bar">' + buttonText + '</div>' +
+	        '<div class="topcoat-dialog-button-bar ' + buttonClass + '">' + buttonText + '</div>' +
         	'</div>');
 
 
@@ -1619,8 +1700,7 @@ function PageController(pageName, fns, data, tt) {
             events = events.split(/[, ]/);
         }
         for (var i = 0; i < events.length; i++) {
-            var event = events[i] == 'click' ? tt.clickEvent : events[i];
-            this.events.push({event: event, selector: selector, callback: callback});
+            this.events.push({event: events[i], selector: selector, callback: callback});
         }
         return this;
     };
