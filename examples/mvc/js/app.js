@@ -95,6 +95,22 @@
                     , Cancel: function() { console.log('Cancel Pressed')}});
             });
 
+            $(document).on('click', '#showOptionDialog', function() {
+                var options = {};
+                for (var i = 0; i < 30; i++) {
+                    options['option' + i] = 'Option Number ' + (i + 1);
+                }
+
+                tt.showOptionsDialog('Pick from the following options', 'Option Dialog', options, {
+                        OK: function(value) {
+                            console.log('OK Pressed, value: ' + value)
+                        }
+                    }, {
+                        Cancel: function() {
+                            console.log('Cancel Pressed')
+                        }
+                    });
+            })
         }
 
     });

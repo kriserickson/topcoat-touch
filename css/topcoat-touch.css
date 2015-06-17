@@ -39,6 +39,12 @@ body {
     position: relative;
 }
 
+.topcoat-list__item.active {
+  background-color: #9daca9;
+  color: #fff;
+  border-top: 0;
+}
+
 .topcoat-list__item p {
 	color: #000;
     margin: 0;
@@ -641,4 +647,8 @@ body > div {
     top: 0;
     -webkit-transition: left .5s ease-in-out;
     transition: left .5s ease-in-out;
+}
+
+#topCoatTouchOptionDialog .topcoat-list__container {
+	overflow: hidden;
 }

@@ -100,8 +100,13 @@ Version 0.4.9
 - Allow checking whether a page has loaded.
 - Fix bounce option for iScroll
 - Wait until the document loads before initializing container (important
-  when no container is passed into contstructor).
+  when no container is passed into constructor).
 
 Version 0.5.0
 - Improve handling of dialogs and loading modals (allow for Cancel, and varied button counts).
 - Added a progress modal, (call showProgress and updateProgess).
+
+Version 0.6.0
+- Add an option dialog
+- Add before end event that fires before a page is exited.
+
