@@ -1758,8 +1758,7 @@ function PageController(pageName, fns, data, tt) {
 
     for (var name in defaultFunctions) {
         if (defaultFunctions.hasOwnProperty(name)) {
-            this[name] = fns[name] || defaultFunctions[name] || function () {
-                };
+            this[name] = fns[name] || defaultFunctions[name] || function () {};
         }
     }
 
