@@ -19,13 +19,23 @@ function TopcoatTouch($container, options) {
     var _isDialog;
     var _dialogTransition;
     var _fromDialog;
-    var _deviceHeight = document.documentElement.clientHeight;
+    var _deviceHeight;
     var _stashedScroll;
     var _backCallback;
     var _cancelFunction;
     var _$menuDiv;
     var _containerLoadEvents = [];
     var self = this;
+    var _okButton = 'OK';
+    var _cancelButton = 'Cancel';
+
+    function setDeviceHeight() {
+        _deviceHeight = document.documentElement.clientHeight || window.innerHeight;
+        if (_deviceHeight <= 0) {
+            setTimeout(setDeviceHeight, 100);
+        }
+    }
+    setDeviceHeight();
 
     var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
         'dragright', 'swipe', 'swipeup', 'swipedown', 'swipeleft', 'swiperight', 'transform', 'transformstart',
@@ -88,13 +98,18 @@ function TopcoatTouch($container, options) {
         console.error('jQuery or Zepto must be included before instantiating TopcoatTouch');
     }
 
+    if (options.buttons) {
+        _cancelButton = options.buttons.cancelButton || _cancelButton;
+        _okButton = options.buttons.cancelButton || _okButton;
+    };
+
     this.options = $.extend(defaults, options);
 
     this.locals = options.locals || {};
 
     delete this.options.locals;
 
-
+    
     /**
      * Hides the menu, calling any events required on closing the menu
      * @param fade
@@ -143,14 +158,18 @@ function TopcoatTouch($container, options) {
             var menuItems = clone(self.options.menu);
 
             arrayEach(getActiveEvents(self.EVENTS.SHOW_MENU, _currentPage), function (callback) {
-                var res = callback(_currentPage, menuItems);
+                var menuEvent = {cancelPropagation: false};
+                var res = callback(_currentPage, menuItems, menuEvent);
                 if (res) {
                     menuItems = res;
+                    if (menuEvent.cancelPropagation) {
+                        return false;
+                    }
                 }
             });
 
             menuItems.sort(function (a, b) {
-                if (!a.order && !b.order) {
+                if (!a.order  && !b.order) {
                     return 0;
                 }
                 if ((!a.order || a.order > b.order) && b.order !== -1) {
@@ -160,7 +179,7 @@ function TopcoatTouch($container, options) {
             });
 
             var menuDiv = '<ul id="menuList">';
-            for (var i = 0; i < menuItems.length; i++) {
+              for (var i = 0; i < menuItems.length; i++) {
                 if (menuItems[i].id) {
                     if (!menuItems[i].page || menuItems[i].page != _currentPage) {
                         menuDiv += '<li class="menuItem" id="menuItem' + ucFirst(menuItems[i].id) + '" data-id="' + menuItems[i].id + '"' +
@@ -209,7 +228,7 @@ function TopcoatTouch($container, options) {
     function objectSize(obj) {
         var count = 0;
         $.each(obj, function () {
-            count++
+            count += 1;
         });
         return count;
     }
@@ -260,9 +279,9 @@ function TopcoatTouch($container, options) {
                 res = callback();
             }
             if (res !== false) {
-                self.hideDialog();
-            }
-        };
+            	self.hideDialog();
+        	}
+    	};
     }
 
     /**
@@ -912,15 +931,25 @@ function TopcoatTouch($container, options) {
 
         $scrollable = $scrollable || $(scrollable);
 
-        // Resize the scroller to fit...
-        var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
-        $scrollable.height(_$currentPage.height() - $scrollable.position().top - bottomBarHeight);
+
+
+
 
         // Clean up the old scroller if required...
         self.destroyScroll();
 
         var scrollY = (!$scrollable.attr('data-scroll-y') || $scrollable.data('scroll-y'));
         var scrollX = $scrollable.data('scroll-x');
+
+        // Resize the scroller to fit...
+        var scrollHeight = $scrollable.data('scroll-height');
+        if (!scrollHeight) {
+            var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
+            scrollHeight = _$currentPage.height() - $scrollable.position().top - bottomBarHeight;
+        }
+
+        $scrollable.height(scrollHeight);
+
 
         // Create the iScroll object...
         _iScroll = new IScroll(scrollable, {
@@ -1022,11 +1051,11 @@ function TopcoatTouch($container, options) {
         }
     };
 
-    /**
-     * Show a custom loader
-     *
+	/**
+	 * Show a custom loader
+     * 
      * @param ui {String}
-     **/
+     **/  
     this.showCustomLoading = function (ui) {
         if (_loadingShowing) {
             self.hideLoading();
@@ -1058,15 +1087,15 @@ function TopcoatTouch($container, options) {
             '<span class="topcoat-spinner"></span></aside>');
         $container.append(_$loadingDiv);    // Have to add the loading div for getting the height and top of the spinner to size the div...
         if (cancelFunction) {
-            var $cancelButton = $('<button class="topcoat-button loading-cancel-button">' + (cancelText || 'Cancel') + '</button>');
+            var $cancelButton = $('<button class="topcoat-button loading-cancel-button">' + (cancelText || _cancelButton) + '</button>');
             _cancelFunction = function () {
-                self.hideLoading();
-                if (typeof cancelFunction == 'function') {
-                    cancelFunction();
-                }
+               self.hideLoading();
+               if (typeof cancelFunction == 'function') {
+                   cancelFunction();
+               }
             };
             $cancelButton.click(function () {
-                _cancelFunction();
+               _cancelFunction();
             });
             _$loadingDiv.append($cancelButton);
             _$loadingDiv.height($cancelButton.position().top + $cancelButton.height() + 75); // This is ugh and relies upon the margin-top set on the cancel button.
@@ -1077,7 +1106,7 @@ function TopcoatTouch($container, options) {
             _$loadingDiv.height($spinner.position().top + $spinner.height() + 20);
         }
         showOverlay();
-
+        
     };
 
     this.showProgress = function (msg, cancelFunction, cancelText) {
@@ -1089,25 +1118,25 @@ function TopcoatTouch($container, options) {
         }
         _loadingShowing = true;
         _$loadingDiv = $('<aside id="topcoat-loading-div" class="topcoat-overlay">' +
-            '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
-            '<div class="progress-container">' +
-            '<div class="progress progress-wrap">' +
-            '<div class="progress progress-bar"></div>' +
-            '</div>' +
-            '</div>' +
+                '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
+                '<div class="progress-container">' +
+                    '<div class="progress progress-wrap">' +
+                        '<div class="progress progress-bar"></div>' +
+                    '</div>' +
+                '</div>' +
             '</aside>');
         $container.append(_$loadingDiv); // Have to add the loading div for getting the height and top of the progress bar to size the div...
 
         if (cancelFunction) {
-            var $cancelButton = $('<button class="topcoat-button progress-cancel-button">' + (cancelText || 'Cancel') + '</button>');
+            var $cancelButton = $('<button class="topcoat-button progress-cancel-button">' + (cancelText || _cancelButton) + '</button>');
             _cancelFunction = function () {
-                self.hideLoading();
-                if (typeof cancelFunction == 'function') {
-                    cancelFunction();
-                }
+               self.hideLoading();
+               if (typeof cancelFunction == 'function') {
+                   cancelFunction();
+               }
             };
             $cancelButton.click(function () {
-                _cancelFunction();
+               _cancelFunction();
             });
             _$loadingDiv.append($cancelButton);
             _$loadingDiv.height($cancelButton.position().top + $cancelButton.height() + 35); // This is ugh and relies upon the margin-top set on the cancel button.
@@ -1116,7 +1145,7 @@ function TopcoatTouch($container, options) {
             // see notes in showLoading for why this has to happen
             _$loadingDiv.height($spinner.position().top + $spinner.height() + 20);
         }
-        showOverlay();
+        showOverlay();        
     };
 
     this.updateProgress = function (percent) {
@@ -1172,11 +1201,11 @@ function TopcoatTouch($container, options) {
     this.createToggleButton = function ($el, value) {
         $el.addClass('toggleButton').html('<div class="button-wrap' + (value ? ' button-active' : '') + '">' +
             '<div class="button-bg">' +
-            '<div class="button-out"></div>' +
-            '<div class="button-in"></div>' +
-            '<div class="button-switch"></div>' +
+               '<div class="button-out"></div>' +
+               '<div class="button-in"></div>' +
+               '<div class="button-switch"></div>' +
             '</div>' +
-            '</div>');
+        '</div>');
         $el.on('click', function () {
             var $wrap = $el.find('.button-wrap');
             $wrap.toggleClass('button-active');
@@ -1280,8 +1309,11 @@ function TopcoatTouch($container, options) {
         if (self.dialogShowing()) {
             self.hideDialog();
         }
+        if (self.loadingShowing()) {
+            self.hideLoading();
+        }
         _dialogShowing = true;
-        if (typeof title == 'object') {
+        if (typeof title === 'object' || typeof title === 'function') {
             dialogId = buttons;
             buttons = title;
             title = '';
@@ -1291,7 +1323,15 @@ function TopcoatTouch($container, options) {
         title = title || 'Info';
         dialogId = dialogId || 'topcoat-dialog-div';
 
-        buttons = buttons || {OK: null};
+        var okFunction = null;
+        if (typeof buttons === 'function') {
+            okFunction = buttons;
+            buttons = false;
+        }
+        if (!buttons) {
+            buttons = {};
+            buttons[_okButton] = okFunction;
+        }
 
         var buttonClass = ['one', 'two', 'three', 'many'][Math.min(objectSize(buttons), 4) - 1] + '-button';
 
@@ -1301,20 +1341,20 @@ function TopcoatTouch($container, options) {
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
                 $container.off(self.clickEvent, '#' + buttonId)
                     .on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
-                buttonCount++;
-            }
+            	buttonCount++;
+        	}
         }
 
         var $dialog = $('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>' +
             '<div id="' + dialogId + '" class="topcoat-overlay">' +
-            '<div class="topcoat-dialog-header">' + title + '</div>' +
-            '<div class="topcoat-dialog-content">' + content + '</div>' +
-            '<div class="topcoat-dialog-button-bar ' + buttonClass + '">' + buttonText + '</div>' +
-            '</div>');
+	        '<div class="topcoat-dialog-header">' + title + '</div>' +
+	        '<div class="topcoat-dialog-content">' + content + '</div>' +
+	        '<div class="topcoat-dialog-button-bar ' + buttonClass + '">' + buttonText + '</div>' +
+	        '</div>');
 
 
         (function attachDialogToPage() {
-            function setDialogHeight() {
+             function setDialogHeight() {
                 if (imagesLoaded > 0) {
                     setTimeout(setDialogHeight, 50);
                 } else {
@@ -1380,6 +1420,12 @@ function TopcoatTouch($container, options) {
      */
     this.loadingShowing = function () {
         return _loadingShowing;
+    };
+
+    this.loadingCancel = function(){
+        if (typeof _cancelFunction === 'function') {
+            _cancelFunction.call(self);
+        }
     };
 
     /**
@@ -1522,7 +1568,7 @@ function TopcoatTouch($container, options) {
                         }
                     }
                 }
-
+               
 
                 if (_fastClick) {
                     // We disable tracking of fastclicks during a page switch...
@@ -1545,16 +1591,16 @@ function TopcoatTouch($container, options) {
             window.addEventListener('popstate', function (event) {
                 var state = event.state;
                 if (state == -1) {
-                    var goBack = true;
-                    arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
-                        if (callback(_currentPage) === false) {
-                            goBack = false;
-                            return false;
+                        var goBack = true;
+                        arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
+                            if (callback(_currentPage) === false) {
+                                goBack = false;
+                                return false;
+                            }
+                        });
+                        if (goBack) {
+                            self.goBack();
                         }
-                    });
-                    if (goBack) {
-                        self.goBack();
-                    }
                     // reset state to what it should be
                     history.go(-state);
                 }
@@ -1632,7 +1678,7 @@ function TopcoatTouch($container, options) {
                 var dropdownHeight = $dropdown.height();
                 var toggleHeight = $toggle.outerHeight(true);
                 var top = 0;
-                if (toggleTop + toggleHeight + dropdownHeight > window.innerHeight) {
+                if (toggleTop + toggleHeight + dropdownHeight > _deviceHeight) {
                     top -= dropdownHeight;
                     if ($dropdown.hasClass('contained')) {
                         top -= toggleHeight;

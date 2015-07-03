@@ -110,3 +110,8 @@ Version 0.6.0
 - Add an option dialog
 - Add before end event that fires before a page is exited.
 
+Version 0.6.1
+- Added ability to translate default Buttons.
+- Minor improvements to scrolling, sizing and dialogs.
+- Removed Range-Slider from kitchen sink demo until a solution can be found between range-slider and iscroll.
+
