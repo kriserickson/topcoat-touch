@@ -3,7 +3,7 @@ Topcoat Touch
 
 [![Build Status](https://travis-ci.org/kriserickson/topcoat-touch.png?branch=master)](https://travis-ci.org/kriserickson/topcoat-touch)
 
-See [TopcoatTouch.com](http://topcoattouch.com) for more details.
+See [TopcoatTouch.com](http://kriserickson.github.io/topcoat-touch/) for more details.
 
 A very simple mobile framework that uses [Topcoat](http://topcoat.io) CSS framework to create mobile applications. inspired by [jQT](http://jqtjs.com/), it can be used either with a [single html document with multiple pages](/example/one-document/), or
 using a [collection of controllers and templates](/example/mvc/).  It uses a collection of optional libraries to provide most of the functionality
