@@ -20,7 +20,7 @@ It has a [generator](https://github.com/kriserickson/generator-topcoat-touch) fo
 Uses some of the CSS for page flipping from the Christopher Coenraets [topcoat/backbone](http://coenraets.org/blog/2013/06/sample-mobile-phonegap-application-with-backbone-js-and-topcoat) example
 and screencasts.
 
-Read more about why topcoat-touch was created on my blog post, [It Appears You are Building A Framework](http://www.agingcoder.com/2014/01/06/it-appears-like-you-are-building-a-framework/)
+Read more about why topcoat-touch was created on my blog post, [It Appears You are Building A Framework](https://www.agingcoder.com/topcoattouch/2014/01/06/it-appears-like-you-are-building-a-framework/)
 
 * [Getting Started](//github.com/kriserickson/topcoat-touch/wiki/Getting-Started) -- Getting started with topcoat touch.
 * [Wiki](//github.com/kriserickson/topcoat-touch/wiki) - Browse the Wiki for more detailed documentation.
