@@ -194,7 +194,7 @@ describe('MVC Dynamic Page', function () {
 
 });
 
-describe('MVC Validate Added Events Fire', function () {
+describe('MVC Validate Form Events Fire', function () {
 
     var tt;
     var buttonClicked = false;
@@ -205,19 +205,28 @@ describe('MVC Validate Added Events Fire', function () {
         $('body').append('<div id="testContainer">');
         tt = new TopcoatTouch($('#testContainer'), {templateDirectory: 'test/templates'});
         var controller = tt.createController('home');
+
         controller.addEvent(tt.clickEvent, '#testClick', function() {
             buttonClicked = true;
+            // PhantomJS wll not submit the form...
+            if (navigator.userAgent.indexOf('PhantomJS') !== -1) {
+                $('#testForm').trigger('submit');
+            }
         });
+
+
         controller.addEvent('submit', '#testForm', function(e) {
             e.preventDefault();
             formSubmitted = true;
         });
+
         controller.pagestart = function () {
             setTimeout(function() {
                 $('#testClick').trigger(tt.clickEvent);
                 done();
             }, 1);
         };
+
         tt.goTo('home');
     });
 
@@ -228,11 +237,11 @@ describe('MVC Validate Added Events Fire', function () {
 
 
 
-    it('should be on page 2', function() {
+    it('button should have been clicked', function() {
         expect(buttonClicked).to.be.true;
     });
 
-    it('page 2 should have a header title Page2', function() {
+    it('form should have been submitted', function() {
         expect(formSubmitted).to.be.true;
     });
 

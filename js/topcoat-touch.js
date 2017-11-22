@@ -41,7 +41,7 @@ function TopcoatTouch($container, options) {
     }
     setDeviceHeight();
 
-    var HAMMER_EVENTS = ['hold', 'tap', 'doubletap', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
+    var HAMMER_EVENTS = ['doubletap', 'hold', 'drag', 'dragstart', 'dragend', 'dragup', 'dragdown', 'dragleft',
         'dragright', 'swipe', 'swipeup', 'swipedown', 'swipeleft', 'swiperight', 'transform', 'transformstart',
         'transformend', 'rotate', 'pinch', 'pinchin', 'pinchout', 'touch', 'release'];
 
@@ -563,19 +563,6 @@ function TopcoatTouch($container, options) {
      * @returns {*}
      */
     function eventHandler(event) {
-        // HACK: preventing native browser event from also firing a ghost click,
-        // that this handler cannot directly patch
-        // This is a monkeypatch b/c hammer js tap triggers a DOM ghost click
-        if (
-            event.type === 'tap' &&
-                event.gesture &&
-                event.target &&
-                event.target.id.match(/^topcoat-button-\d+$/)
-        ) {
-            event.gesture.srcEvent.preventDefault();
-        }
-
-        // TODO: this needs documentation
         //noinspection EqualityComparisonWithCoercionJS
         if (_disableEvents || (event.type == self.clickEvent && self.isScrolling && !self.options.iScrollPreventDefault)) {
             event.preventDefault();
@@ -585,12 +572,10 @@ function TopcoatTouch($container, options) {
         // find all events that subscribe to this trigger
         var events = _events[event.type];
         if (events) {
-            var hasChecked = false;
+            var $target = $(event.target);
             for (var i = 0; i < events.length; i++) {
-                //noinspection EqualityComparisonWithCoercionJS
-                if (!events[i].page || events[i].page == _currentPage) {
+                 if (!events[i].page || events[i].page === _currentPage) {
                     var target;
-                    var $target = $(event.target);
                     var selector = events[i].selector;
 
                     if ($target.is(selector) || !selector) {
@@ -600,9 +585,8 @@ function TopcoatTouch($container, options) {
                         target = target.length > 0 ? target[0] : false;
                     }
 
-                    if (target && (hasChecked || !isDuplicateTapOrClick(event))) {
-                        hasChecked = true;
-                        var ret = events[i].callback.apply(target, [event, target]);
+                    if (target) {
+                        var ret = events[i].callback.apply(target, [event]);
                         if (ret === false) {
                             return false;
                         }
@@ -614,37 +598,7 @@ function TopcoatTouch($container, options) {
         return undefined;
     }
 
-    /**
-    * Hammer sends multiple taps on click event, thus may trigger a callback more than once
-    * this function dumb-checks based on time-delta of events
-    * NOTE: it does not prevent native DOM events, use e.gesture.srcEvent.preventDefault() for that
-    * info: http://hammerjs.github.io/tips/
-    * discussion: https://github.com/hammerjs/hammer.js/issues/626
-    * @param event
-    * @returns {Boolean}
-    */
-    function isDuplicateTapOrClick(event) {
-        // early return for things we don't need
-        if (event.type !== 'tap' && event.type !== 'click' && event.type !== 'doubletap' && event.type !== 'doubleclick') {
-            return false;
-        }
-
-        var tappedTime = new Date().getTime();
-        var elapsed = tappedTime - _lastTapTime;
-        _lastTapTime = tappedTime;
-
-        // if two different targets or sufficient time passed (elapsed will be less than 0 if the last event was not the same type of event).
-        if (elapsed > GHOSTCLICK_THRESHOLD || elapsed < 0) {
-            console.log('Not duplicate event type: ' + event.type + ', elapsed: ' + elapsed);
-            return false;
-        } else {
-            console.log('Duplicate event type: ' + event.type + ', elapsed: ' + elapsed);
-        	return true;
-    	}
-    }
-
-
-    /**
+   /**
      * Turn on delegated events
      *
      * @param event {String}

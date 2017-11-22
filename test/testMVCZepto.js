@@ -193,7 +193,7 @@ describe('Zepto MVC Dynamic Page', function () {
 
 });
 
-describe('Zepto MVC Validate Added Events Fire', function () {
+describe('Zepto MVC Validate Form Events Fire', function () {
 
     var tt;
     var buttonClicked = false;
@@ -206,6 +206,11 @@ describe('Zepto MVC Validate Added Events Fire', function () {
         var controller = tt.createController('home');
         controller.addEvent(tt.clickEvent, '#testClick', function() {
             buttonClicked = true;
+            // PhantomJS wll not submit the form...
+            if (navigator.userAgent.indexOf('PhantomJS') !== -1) {
+                $('#testForm').trigger('submit');
+            }
+
         });
         controller.addEvent('submit', '#testForm', function(e) {
             e.preventDefault();

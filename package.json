@@ -2,11 +2,10 @@
     "name": "topcoat-touch",
     "version": "0.7.0",
     "devDependencies": {
-        "mocha": "1.18.2",
-        "chai": "1.9.1",
-        "mocha-phantomjs": "3.3.2",
-        "http-server": "0.6.1",
-        "phantomjs": "~1.9"
+        "mocha": "4.0.1",
+        "chai": "4.1.2",
+        "mocha-phantomjs": "4.1",
+        "http-server": "0.10.0"
     },
     "repository": {
         "type": "git",

@@ -276,8 +276,7 @@ describe('Single Page Click to page 3 tests', function() {
             }, 1);
         });
         tt.on(tt.EVENTS.PAGE_START, 'page2', function() {
-            console.log('on page 2: click is: ' + tt.clickEvent);
-            setTimeout(function() {
+           setTimeout(function() {
                 $('#gotoPage3Button').trigger(tt.clickEvent);
             }, 1);
         });
