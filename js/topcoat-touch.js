@@ -14,7 +14,6 @@ function TopcoatTouch($container, options) {
     var _pages = [];
     var _controllers = {};
     var _controller;
-    var _fastClick;
     var _showingMenu;
     var _isDialog;
     var _dialogTransition;
@@ -28,6 +27,11 @@ function TopcoatTouch($container, options) {
     var self = this;
     var _okButton = 'OK';
     var _cancelButton = 'Cancel';
+    var _disableEvents = false;
+    var _lastTapTime = 0; // flag used to prevent ghostclick
+    var _scrollingTimeout = 0;
+    var GHOSTCLICK_THRESHOLD = 200;
+	var VERSION = '0.7.0';
 
     function setDeviceHeight() {
         _deviceHeight = document.documentElement.clientHeight || window.innerHeight;
@@ -42,7 +46,7 @@ function TopcoatTouch($container, options) {
         'transformend', 'rotate', 'pinch', 'pinchin', 'pinchout', 'touch', 'release'];
 
     // If the container is empty but the options exist...
-    if (typeof $container == 'object' && !options && !$container.jquery && !Array.isArray($container)) {
+    if (typeof $container === 'object' && !options && !$container.jquery && !Array.isArray($container)) {
         options = $container;
         $container = false;
     }
@@ -58,8 +62,17 @@ function TopcoatTouch($container, options) {
 
     // The TT events...
     this.EVENTS = {
-        PAGE_START: 'pagestart', PAGE_END: 'pageend', SCROLL_START: 'scrollstart', SCROLL_END: 'scrollend',
-        MENU_ITEM_CLICKED: 'menuitem', SHOW_MENU: 'showmenu', HIDE_MENU: 'hidemenu', BACK: 'back', BEFORE_END: 'beforeend'
+        PAGE_START: 'page-start',
+        PAGE_END: 'page-end',
+        SCROLL_START: 'scroll-start',
+        SCROLL_CANCEL: 'scroll-cancel',
+        SCROLL_END: 'scroll-end',
+        MENU_ITEM_CLICKED: 'menu-item',
+        SHOW_MENU: 'show-menu',
+        HIDE_MENU: 'hide-menu',
+        BACK: 'back',
+        BEFORE_END: 'before-end',
+        HIDE_DIALOG: 'hide-dialog'
     };
 
     this.TRANSITIONS = {
@@ -72,8 +85,10 @@ function TopcoatTouch($container, options) {
     };
 
     this.isScrolling = false;
-    this.clickEvent = 'ontap' in document.documentElement ? 'tap' : 'click';
+    this.clickEvent = 'ontouchstart' in document.documentElement ? 'tap' : 'click';  // Bug with ios, no tap in document.documentElement
     this.touchStartEvent = 'ontouchstart' in document.documentElement ? 'touchstart' : 'mousedown';
+    
+    //noinspection JSUnusedGlobalSymbols
     this.touchMoveEvent = 'ontouchmove' in document.documentElement ? 'touchmove' : 'mousemove';
     this.touchEndEvent = 'ontouchend' in document.documentElement ? 'touchend touchcancel touchleave' : 'mouseup';
 
@@ -94,14 +109,14 @@ function TopcoatTouch($container, options) {
 
     options = options || {};
 
-    if (typeof $ == 'undefined') {
-        console.error('jQuery or Zepto must be included before instantiating TopcoatTouch');
+    if (typeof $ === 'undefined') {
+        console.error('jQuery must be included before instantiating TopcoatTouch');
     }
 
     if (options.buttons) {
         _cancelButton = options.buttons.cancelButton || _cancelButton;
-        _okButton = options.buttons.cancelButton || _okButton;
-    };
+        _okButton = options.buttons.okButton || _okButton;
+    }
 
     this.options = $.extend(defaults, options);
 
@@ -181,6 +196,7 @@ function TopcoatTouch($container, options) {
             var menuDiv = '<ul id="menuList">';
               for (var i = 0; i < menuItems.length; i++) {
                 if (menuItems[i].id) {
+                    //noinspection EqualityComparisonWithCoercionJS
                     if (!menuItems[i].page || menuItems[i].page != _currentPage) {
                         menuDiv += '<li class="menuItem" id="menuItem' + ucFirst(menuItems[i].id) + '" data-id="' + menuItems[i].id + '"' +
                             (menuItems[i].page ? ' data-page="' + menuItems[i].page + '"' : '') + '>' +
@@ -211,16 +227,6 @@ function TopcoatTouch($container, options) {
 
 
     /**
-     * Uppercases the first character of a string...
-     *
-     * @param str
-     * @returns {String}
-     */
-    function ucFirst(str) {
-        return str.substr(0, 1).toUpperCase() + str.substr(1);
-    }
-
-    /**
      * Counts number of items in an object.
      * @param obj
      * @returns {Number}
@@ -240,9 +246,9 @@ function TopcoatTouch($container, options) {
      * @returns {String}
      */
     function fixPage(page) {
-        if (typeof page == 'string' && page.substr(0, 1) == '#') {
+        if (typeof page === 'string' && page.substr(0, 1) === '#') {
             page = page.substr(1);
-        } else if (typeof page == 'object') {
+        } else if (typeof page === 'object') {
             page = $(page).attr('id');
         }
         return page;
@@ -257,7 +263,7 @@ function TopcoatTouch($container, options) {
     function checkForEvent(event) {
         var hasEvent = false;
         for (var eventName in self.EVENTS) {
-            if (self.EVENTS.hasOwnProperty(eventName) && self.EVENTS[eventName] == event) {
+            if (self.EVENTS.hasOwnProperty(eventName) && self.EVENTS[eventName] === event) {
                 hasEvent = true;
                 break;
             }
@@ -279,7 +285,11 @@ function TopcoatTouch($container, options) {
                 res = callback();
             }
             if (res !== false) {
+                _disableEvents = true;
             	self.hideDialog();
+                setTimeout(function () {
+                    _disableEvents = false;
+                }, 250);
         	}
     	};
     }
@@ -291,7 +301,7 @@ function TopcoatTouch($container, options) {
      * @param callback
      */
     function arrayEach(arr, callback) {
-        var cont = undefined;
+        var cont = true;
         for (var index = 0; cont !== false && index < arr.length; index++) {
             cont = callback(arr[index], index);
         }
@@ -319,7 +329,7 @@ function TopcoatTouch($container, options) {
         var scrollable = '#' + _currentPage + ' .scrollable';
         var $scrollable = $(scrollable);
 
-        if ($scrollable.length > 0 && typeof IScroll == 'function') {
+        if ($scrollable.length > 0 && typeof IScroll === 'function') {
             self.turnOnScrolling(scrollable, $scrollable);
         }
     }
@@ -342,6 +352,7 @@ function TopcoatTouch($container, options) {
      */
     function getMenuIndex(id) {
         for (var i = 0; i < self.options.menu.length; i++) {
+            //noinspection EqualityComparisonWithCoercionJS
             if (self.options.menu[i].id == id) {
                 return i;
             }
@@ -360,6 +371,7 @@ function TopcoatTouch($container, options) {
         if (_events[event]) {
             for (var i = 0; i < _events[event].length; i++) {
                 var pageEvent = _events[event][i];
+                //noinspection EqualityComparisonWithCoercionJS
                 if (!pageEvent.page || pageEvent.page == page) {
                     callbacks.push(pageEvent.callback);
                 }
@@ -374,11 +386,11 @@ function TopcoatTouch($container, options) {
      * @param [callback] {Function} - optional callback when render is complete...
      */
     function renderPage(page, callback) {
-        if (typeof page == 'function') {
+        if (typeof page === 'function') {
             callback = page;
             page = false;
         }
-        _controller.prerender();
+        _controller.prerender(_controller);
         if (_controller.template) {
             var $page;
             try {
@@ -386,6 +398,7 @@ function TopcoatTouch($container, options) {
             } catch (e) {
                 self._error('Error calling render on page : ' + page + '\nError: ' + e);
             }
+            //noinspection EqualityComparisonWithCoercionJS
             if (page && $page.attr('id') != page) {
                 self._error('page id for page "' + page + '" does not match, it is currently set to "' + $page.attr('id') + '"');
             }
@@ -457,10 +470,6 @@ function TopcoatTouch($container, options) {
 
         _startedAnimation = true;
 
-        if (_fastClick) {
-            _fastClick.trackingDisabled = true;
-        }
-
         if (!_$currentPage) {
             $page.attr('class', 'page page-center');
             _$currentPage = $page;
@@ -496,6 +505,7 @@ function TopcoatTouch($container, options) {
         $container.get(0).offsetWidth;
 
         // Position the page at the starting position of the animation        
+        //noinspection EqualityComparisonWithCoercionJS
         var pageTransition = (pageClass.next == 'page-flip' ? 'transition-slow' : 'transition');
 
         if (!back) {
@@ -514,9 +524,12 @@ function TopcoatTouch($container, options) {
         if (_isDialog) {
             if (!noOverlay) {
                 showOverlay(false);
+            } else {
+                hideOverlay();
             }
             $prevPage.attr('class', 'page page-remove');
         } else {
+            hideOverlay();  // If somehow we have an overlay stuck, lets hide it.
             $prevPage.attr('class', 'page page-remove ' + pageClass.prev + ' ' + pageTransition);
         }
 
@@ -526,7 +539,7 @@ function TopcoatTouch($container, options) {
     }
 
     function getPageName(page) {
-        if (typeof(page) == 'string') {
+        if (typeof(page) === 'string') {
             return fixPage(page);
         } else {
             return $(page).attr('id');
@@ -538,7 +551,7 @@ function TopcoatTouch($container, options) {
         $overlayContainer.append('<div id="topcoat-loading-overlay-div" class="topcoat-overlay-bg"></div>');
     }
 
-    function removeOverlay() {
+    function hideOverlay() {
         $('#topcoat-loading-overlay-div').remove();
     }
 
@@ -550,12 +563,31 @@ function TopcoatTouch($container, options) {
      * @returns {*}
      */
     function eventHandler(event) {
-        if (event.type == self.clickEvent && self.isScrolling && !self.options.iScrollPreventDefault) {
-            return;
+        // HACK: preventing native browser event from also firing a ghost click,
+        // that this handler cannot directly patch
+        // This is a monkeypatch b/c hammer js tap triggers a DOM ghost click
+        if (
+            event.type === 'tap' &&
+                event.gesture &&
+                event.target &&
+                event.target.id.match(/^topcoat-button-\d+$/)
+        ) {
+            event.gesture.srcEvent.preventDefault();
         }
+
+        // TODO: this needs documentation
+        //noinspection EqualityComparisonWithCoercionJS
+        if (_disableEvents || (event.type == self.clickEvent && self.isScrolling && !self.options.iScrollPreventDefault)) {
+            event.preventDefault();
+            return undefined;
+        }
+
+        // find all events that subscribe to this trigger
         var events = _events[event.type];
         if (events) {
+            var hasChecked = false;
             for (var i = 0; i < events.length; i++) {
+                //noinspection EqualityComparisonWithCoercionJS
                 if (!events[i].page || events[i].page == _currentPage) {
                     var target;
                     var $target = $(event.target);
@@ -568,8 +600,9 @@ function TopcoatTouch($container, options) {
                         target = target.length > 0 ? target[0] : false;
                     }
 
-                    if (target) {
-                        var ret = events[i].callback.apply(target, [event]);
+                    if (target && (hasChecked || !isDuplicateTapOrClick(event))) {
+                        hasChecked = true;
+                        var ret = events[i].callback.apply(target, [event, target]);
                         if (ret === false) {
                             return false;
                         }
@@ -581,6 +614,35 @@ function TopcoatTouch($container, options) {
         return undefined;
     }
 
+    /**
+    * Hammer sends multiple taps on click event, thus may trigger a callback more than once
+    * this function dumb-checks based on time-delta of events
+    * NOTE: it does not prevent native DOM events, use e.gesture.srcEvent.preventDefault() for that
+    * info: http://hammerjs.github.io/tips/
+    * discussion: https://github.com/hammerjs/hammer.js/issues/626
+    * @param event
+    * @returns {Boolean}
+    */
+    function isDuplicateTapOrClick(event) {
+        // early return for things we don't need
+        if (event.type !== 'tap' && event.type !== 'click' && event.type !== 'doubletap' && event.type !== 'doubleclick') {
+            return false;
+        }
+
+        var tappedTime = new Date().getTime();
+        var elapsed = tappedTime - _lastTapTime;
+        _lastTapTime = tappedTime;
+
+        // if two different targets or sufficient time passed (elapsed will be less than 0 if the last event was not the same type of event).
+        if (elapsed > GHOSTCLICK_THRESHOLD || elapsed < 0) {
+            console.log('Not duplicate event type: ' + event.type + ', elapsed: ' + elapsed);
+            return false;
+        } else {
+            console.log('Duplicate event type: ' + event.type + ', elapsed: ' + elapsed);
+        	return true;
+    	}
+    }
+
 
     /**
      * Turn on delegated events
@@ -588,15 +650,15 @@ function TopcoatTouch($container, options) {
      * @param event {String}
      * @param selector {String}
      * @param [page] {String}
-     * @param callback {Function}
-     * @param type {String}
+     * @param [callback] {Function}
+     * @param [type] {String}
      */
     function eventOn(event, selector, page, callback, type) {
-        if (typeof selector == 'function') {
+        if (typeof selector === 'function') {
             callback = selector;
             selector = '';
             page = '';
-        } else if (typeof page == 'function') {
+        } else if (typeof page === 'function') {
             callback = page;
             page = '';
         } else {
@@ -606,9 +668,9 @@ function TopcoatTouch($container, options) {
 
         if (!_events[event]) {
             _events[event] = [];
-            if (type == 'hammer') {
+            if (type === 'hammer') {
                 _hammer.on(event, eventHandler);
-            } else if (type == 'jquery') {
+            } else if (type === 'jquery') {
                 $container.on(event, eventHandler);
             }
         }
@@ -630,7 +692,12 @@ function TopcoatTouch($container, options) {
      * @param type {String}
      */
     function eventOff(event, selector, page, callback, type) {
-        if (typeof page == 'function') {
+        if(typeof selector === 'function') {
+            callback = selector;
+            selector = undefined;
+            page = undefined;
+        }
+        else if (typeof page === 'function') {
             callback = page;
             page = undefined;
         } else {
@@ -641,14 +708,18 @@ function TopcoatTouch($container, options) {
         var storedEvent = _events[event];
         if (storedEvent) {
             for (var j = storedEvent.length - 1; j >= 0; j--) {
+                //noinspection EqualityComparisonWithCoercionJS
                 if ((!selector || storedEvent[j].selector == selector) && (!page || storedEvent[j].page == page) &&
                     (!callback || storedEvent[j].callback == callback)) {
                     storedEvent.splice(j, 1);
                 }
                 if (storedEvent.length === 0) {
+                    //noinspection EqualityComparisonWithCoercionJS
                     if (type == 'hammer') {
                         _hammer.off(event, eventHandler);
-                    } else if (type == 'jquery') {
+                        
+                    } else //noinspection EqualityComparisonWithCoercionJS 
+                        if (type == 'jquery') {
                         $container.off(event, eventHandler);
                     }
                     delete _events[event];
@@ -677,9 +748,30 @@ function TopcoatTouch($container, options) {
     this._getEvent = function (event) {
         return _events[event];
     };
+	
+	this._getVersion = function() {
+		return VERSION;
+	};
 
     // Public functions
 
+    
+    // Public functions
+    this.setButtonTranslations = function (okButton, cancelButton) {
+        _okButton = okButton;
+        _cancelButton = cancelButton;
+    };
+
+    this.trigger = function(event, selector, args) {
+        var e = jQuery.Event(event, args);
+
+        var $select = $(selector);
+        if ($select.length > 0) {
+            e.target = $select[0];
+        }
+        e.selector = selector;
+        eventHandler(e)
+    };
 
     /**
      * Turns on event delegation for event with selector on page...
@@ -726,8 +818,8 @@ function TopcoatTouch($container, options) {
      *
      * @param event {String}
      * @param [selector] {String}
-     * @param page {String}
-     * @param callback {Function}
+     * @param [page] {String}
+     * @param [callback] {Function}
      * @returns {TopcoatTouch}
      */
     this.off = function (event, selector, page, callback) {
@@ -751,9 +843,10 @@ function TopcoatTouch($container, options) {
      * @returns {String}
      */
     this.currentPage = function () {
-        return _currentPage;
+        return _$currentPage ? _$currentPage.attr('id') : _currentPage;
     };
 
+    //noinspection JSUnusedGlobalSymbols
     this.currentPageLoaded = function () {
         return !!_$currentPage;
     };
@@ -768,13 +861,18 @@ function TopcoatTouch($container, options) {
         return _$currentPage.find(selector);
     };
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * Returns the previous page
      *
      * @returns {String}
      */
     this.previousPage = function () {
-        return _previousPage;
+        if (self.hasBack()) {
+            return _pages[_pages.length - 2];
+        } else {
+            return '';
+        }
     };
 
     /**
@@ -786,6 +884,7 @@ function TopcoatTouch($container, options) {
         return _pages.length > 1;
     };
 
+    //noinspection JSUnusedGlobalSymbols
     this.closeDialog = function () {
         this.goBack();
     };
@@ -797,13 +896,13 @@ function TopcoatTouch($container, options) {
      * @param [dontResetPage] (Boolean)
      */
     this.goBack = function (callback, numberOfPages, dontResetPage) {
-        if (typeof callback != 'function') {
+        if (typeof callback !== 'function') {
             numberOfPages = callback;
             _backCallback = undefined;
         } else {
             _backCallback = callback;
         }
-        if (typeof numberOfPages != 'number') {
+        if (typeof numberOfPages !== 'number') {
             dontResetPage = numberOfPages;
             numberOfPages = 1;
         }
@@ -841,11 +940,11 @@ function TopcoatTouch($container, options) {
      */
     this.goTo = function (page, transition, dialog, back, noOverlay, dontResetPage) {
 
-        if (page == _currentPage) {
+        if (page === _currentPage) {
             return self;
         }
 
-        if (_currentPage == getPageName(page)) {
+        if (_currentPage === getPageName(page)) {
             return self;
         }
 
@@ -869,10 +968,7 @@ function TopcoatTouch($container, options) {
                 if (_controllers[_currentPage] && _isDialog) {
                     _controller = _controllers[_currentPage];
                 }
-                if (page.substr(0, 1) != '#') {
-                    page = '#' + page;
-                }
-                $page = $(page);
+                $page = $((page.substr(0, 1) !== '#' ? '#' : '') + page);
                 goToPage(page, $page, back, transition, dialog, noOverlay, dontResetPage);
             }
         } else {
@@ -899,8 +995,10 @@ function TopcoatTouch($container, options) {
 
             setupIScroll();
 
-            _controller.pagestart.call(_controller);
-            _controller = null;
+            if (_controller && _controller.pagestart) {
+	            _controller.pagestart.call(_controller, _controller);
+            	_controller = null;
+            }
         });
 
     };
@@ -909,15 +1007,28 @@ function TopcoatTouch($container, options) {
     /**
      * Remove the previous page from the history (not the current page)...
      */
-    this.removePageFromHistory = function () {
+    this.removePreviousPageFromHistory = function () {
         _pages.splice(_pages.length - 2, 1);
     };
 
+    /**
+     * Remove the current page from the ..
+     */
+    this.removeCurrentPageFromHistory = function () {
+        _pages.pop();
+    };
+
+    /**
+     * Removes either all pages, or all pages and leaves the current page...
+     * @param removeAllPages
+     */
     this.clearHistory = function (removeAllPages) {
-        if (removeAllPages || _pages.length === 0) {
+        if (removeAllPages) {
             _pages = [];
         } else {
-            _pages = [_pages[_pages.length - 1]];
+            if (_pages.length > 1) {
+	            _pages = [_pages[_pages.length - 1]];
+	        }
         }
     };
 
@@ -945,7 +1056,7 @@ function TopcoatTouch($container, options) {
         var scrollHeight = $scrollable.data('scroll-height');
         if (!scrollHeight) {
             var bottomBarHeight = _$currentPage.find('.topcoat-bottom-bar').height() || 0;
-            scrollHeight = _$currentPage.height() - $scrollable.position().top - bottomBarHeight;
+            scrollHeight = _$currentPage.height() - $scrollable.offset().top - bottomBarHeight;
         }
 
         $scrollable.height(scrollHeight);
@@ -963,19 +1074,32 @@ function TopcoatTouch($container, options) {
         $(window).on('resize', scrollResize);
 
         _iScroll.on('scrollStart', function () {
+            if (_scrollingTimeout) {
+                clearTimeout(_scrollingTimeout);
+                _scrollingTimeout = 0;
+            }
             self.isScrolling = true;
             arrayEach(getActiveEvents(self.EVENTS.SCROLL_START, _currentPage), function (callback) {
                 callback(_currentPage);
             });
         });
 
+        _iScroll.on('scrollCancel', function () {
+            arrayEach(getActiveEvents(self.EVENTS.SCROLL_CANCEL, _currentPage), function (callback) {
+                callback(_currentPage);
+            });
+            _scrollingTimeout = setTimeout(function () {
+                self.isScrolling = false;
+            }, 350);
+        });
+
         _iScroll.on('scrollEnd', function () {
             arrayEach(getActiveEvents(self.EVENTS.SCROLL_END, _currentPage), function (callback) {
                 callback(_currentPage);
             });
-            setTimeout(function () {
+            _scrollingTimeout = setTimeout(function () {
                 self.isScrolling = false;
-            }, 150);
+            }, 350);
         });
     };
 
@@ -1075,7 +1199,7 @@ function TopcoatTouch($container, options) {
      *
      **/
     this.showLoading = function (msg, cancelFunction, cancelText) {
-        if (typeof cancelFunction == 'string') {
+        if (typeof cancelFunction === 'string') {
             cancelText = cancelFunction;
         }
         if (_loadingShowing) {
@@ -1086,16 +1210,22 @@ function TopcoatTouch($container, options) {
             '<h3 id="topcoat-loading-message" class="topcoat-overlay__title">' + msg + '</h3>' +
             '<span class="topcoat-spinner"></span></aside>');
         $container.append(_$loadingDiv);    // Have to add the loading div for getting the height and top of the spinner to size the div...
+
+        var startShowLoading = new Date().getTime();
+
         if (cancelFunction) {
             var $cancelButton = $('<button class="topcoat-button loading-cancel-button">' + (cancelText || _cancelButton) + '</button>');
             _cancelFunction = function () {
                self.hideLoading();
-               if (typeof cancelFunction == 'function') {
+                if (typeof cancelFunction === 'function') {
                    cancelFunction();
                }
             };
-            $cancelButton.click(function () {
-               _cancelFunction();
+            $cancelButton.on(this.clickEvent, function () {
+                // Wait at least 2 seconds before accepting a cancel click...
+                if (new Date().getTime() - startShowLoading > 2000) {
+               		_cancelFunction();
+                }
             });
             _$loadingDiv.append($cancelButton);
             _$loadingDiv.height($cancelButton.position().top + $cancelButton.height() + 75); // This is ugh and relies upon the margin-top set on the cancel button.
@@ -1110,7 +1240,7 @@ function TopcoatTouch($container, options) {
     };
 
     this.showProgress = function (msg, cancelFunction, cancelText) {
-        if (typeof cancelFunction == 'string') {
+        if (typeof cancelFunction === 'string') {
             cancelText = cancelFunction;
         }
         if (_loadingShowing) {
@@ -1125,13 +1255,14 @@ function TopcoatTouch($container, options) {
                     '</div>' +
                 '</div>' +
             '</aside>');
+         _$loadingDiv.find('.progress-bar').data('progress', 0);
         $container.append(_$loadingDiv); // Have to add the loading div for getting the height and top of the progress bar to size the div...
 
         if (cancelFunction) {
             var $cancelButton = $('<button class="topcoat-button progress-cancel-button">' + (cancelText || _cancelButton) + '</button>');
             _cancelFunction = function () {
                self.hideLoading();
-               if (typeof cancelFunction == 'function') {
+               if (typeof cancelFunction === 'function') {
                    cancelFunction();
                }
             };
@@ -1152,9 +1283,10 @@ function TopcoatTouch($container, options) {
         if (percent < 1) {
             percent *= 100;
         }
-        var oldProgress = parseInt(_$loadingDiv.find('.progress-bar').css('left'), 10);
+        var $progressBar = _$loadingDiv.find('.progress-bar');
+        var oldProgress = $progressBar.data('progress') || 0;
         if (percent > oldProgress) {
-            _$loadingDiv.find('.progress-bar').css('left', percent + '%');
+            _$loadingDiv.find('.progress-bar').css('width', 100 - percent + '%').data('progress', percent);
         }
     };
 
@@ -1174,13 +1306,14 @@ function TopcoatTouch($container, options) {
     this.hideLoading = function () {
         if (_loadingShowing) {
             _loadingShowing = false;
-            removeOverlay();
+            hideOverlay();
             _$loadingDiv.remove();
         }
         _cancelFunction = false;
         return self;
     };
 
+    //noinspection JSUnusedGlobalSymbols
     this.hideProgress = function () {
         self.hideLoading();
     };
@@ -1238,28 +1371,35 @@ function TopcoatTouch($container, options) {
      * @param title {String}
      * @param options {Object}
      * @param okButton {Object}
-     * @param [cancelButton} {Object}
+     * @param cancelButton {Object}
+     * @param [defaultValue] {String}
      */
-    this.showOptionsDialog = function(message, title, options, okButton, cancelButton) {
+    this.showOptionsDialog = function (message, title, options, okButton, cancelButton, defaultValue) {
         if (message.indexOf('<') < 0 || message.indexOf('>') < 0) {
             message = '<h3>' + message + '</h3>';
         }
         message += '<div class="topcoat-list__container"><ul class="topcoat-list">';
 
+
+        var okKey = Object.keys(okButton)[0];
+        var cancelKey = Object.keys(cancelButton)[0];
+        var buttons = {};
+        var selectedOption = false;
+
         for (var key in options) {
+            var selected = false;
             if (options.hasOwnProperty(key)) {
-                message += '<li class="topcoat-list__item" data-val="' + key + '">' +
+                if ((!selectedOption && !defaultValue) || (defaultValue == key)) {
+                    selectedOption = key;
+                    selected = true;
+                }
+                message += '<li class="topcoat-list__item' + (selected ? ' active' : '') + '" data-val="' + key + '">' +
                         '<span class="optionDialogItem">' +  options[key] + '</span>' +
                     '</li>';
             }
         }
 
         message += '</ul></div>';
-
-        var okKey = Object.keys(okButton)[0];
-        var cancelKey = Object.keys(cancelButton)[0];
-        var buttons = {};
-        var selectedOption = '';
 
         buttons[okKey] = function() {
             optionScroll.destroy();
@@ -1273,11 +1413,14 @@ function TopcoatTouch($container, options) {
 
         var $topCoatTouchOptionDialog = $('#topCoatTouchOptionDialog');
         var $container = $topCoatTouchOptionDialog.find('.topcoat-list__container');
+        var $list = $container.find('ul');
         var containerPosition = $container.position();
         var buttonBarPosition =  $topCoatTouchOptionDialog.find('.topcoat-dialog-button-bar').position();
         var containerHeight = buttonBarPosition.top - containerPosition.top - 10; 
+        if ($list.height() < containerHeight) {
+            containerHeight = $list.height();
+        }
         $container.height(containerHeight);
-        $topCoatTouchOptionDialog.find('#topcoat-button-1').attr('disabled',true);
 
         var optionScroll = new IScroll($container[0], {
             momentum: true,
@@ -1286,13 +1429,23 @@ function TopcoatTouch($container, options) {
             bounce: this.options.iScrollBounce
         });
 
-        $container.on('click', '.topcoat-list__item', function() {
+        this.on(this.clickEvent, '.topcoat-list__item', function () {
             $container.find('.topcoat-list__item.active').removeClass('active');
             var $this = $(this);
             $this.addClass('active');
             selectedOption = $this.data('val');
-            $topCoatTouchOptionDialog.find('#topcoat-button-1').removeAttr('disabled');
         });
+
+        this.on('dblclick doubletap', '.topcoat-list__item', function () {
+            selectedOption = $(this).data('val');
+            self.trigger('doubletap', '#topcoat-button-1');
+        });
+
+        this.on(this.EVENTS.HIDE_DIALOG, _currentPage, function() {
+            self.off(self.EVENTS.HIDE_DIALOG, _currentPage);
+            self.off('dblclick doubletap', '.topcoat-list__item');
+            self.off(self.clickEvent, '.topcoat-list__item');
+        })
 
 
     };
@@ -1335,12 +1488,14 @@ function TopcoatTouch($container, options) {
 
         var buttonClass = ['one', 'two', 'three', 'many'][Math.min(objectSize(buttons), 4) - 1] + '-button';
 
+        var triggerEvent = this.clickEvent + ' doubletap doubleclick';
+
         for (var buttonCaption in buttons) {
             if (buttons.hasOwnProperty(buttonCaption)) {
                 var buttonId = 'topcoat-button-' + buttonCount;
                 buttonText += '<button class="topcoat-button--cta button-small" id="' + buttonId + '">' + buttonCaption + '</button>';
-                $container.off(self.clickEvent, '#' + buttonId)
-                    .on(self.clickEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
+                self.off(triggerEvent, '#' + buttonId);
+                self.on(triggerEvent, '#' + buttonId, returnButtonFunction(buttons[buttonCaption]));
             	buttonCount++;
         	}
         }
@@ -1368,8 +1523,8 @@ function TopcoatTouch($container, options) {
                             dialogHeight += zeptoOuterHeightWithMargin($this);
                         }
                     });
-                    if (dialogHeight > (_deviceHeight * .8)) {
-                        dialogHeight = Math.round(_deviceHeight * .8);
+                    if (dialogHeight > (_deviceHeight * 0.8)) {
+                        dialogHeight = Math.round(_deviceHeight * 0.8);
                     }
                     $('.topcoat-overlay').height(dialogHeight).css('visibility', 'visible');
                     $dialog[1].style.top = '0px';
@@ -1384,7 +1539,7 @@ function TopcoatTouch($container, options) {
 
                 var images = $dialog.find('img');
                 var imagesLoaded = images.length;
-                images.load(function () {
+                images.on('load', function () {
                     imagesLoaded--;
                 });
                 for (var i = 0; i < images.length; i++) {
@@ -1401,7 +1556,7 @@ function TopcoatTouch($container, options) {
         })();
 
 
-        return self;
+        return $dialog;
     };
 
     /**
@@ -1435,7 +1590,9 @@ function TopcoatTouch($container, options) {
     this.hideDialog = function () {
         _dialogShowing = false;
         $('#topcoat-loading-overlay-div,.topcoat-overlay').remove();
-        return self;
+        arrayEach(getActiveEvents(self.EVENTS.HIDE_DIALOG, _currentPage), function (callback) {
+            callback();
+        });
     };
 
 
@@ -1462,22 +1619,17 @@ function TopcoatTouch($container, options) {
             self.on(_containerLoadEvents[i][0], _containerLoadEvents[i][1], _containerLoadEvents[i][2], _containerLoadEvents[i][3]);
         }
 
-        // Setup FastClick...
-        if (typeof FastClick == 'function' && FastClick.notNeeded(document.body) === false) {
-            _fastClick = new FastClick(document.body);
-            self.clickEvent = 'click';
-        }
-
         // Use Hammer for clickevent handling...
         if (typeof Hammer === 'function' && self.clickEvent === 'touchend') {
             self.clickEvent = 'tap';
         }
-        // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
-        if (typeof IScroll == 'function') {
-            document.addEventListener('touchmove', function (e) {
-                e.preventDefault();
-            }, false);
-        }
+
+        // // If IScroll is enabled, prevent default touchmove behavior to handle scrolling...
+        // if (typeof IScroll == 'function') {
+        //     document.addEventListener('touchmove', function (e) {
+        //         e.preventDefault();
+        //     }, { passive: false });
+        // }
 
 
         // Page Start event...  Handle when the page transition has ended...
@@ -1544,7 +1696,7 @@ function TopcoatTouch($container, options) {
                     }
 
                     if (_fromDialog) {
-                        removeOverlay();
+                        hideOverlay();
                         if (_backCallback) {
                             _backCallback();
                         }
@@ -1562,17 +1714,11 @@ function TopcoatTouch($container, options) {
                         $container.find('.page-remove').removeClass('page page-left page-right page-up page-down page-scale page-flip');
                     }
                     if (_fromDialog) {
-                        removeOverlay();
+                        hideOverlay();
                         if (_backCallback) {
                             _backCallback();
                         }
                     }
-                }
-               
-
-                if (_fastClick) {
-                    // We disable tracking of fastclicks during a page switch...
-                    _fastClick.trackingDisabled = false;
                 }
             } else if (_$currentPage.hasClass('remove-side-drawer')) {
                 _$currentPage.removeClass('remove-side-drawer');
@@ -1590,7 +1736,7 @@ function TopcoatTouch($container, options) {
             history.go(-1); // start in main state
             window.addEventListener('popstate', function (event) {
                 var state = event.state;
-                if (state == -1) {
+                if (state === -1) {
                         var goBack = true;
                         arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
                             if (callback(_currentPage) === false) {
@@ -1644,11 +1790,12 @@ function TopcoatTouch($container, options) {
 
             // setup menu handlers
             self.on(self.clickEvent, '#menuDiv .menuItem', function (e) {
+                _disableEvents = true;
                 $('#menuDiv').hide();
                 var $this = $(this);
                 var page = $this.data('page');
                 if (page) {
-                    tt.goTo(page);
+                    self.goTo(page);
                 } else {
                     var menuId = $(this).data('id');
                     arrayEach(getActiveEvents(self.EVENTS.MENU_ITEM_CLICKED, _currentPage), function (callback) {
@@ -1656,6 +1803,11 @@ function TopcoatTouch($container, options) {
                     });
                 }
                 e.preventDefault();
+
+                setTimeout(function () {
+                    _disableEvents = false;
+                }, 250);
+
                 return false;
             });
 
@@ -1715,7 +1867,16 @@ function TopcoatTouch($container, options) {
 
         // setup the all the back buttons
         self.on(self.clickEvent, '.back-button', function (e) {
-            self.goBack();
+            var goBack = true;
+            arrayEach(getActiveEvents(self.EVENTS.BACK, _currentPage), function (callback) {
+            if (callback(_currentPage) === false) {
+                    goBack = false;
+                    return false;
+                }
+            });
+            if (goBack) {
+            	self.goBack();
+            }
             e.preventDefault();
             return false;
         });
@@ -1817,10 +1978,10 @@ function PageController(pageName, fns, data, tt) {
      */
     this.addData = function (key, value) {
         if (typeof key === 'object') {
-            value = key;
-            for (key in value) {
-                if (value.hasOwnProperty(key)) {
-                    this.data[key] = value[key];
+            var values = key;
+            for (key in values) {
+                if (values.hasOwnProperty(key)) {
+                    this.data[key] = values[key];
                 }
             }
         } else {
@@ -1838,11 +1999,11 @@ function PageController(pageName, fns, data, tt) {
      * @returns PageController
      */
     this.addEvent = function (events, selector, callback) {
-        if (typeof selector == 'function') {
+        if (typeof selector === 'function') {
             callback = selector;
             selector = '';
         }
-        if (typeof events == 'string') {
+        if (typeof events === 'string') {
             events = events.split(/[, ]/);
         }
         for (var i = 0; i < events.length; i++) {
@@ -1857,6 +2018,11 @@ function PageController(pageName, fns, data, tt) {
      */
     this.goTo = function (transition) {
         self.tt.goTo(self.pageName, transition);
+    };
+
+    this.refresh = function() {
+        var html = self.render();
+
     };
 
     this.initialize();
