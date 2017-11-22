@@ -10,7 +10,6 @@ using a [collection of controllers and templates](/example/mvc/).  It uses a col
  for a mobile framework:
 
 * [jQuery](http://jquery.com) or [Zepto](http://zeptojs.com) to provide DOM manipulation.
-* [fastclick](https://github.com/ftlabs/fastclick) is an optional plugin to remove the 300ms click delay in [most](http://updates.html5rocks.com/2013/12/300ms-tap-delay-gone-away) mobile browsers
 * [iScroll](https://github.com/cubiq/iscroll) is an optional plugin that can be used to provide smooth scrolling automatically.
 * [hammer.js](http://eightmedia.github.io/hammer.js) is an optional plugin to allow TopcoatTouch to provide event brokering for mobile touch options (swipe, tap, hold, doubletap, drag, roate, pinch, etc).
 * [lodash](http://lodash.com/) is a plugin that is only required when using [templating strategy](/example/mvc/), of course you could also use [underscore](http://underscorejs.org/).
