@@ -1,7 +1,9 @@
 Topcoat Touch
 =============
 
-[![Build Status](https://travis-ci.org/kriserickson/topcoat-touch.png?branch=master)](https://travis-ci.org/kriserickson/topcoat-touch)
+# ⚠️ ARCHIVED / DEPRECATED
+
+**This project is no longer maintained.** It has been archived and is now in a read-only state.
 
 See [TopcoatTouch.com](http://kriserickson.github.io/topcoat-touch/) for more details.
 
